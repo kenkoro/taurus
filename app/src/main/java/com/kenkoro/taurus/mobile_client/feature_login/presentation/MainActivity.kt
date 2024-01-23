@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.mobile_client
+package com.kenkoro.taurus.mobile_client.feature_login.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

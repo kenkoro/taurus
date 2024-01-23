@@ -1,6 +1,5 @@
 package com.kenkoro.taurus.mobile_client.feature_login.presentation.login_screen.components
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -26,10 +25,10 @@ fun PasswordField(
 ) {
   TextField(
     value = password.value,
-    onValueChange = { enteredPassword ->
-      password.value = enteredPassword
+    onValueChange = { newPassword ->
+      password.value = newPassword
     },
-    label = {
+    placeholder = {
       Text(text = "Password")
     },
     leadingIcon = {
@@ -40,6 +39,6 @@ fun PasswordField(
       keyboardType = KeyboardType.Password,
       imeAction = ImeAction.Done
     ),
-    modifier = modifier.fillMaxWidth()
+    modifier = modifier
   )
 }

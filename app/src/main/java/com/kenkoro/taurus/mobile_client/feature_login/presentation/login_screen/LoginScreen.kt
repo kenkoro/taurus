@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -24,7 +25,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.mobile_client.feature_login.domain.model.AuthRequest
 import com.kenkoro.taurus.mobile_client.feature_login.domain.model.User
@@ -40,7 +40,7 @@ fun LoginScreen(
   repository: Repository,
   modifier: Modifier = Modifier
 ) {
-  val login = remember { mutableStateOf("") }
+  val userName = remember { mutableStateOf("") }
   val password = remember { mutableStateOf("") }
   val snackbarHostState = remember { SnackbarHostState() }
   val scope = rememberCoroutineScope()
@@ -65,25 +65,26 @@ fun LoginScreen(
           horizontalAlignment = Alignment.CenterHorizontally,
           verticalArrangement = Arrangement.Center
         ) {
-          LoginField(login = login)
+          LoginField(userName = userName, modifier = Modifier.fillMaxWidth())
           Spacer(modifier = Modifier.height(16.dp))
-          PasswordField(password = password)
+          PasswordField(password = password, modifier = Modifier.fillMaxWidth())
           Spacer(modifier = Modifier.height(16.dp))
           Button(
             onClick = {
               scope.launch {
                 localView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                val user = auth(repository, login.value, password.value)
+                /**
+                 * WARN: API isn't linked yet
+                 * val user = auth(repository, login.value, password.value)
+                 */
 
-                if (user.nickname.isNotBlank()) {
-                  snackbarHostState.showSnackbar(
-                    message = "${user.nickname} exists!",
-                    withDismissAction = true,
-                    duration = SnackbarDuration.Short
-                  )
-                }
+                snackbarHostState.showSnackbar(
+                  message = "Works!",
+                  withDismissAction = true,
+                  duration = SnackbarDuration.Short
+                )
               }
-            }
+            },
           ) {
             Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = null)
           }
@@ -95,12 +96,12 @@ fun LoginScreen(
 
 private suspend fun auth(
   repository: Repository,
-  login: String,
+  userName: String,
   password: String
 ): User {
   return repository.auth(
     AuthRequest(
-      login = login,
+      userName = userName,
       password = password
     )
   )

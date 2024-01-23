@@ -1,6 +1,5 @@
 package com.kenkoro.taurus.mobile_client.feature_login.presentation.login_screen.components
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
@@ -20,16 +19,16 @@ object LoginFieldLiterals {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginField(
-  login: MutableState<String>,
+  userName: MutableState<String>,
   modifier: Modifier = Modifier
 ) {
   TextField(
-    value = login.value,
-    onValueChange = { enteredLogin ->
-      login.value = enteredLogin
+    value = userName.value,
+    onValueChange = { newUserName ->
+      userName.value = newUserName
     },
-    label = {
-      Text(text = "Login")
+    placeholder = {
+      Text(text = "Your login")
     },
     leadingIcon = {
       Icon(imageVector = Icons.Default.AccountBox, contentDescription = null)
@@ -38,6 +37,6 @@ fun LoginField(
     keyboardOptions = KeyboardOptions(
       imeAction = ImeAction.Next
     ),
-    modifier = modifier.fillMaxWidth()
+    modifier = modifier
   )
 }
