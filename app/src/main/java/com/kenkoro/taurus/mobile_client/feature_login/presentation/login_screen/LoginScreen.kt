@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -19,29 +18,27 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
-import com.kenkoro.taurus.mobile_client.feature_login.domain.model.AuthRequest
-import com.kenkoro.taurus.mobile_client.feature_login.domain.model.User
-import com.kenkoro.taurus.mobile_client.feature_login.domain.repository.Repository
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.kenkoro.taurus.mobile_client.feature_login.presentation.login_screen.components.LoginField
 import com.kenkoro.taurus.mobile_client.feature_login.presentation.login_screen.components.PasswordField
 import com.kenkoro.taurus.mobile_client.ui.theme.TaurusTheme
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-  repository: Repository,
+  navController: NavController,
+  viewModel: LoginViewModel = hiltViewModel(),
   modifier: Modifier = Modifier
 ) {
-  val userName = remember { mutableStateOf("") }
-  val password = remember { mutableStateOf("") }
+  val username = viewModel.username
+  val password = viewModel.password
   val snackbarHostState = remember { SnackbarHostState() }
   val scope = rememberCoroutineScope()
   val localView = LocalView.current
@@ -65,7 +62,7 @@ fun LoginScreen(
           horizontalAlignment = Alignment.CenterHorizontally,
           verticalArrangement = Arrangement.Center
         ) {
-          LoginField(userName = userName, modifier = Modifier.fillMaxWidth())
+          LoginField(userName = username, modifier = Modifier.fillMaxWidth())
           Spacer(modifier = Modifier.height(16.dp))
           PasswordField(password = password, modifier = Modifier.fillMaxWidth())
           Spacer(modifier = Modifier.height(16.dp))
@@ -73,13 +70,17 @@ fun LoginScreen(
             onClick = {
               scope.launch {
                 localView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                /**
-                 * WARN: API isn't linked yet
-                 * val user = auth(repository, login.value, password.value)
-                 */
+                val response = viewModel.onEvent(UserEvent.AUTH)
+
+                var message = ""
+                message += if (response.isOk()) {
+                  "Works!"
+                } else {
+                  "Failed!"
+                }
 
                 snackbarHostState.showSnackbar(
-                  message = "Works!",
+                  message = message,
                   withDismissAction = true,
                   duration = SnackbarDuration.Short
                 )
@@ -92,17 +93,4 @@ fun LoginScreen(
       }
     }
   }
-}
-
-private suspend fun auth(
-  repository: Repository,
-  userName: String,
-  password: String
-): User {
-  return repository.auth(
-    AuthRequest(
-      userName = userName,
-      password = password
-    )
-  )
 }

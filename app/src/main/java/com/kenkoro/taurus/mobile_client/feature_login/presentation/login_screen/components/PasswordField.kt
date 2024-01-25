@@ -12,6 +12,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 object PasswordFieldLiterals {
   const val MAX_LINES = 1
@@ -39,6 +40,7 @@ fun PasswordField(
       keyboardType = KeyboardType.Password,
       imeAction = ImeAction.Done
     ),
+    visualTransformation = PasswordVisualTransformation(),
     modifier = modifier
   )
 }

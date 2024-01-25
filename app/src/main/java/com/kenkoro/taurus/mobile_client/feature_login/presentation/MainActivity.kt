@@ -3,46 +3,37 @@ package com.kenkoro.taurus.mobile_client.feature_login.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.kenkoro.taurus.mobile_client.feature_login.data.repository.TaurusRepository
-import com.kenkoro.taurus.mobile_client.feature_login.data.source.TaurusApi
-import com.kenkoro.taurus.mobile_client.feature_login.domain.repository.Repository
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.kenkoro.taurus.mobile_client.feature_login.presentation.login_screen.LoginScreen
-import com.kenkoro.taurus.mobile_client.feature_login.presentation.util.ApiLiterals
+import com.kenkoro.taurus.mobile_client.feature_login.presentation.util.Screen
 import com.kenkoro.taurus.mobile_client.ui.theme.TaurusTheme
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.create
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    val repository = configureApiAndGetRepository()
     setContent {
       TaurusTheme {
-        LoginScreen(repository = repository)
+        Surface(
+          modifier = Modifier.fillMaxSize(),
+          color = MaterialTheme.colorScheme.background
+        ) {
+          val navController = rememberNavController()
+          NavHost(navController = navController, startDestination = Screen.LoginScreen.route) {
+            composable(route = Screen.LoginScreen.route) {
+              LoginScreen(navController = navController)
+            }
+          }
+        }
       }
     }
-  }
-
-  private fun configureApiAndGetRepository(): Repository {
-    val interceptor = HttpLoggingInterceptor()
-    interceptor.level = HttpLoggingInterceptor.Level.BODY
-
-    val okHttpClient = OkHttpClient.Builder()
-      .addInterceptor(interceptor)
-      .build()
-
-    val retrofit = Retrofit.Builder()
-      .baseUrl(ApiLiterals.BASE_URL)
-      .client(okHttpClient)
-      .addConverterFactory(MoshiConverterFactory.create())
-      .build()
-
-    val api = retrofit.create<TaurusApi>()
-
-    return TaurusRepository(api)
   }
 }
