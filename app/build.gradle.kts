@@ -1,3 +1,5 @@
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 val retrofitVersion: String by project
 val okhttpVersion: String by project
 val daggerHiltVersion: String by project
@@ -12,22 +14,45 @@ plugins {
   id("org.jetbrains.kotlin.android")
   id("com.google.devtools.ksp")
   id("com.google.dagger.hilt.android")
+  id("org.jlleitschuh.gradle.ktlint")
 }
 
+subprojects {
+  apply(plugin = "org.jlleitschuh.gradle.ktlint")
+
+  configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    android.set(true)
+    verbose.set(true)
+    reporters {
+      reporter(ReporterType.PLAIN)
+      reporter(ReporterType.CHECKSTYLE)
+      reporter(ReporterType.JSON)
+    }
+  }
+}
+
+tasks["assemble"].finalizedBy(tasks["ktlintCheck"])
+
 android {
-  namespace = "com.kenkoro.taurus.mobile_client"
+  namespace = "com.kenkoro.taurus.client"
   compileSdk = 34
 
   defaultConfig {
-    applicationId = "com.kenkoro.taurus.mobile_client"
+    applicationId = "com.kenkoro.taurus.client"
     minSdk = 24
     targetSdk = 34
     versionCode = 1
-    versionName = "1.0"
+    versionName = "0.0.1"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables {
       useSupportLibrary = true
+    }
+
+    javaCompileOptions {
+      annotationProcessorOptions {
+        arguments["room.schemaLocation"] = "$projectDir/schemas"
+      }
     }
   }
 
