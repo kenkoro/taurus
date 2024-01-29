@@ -1,0 +1,6 @@
+[*.{kt,kts}]
+ktlint_code_style = android_studio
+insert_final_newline = false
+max_line_length = 100
+indent_size = 2
+ktlint_function_naming_ignore_when_annotated_with = Composable
