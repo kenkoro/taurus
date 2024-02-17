@@ -26,7 +26,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.kenkoro.taurus.client.feature.login.presentation.login.screen.LoginViewModel
 import com.kenkoro.taurus.client.feature.login.presentation.login.screen.UserEvent
-import com.kenkoro.taurus.client.feature.login.presentation.util.Screen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -66,11 +65,10 @@ fun LoginBlock(
             val response = viewModel.onApiEvent(UserEvent.AUTH)
 
             var message = ""
-            if (response.isOk()) {
-              message += "Works!"
-              navController.navigate(Screen.CustomerScreen.route)
+            message += if (response.isOk()) {
+              "Works!"
             } else {
-              message += "Failed!"
+              "Failed!"
             }
 
             snackbarHostState.showSnackbar(

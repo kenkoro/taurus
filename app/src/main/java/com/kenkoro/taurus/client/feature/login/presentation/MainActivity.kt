@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.kenkoro.taurus.client.feature.login.presentation.customer.screen.CustomerScreen
 import com.kenkoro.taurus.client.feature.login.presentation.login.screen.LoginScreen
 import com.kenkoro.taurus.client.feature.login.presentation.util.Screen
 import com.kenkoro.taurus.client.ui.theme.TaurusTheme
@@ -31,10 +30,6 @@ class MainActivity : ComponentActivity() {
           NavHost(navController = navController, startDestination = Screen.LoginScreen.route) {
             composable(route = Screen.LoginScreen.route) {
               LoginScreen(navController = navController)
-            }
-
-            composable(route = Screen.CustomerScreen.route) {
-              CustomerScreen()
             }
           }
         }

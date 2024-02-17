@@ -2,6 +2,9 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="LoginBlockPreview">
+        <State />
+      </entry>
       <entry key="MainPreview">
         <State />
       </entry>
