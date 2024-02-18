@@ -2,64 +2,23 @@ package com.kenkoro.taurus.client.di
 
 import android.app.Application
 import androidx.room.Room
-import com.kenkoro.taurus.client.feature.login.data.repository.DummyApiRepository
-import com.kenkoro.taurus.client.feature.login.data.repository.UserRepositoryImpl
-import com.kenkoro.taurus.client.feature.login.data.source.local.TaurusDatabase
-import com.kenkoro.taurus.client.feature.login.data.source.remote.DummyApi
-import com.kenkoro.taurus.client.feature.login.domain.repository.ApiRepository
-import com.kenkoro.taurus.client.feature.login.domain.repository.UserRepository
+import com.kenkoro.taurus.client.feature.login.data.source.local.LocalDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.create
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
   @Provides
   @Singleton
-  fun provideTaurusDatabase(app: Application): TaurusDatabase {
+  fun provideLocalDatabase(app: Application): LocalDatabase {
     return Room.databaseBuilder(
       app,
-      TaurusDatabase::class.java,
-      TaurusDatabase.DB_NAME
+      LocalDatabase::class.java,
+      LocalDatabase.DB_NAME
     ).build()
-  }
-
-  @Provides
-  @Singleton
-  fun provideUserRepository(db: TaurusDatabase): UserRepository {
-    return UserRepositoryImpl(db.userDao)
-  }
-
-  @Provides
-  @Singleton
-  fun provideDummyApiRepository(): ApiRepository {
-    return DummyApiRepository(
-      configRetrofitClientAndGetApi()
-    )
-  }
-
-  private fun configRetrofitClientAndGetApi(): DummyApi {
-    val interceptor = HttpLoggingInterceptor()
-    interceptor.level = HttpLoggingInterceptor.Level.BODY
-
-    val okHttpClient = OkHttpClient.Builder()
-      .addInterceptor(interceptor)
-      .build()
-
-    val retrofit = Retrofit.Builder()
-      .baseUrl(DummyApi.BASE_URL)
-      .client(okHttpClient)
-      .addConverterFactory(MoshiConverterFactory.create())
-      .build()
-
-    return retrofit.create<DummyApi>()
   }
 }

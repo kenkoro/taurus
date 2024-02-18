@@ -6,12 +6,12 @@ import com.kenkoro.taurus.client.feature.login.data.source.local.dao.UserDao
 
 @Database(
   entities = [UserEntity::class],
-  version = 1
+  version = 2
 )
-abstract class TaurusDatabase : RoomDatabase() {
+abstract class LocalDatabase : RoomDatabase() {
   abstract val userDao: UserDao
 
   companion object {
-    const val DB_NAME = "taurus.db"
+    const val DB_NAME = "local.db"
   }
 }
