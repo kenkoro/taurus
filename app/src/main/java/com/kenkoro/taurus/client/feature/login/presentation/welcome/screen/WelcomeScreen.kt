@@ -57,9 +57,9 @@ fun WelcomeScreen(
           painter = painterResource(id = R.drawable.welcome),
           contentDescription = "Welcome picture",
           modifier =
-            Modifier
-              .fillMaxSize(0.7F)
-              .weight(1F),
+          Modifier
+            .fillMaxSize(0.7F)
+            .weight(1F),
         )
         Column(
           modifier = Modifier.weight(1F),
@@ -75,8 +75,8 @@ fun WelcomeScreen(
               fontFamily = font,
               fontSize = 24.sp,
               modifier =
-                Modifier
-                  .wrapContentHeight(),
+              Modifier
+                .wrapContentHeight(),
             )
             Spacer(modifier = Modifier.height(15.dp))
             Text(
@@ -86,8 +86,8 @@ fun WelcomeScreen(
               fontSize = 48.sp,
               color = MaterialTheme.colorScheme.primary,
               modifier =
-                Modifier
-                  .wrapContentSize(),
+              Modifier
+                .wrapContentSize(),
             )
           }
           Column(
@@ -101,19 +101,19 @@ fun WelcomeScreen(
               fontSize = 16.sp,
               textAlign = TextAlign.Center,
               modifier =
-                Modifier
-                  .wrapContentHeight()
-                  .width(320.dp),
+              Modifier
+                .wrapContentHeight()
+                .width(320.dp),
             )
             Spacer(modifier = Modifier.height(15.dp))
             Button(
               modifier =
-                Modifier
-                  .width(320.dp)
-                  .padding(bottom = 15.dp),
+              Modifier
+                .width(320.dp)
+                .padding(bottom = 15.dp),
               onClick = {
                 if (!view.isInEditMode) {
-                  viewModel.performConfirmHapticFeedback(view)
+                  viewModel.performKeyboardPressHapticFeedback(view)
                 }
 
                 onContinue()
@@ -126,7 +126,7 @@ fun WelcomeScreen(
               Spacer(modifier = Modifier.width(10.dp))
               Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "Continue button")
             }
-            Spacer(Modifier.height(15.dp))
+            Spacer(Modifier.height(30.dp))
           }
         }
       }

@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client.feature.login.presentation
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -18,15 +19,21 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    enableEdgeToEdge(
-      statusBarStyle =
-        SystemBarStyle.light(
-          scrim = Color.Transparent.toArgb(),
-          darkScrim = Color.Transparent.toArgb(),
-        ),
-    )
 
     setContent {
+      enableEdgeToEdge(
+        statusBarStyle = SystemBarStyle.auto(
+          lightScrim = Color.Transparent.toArgb(),
+          darkScrim = Color.Transparent.toArgb(),
+          detectDarkMode = { resources ->
+            return@auto if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+              resources.configuration.isNightModeActive
+            } else {
+              TODO("VERSION.SDK_INT < R")
+            }
+          }
+        )
+      )
       AppTheme {
         Surface(
           modifier = Modifier.fillMaxSize(),

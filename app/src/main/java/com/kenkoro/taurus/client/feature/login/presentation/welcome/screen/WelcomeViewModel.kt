@@ -11,9 +11,9 @@ import javax.inject.Inject
 class WelcomeViewModel
   @Inject
   constructor() : ViewModel() {
-    fun performConfirmHapticFeedback(view: View) {
+    fun performKeyboardPressHapticFeedback(view: View) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_PRESS)
       }
     }
   }
