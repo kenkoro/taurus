@@ -5,5 +5,5 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class UserEntity(
-  @PrimaryKey val id: Int
+  @PrimaryKey val id: Int,
 )

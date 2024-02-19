@@ -6,7 +6,7 @@ import com.kenkoro.taurus.client.feature.login.data.source.local.dao.UserDao
 
 @Database(
   entities = [UserEntity::class],
-  version = 2
+  version = 2,
 )
 abstract class LocalDatabase : RoomDatabase() {
   abstract val userDao: UserDao

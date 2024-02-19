@@ -7,5 +7,5 @@ enum class UserRole {
   CUTTER,
   INSPECTOR,
   TAILOR,
-  OTHERS
+  OTHERS,
 }

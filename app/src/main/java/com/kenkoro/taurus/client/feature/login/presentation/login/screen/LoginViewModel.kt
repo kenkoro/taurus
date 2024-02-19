@@ -7,10 +7,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor() : ViewModel() {
-  private val _subject = mutableStateOf("")
-  val subject: MutableState<String> = _subject
+class LoginViewModel
+  @Inject
+  constructor() : ViewModel() {
+    private val _subject = mutableStateOf("")
+    val subject: MutableState<String> = _subject
 
-  private val _password = mutableStateOf("")
-  val password: MutableState<String> = _password
-}
+    private val _password = mutableStateOf("")
+    val password: MutableState<String> = _password
+  }

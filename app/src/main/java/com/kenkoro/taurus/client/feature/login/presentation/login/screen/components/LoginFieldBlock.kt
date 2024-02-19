@@ -27,13 +27,13 @@ import com.kenkoro.taurus.client.feature.login.presentation.login.screen.LoginVi
 fun LoginFieldBlock(
   onAuth: () -> Unit,
   viewModel: LoginViewModel = hiltViewModel(),
-  @SuppressLint("ModifierParameter") modifier: Modifier = Modifier
+  @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
 ) {
   val subject = viewModel.subject
   val password = viewModel.password
 
   Column(
-    horizontalAlignment = Alignment.End
+    horizontalAlignment = Alignment.End,
   ) {
     OutlinedTextField(
       value = subject.value,
@@ -42,7 +42,7 @@ fun LoginFieldBlock(
       placeholder = {
         Text(text = stringResource(id = R.string.login_subject))
       },
-      modifier = Modifier.fillMaxWidth()
+      modifier = Modifier.fillMaxWidth(),
     )
     Spacer(modifier = Modifier.height(15.dp))
     OutlinedTextField(
@@ -53,13 +53,14 @@ fun LoginFieldBlock(
         Text(text = stringResource(id = R.string.login_password))
       },
       visualTransformation = PasswordVisualTransformation(),
-      modifier = Modifier.fillMaxWidth()
+      modifier = Modifier.fillMaxWidth(),
     )
     Spacer(modifier = Modifier.height(15.dp))
     Button(
-      modifier = Modifier
-        .size(width = 80.dp, height = 50.dp),
-      onClick = { onAuth() }
+      modifier =
+        Modifier
+          .size(width = 80.dp, height = 50.dp),
+      onClick = { onAuth() },
     ) {
       Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = "Login button")
     }

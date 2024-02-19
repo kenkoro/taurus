@@ -26,17 +26,18 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge(
-      statusBarStyle = SystemBarStyle.light(
-        scrim = Color.Transparent.toArgb(),
-        darkScrim = Color.Transparent.toArgb()
-      )
+      statusBarStyle =
+        SystemBarStyle.light(
+          scrim = Color.Transparent.toArgb(),
+          darkScrim = Color.Transparent.toArgb(),
+        ),
     )
 
     setContent {
       AppTheme {
         Surface(
           modifier = Modifier.fillMaxSize(),
-          color = MaterialTheme.colorScheme.background
+          color = MaterialTheme.colorScheme.background,
         ) {
           val navController = rememberNavController()
           NavHost(navController = navController, startDestination = Screen.WelcomeScreen.route) {

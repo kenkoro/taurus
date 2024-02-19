@@ -18,7 +18,7 @@ object AppModule {
     return Room.databaseBuilder(
       app,
       LocalDatabase::class.java,
-      LocalDatabase.DB_NAME
+      LocalDatabase.DB_NAME,
     ).build()
   }
 }

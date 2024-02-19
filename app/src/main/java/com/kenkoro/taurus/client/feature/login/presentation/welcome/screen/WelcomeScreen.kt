@@ -43,29 +43,30 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 @Composable
 fun WelcomeScreen(
   navController: NavController,
-  viewModel: WelcomeViewModel = hiltViewModel()
+  viewModel: WelcomeViewModel = hiltViewModel(),
 ) {
   val view = LocalView.current
   val font = FontFamily(Font(R.font.just_me_again_down_here))
 
   AppTheme {
     Surface(
-      modifier = Modifier.fillMaxSize()
+      modifier = Modifier.fillMaxSize(),
     ) {
       Column(
         modifier = Modifier.fillMaxHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
       ) {
         Image(
           painter = painterResource(id = R.drawable.welcome),
           contentDescription = "Welcome picture",
-          modifier = Modifier
-            .fillMaxSize(0.7F)
-            .weight(1F)
+          modifier =
+            Modifier
+              .fillMaxSize(0.7F)
+              .weight(1F),
         )
         Column(
           modifier = Modifier.weight(1F),
-          horizontalAlignment = Alignment.CenterHorizontally
+          horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           Column(
             modifier = Modifier.weight(2F),
@@ -76,8 +77,9 @@ fun WelcomeScreen(
               style = MaterialTheme.typography.bodyMedium,
               fontFamily = font,
               fontSize = 24.sp,
-              modifier = Modifier
-                .wrapContentHeight()
+              modifier =
+                Modifier
+                  .wrapContentHeight(),
             )
             Spacer(modifier = Modifier.height(15.dp))
             Text(
@@ -86,13 +88,14 @@ fun WelcomeScreen(
               fontFamily = font,
               fontSize = 48.sp,
               color = MaterialTheme.colorScheme.primary,
-              modifier = Modifier
-                .wrapContentSize()
+              modifier =
+                Modifier
+                  .wrapContentSize(),
             )
           }
           Column(
             modifier = Modifier.weight(3F),
-            verticalArrangement = Arrangement.Bottom
+            verticalArrangement = Arrangement.Bottom,
           ) {
             Text(
               text = stringResource(id = R.string.welcome_warning),
@@ -100,26 +103,28 @@ fun WelcomeScreen(
               fontFamily = font,
               fontSize = 16.sp,
               textAlign = TextAlign.Center,
-              modifier = Modifier
-                .wrapContentHeight()
-                .width(320.dp)
+              modifier =
+                Modifier
+                  .wrapContentHeight()
+                  .width(320.dp),
             )
             Spacer(modifier = Modifier.height(15.dp))
             Button(
-              modifier = Modifier
-                .width(320.dp)
-                .padding(bottom = 15.dp),
+              modifier =
+                Modifier
+                  .width(320.dp)
+                  .padding(bottom = 15.dp),
               onClick = {
                 if (!view.isInEditMode) {
                   viewModel.performConfirmHapticFeedback(view)
                 }
 
                 navController.navigate(Screen.LoginScreen.route)
-              }
+              },
             ) {
               Text(
                 text = stringResource(id = R.string.continue_button),
-                style = MaterialTheme.typography.labelMedium
+                style = MaterialTheme.typography.labelMedium,
               )
               Spacer(modifier = Modifier.width(10.dp))
               Icon(imageVector = Icons.Default.ArrowForward, contentDescription = "Continue button")

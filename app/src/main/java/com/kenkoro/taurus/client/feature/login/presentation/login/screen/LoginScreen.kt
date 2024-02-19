@@ -29,38 +29,40 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 @Composable
 fun LoginScreen(
   navController: NavController,
-  viewModel: LoginViewModel = hiltViewModel()
+  viewModel: LoginViewModel = hiltViewModel(),
 ) {
   AppTheme {
     Surface(
-      modifier = Modifier.fillMaxSize()
+      modifier = Modifier.fillMaxSize(),
     ) {
       Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
       ) {
         LoginBlock(
           onAuth = {},
-          modifier = Modifier
-            .width(320.dp)
-            .weight(9F)
+          modifier =
+            Modifier
+              .width(320.dp)
+              .weight(9F),
         )
         Column(
-          modifier = Modifier
-            .fillMaxWidth()
-            .weight(1F)
-            .clickable {},
+          modifier =
+            Modifier
+              .fillMaxWidth()
+              .weight(1F)
+              .clickable {},
           horizontalAlignment = Alignment.CenterHorizontally,
-          verticalArrangement = Arrangement.Bottom
+          verticalArrangement = Arrangement.Bottom,
         ) {
           Text(
             text = stringResource(id = R.string.login_forgot_password_top),
             style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.wrapContentSize()
+            modifier = Modifier.wrapContentSize(),
           )
           Text(
             text = stringResource(id = R.string.login_forgot_password_bottom),
             style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.wrapContentSize()
+            modifier = Modifier.wrapContentSize(),
           )
           Spacer(modifier = Modifier.height(30.dp))
         }
