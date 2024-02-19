@@ -1,5 +1,5 @@
 [*.{kt,kts}]
-ktlint_code_style = android_studio
+ktlint_code_style = ktlint_official
 insert_final_newline = false
 max_line_length = 100
 indent_size = 2
