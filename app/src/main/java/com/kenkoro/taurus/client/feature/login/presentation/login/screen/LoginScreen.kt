@@ -20,15 +20,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.login.presentation.login.screen.components.LoginBlock
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun LoginScreen(
-  navController: NavController,
+  onLogin: () -> Unit,
   viewModel: LoginViewModel = hiltViewModel(),
 ) {
   AppTheme {
@@ -39,7 +37,7 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
       ) {
         LoginBlock(
-          onAuth = {},
+          onLogin = onLogin,
           modifier =
             Modifier
               .width(320.dp)
@@ -74,10 +72,9 @@ fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-  val navController = rememberNavController()
   AppTheme {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      LoginScreen(navController = navController)
+      LoginScreen(onLogin = {})
     }
   }
 }

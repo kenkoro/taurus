@@ -25,7 +25,7 @@ import com.kenkoro.taurus.client.feature.login.presentation.login.screen.LoginVi
 
 @Composable
 fun LoginFieldBlock(
-  onAuth: () -> Unit,
+  onLogin: () -> Unit,
   viewModel: LoginViewModel = hiltViewModel(),
   @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
 ) {
@@ -60,7 +60,7 @@ fun LoginFieldBlock(
       modifier =
         Modifier
           .size(width = 80.dp, height = 50.dp),
-      onClick = { onAuth() },
+      onClick = { onLogin() },
     ) {
       Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = "Login button")
     }

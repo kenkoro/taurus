@@ -33,16 +33,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.feature.login.presentation.util.Screen
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun WelcomeScreen(
-  navController: NavController,
+  onContinue: () -> Unit,
   viewModel: WelcomeViewModel = hiltViewModel(),
 ) {
   val view = LocalView.current
@@ -119,7 +116,7 @@ fun WelcomeScreen(
                   viewModel.performConfirmHapticFeedback(view)
                 }
 
-                navController.navigate(Screen.LoginScreen.route)
+                onContinue()
               },
             ) {
               Text(
@@ -140,10 +137,9 @@ fun WelcomeScreen(
 @Preview(showBackground = true)
 @Composable
 fun WelcomeScreenPreview() {
-  val navController = rememberNavController()
   AppTheme {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      WelcomeScreen(navController = navController)
+      WelcomeScreen(onContinue = {})
     }
   }
 }

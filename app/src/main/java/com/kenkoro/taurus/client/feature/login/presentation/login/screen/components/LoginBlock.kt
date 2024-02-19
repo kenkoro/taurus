@@ -17,7 +17,7 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun LoginBlock(
-  onAuth: () -> Unit,
+  onLogin: () -> Unit,
   @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
 ) {
   Column(
@@ -29,7 +29,7 @@ fun LoginBlock(
       style = MaterialTheme.typography.headlineLarge,
     )
     Spacer(modifier = Modifier.height(30.dp))
-    LoginFieldBlock(onAuth = onAuth)
+    LoginFieldBlock(onLogin = onLogin)
   }
 }
 
@@ -37,6 +37,6 @@ fun LoginBlock(
 @Composable
 fun LoginBlockPreview() {
   AppTheme {
-    LoginBlock(onAuth = { /*TODO*/ })
+    LoginBlock(onLogin = {})
   }
 }
