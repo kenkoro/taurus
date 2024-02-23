@@ -39,16 +39,16 @@ fun LoginScreen(
         LoginBlock(
           onLogin = onLogin,
           modifier =
-          Modifier
-            .width(320.dp)
-            .weight(9F),
+            Modifier
+              .width(320.dp)
+              .weight(9F),
         )
         Column(
           modifier =
-          Modifier
-            .wrapContentHeight()
-            .weight(1F)
-            .clickable {},
+            Modifier
+              .wrapContentHeight()
+              .weight(1F)
+              .clickable {},
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           Spacer(modifier = Modifier.height(5.dp))
