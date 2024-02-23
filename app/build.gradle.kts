@@ -31,7 +31,7 @@ subprojects {
   }
 }
 
-tasks["assemble"].finalizedBy(tasks["ktlintCheck"])
+tasks["check"].finalizedBy(tasks["ktlintCheck"])
 
 android {
   namespace = "com.kenkoro.taurus.client"
