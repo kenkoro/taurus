@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.login.presentation.welcome.screen
+package com.kenkoro.taurus.client.feature.sewing.presentation.welcome.screen
 
 import android.os.Build
 import android.view.HapticFeedbackConstants

@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.login.presentation.login.screen.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement

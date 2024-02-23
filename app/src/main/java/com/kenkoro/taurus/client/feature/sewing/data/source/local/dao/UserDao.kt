@@ -1,10 +1,10 @@
-package com.kenkoro.taurus.client.feature.login.data.source.local.dao
+package com.kenkoro.taurus.client.feature.sewing.data.source.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
-import com.kenkoro.taurus.client.feature.login.data.source.local.UserEntity
+import com.kenkoro.taurus.client.feature.sewing.data.source.local.UserEntity
 
 @Dao
 interface UserDao {

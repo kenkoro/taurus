@@ -2,7 +2,7 @@ package com.kenkoro.taurus.client.di
 
 import android.app.Application
 import androidx.room.Room
-import com.kenkoro.taurus.client.feature.login.data.source.local.LocalDatabase
+import com.kenkoro.taurus.client.feature.sewing.data.source.local.LocalDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

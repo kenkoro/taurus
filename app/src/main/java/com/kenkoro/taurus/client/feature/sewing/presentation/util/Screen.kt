@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.login.presentation.util
+package com.kenkoro.taurus.client.feature.sewing.presentation.util
 
 sealed class Screen(val route: String) {
   data object WelcomeScreen : Screen("welcome_screen")

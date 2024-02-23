@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.login.presentation.login.screen
+package com.kenkoro.taurus.client.feature.sewing.presentation.login.screen
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf

@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.login.data.source.local
+package com.kenkoro.taurus.client.feature.sewing.data.source.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

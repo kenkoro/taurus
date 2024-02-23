@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.login.presentation.login.screen.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
@@ -20,12 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.feature.login.presentation.login.screen.LoginViewModel
+import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
@@ -47,10 +48,14 @@ fun LoginFieldBlock(
       placeholder = {
         Text(text = stringResource(id = R.string.login_subject))
       },
-      keyboardOptions = KeyboardOptions.Default.copy(
-        imeAction = ImeAction.Next
-      ),
-      modifier = Modifier.fillMaxWidth(),
+      keyboardOptions =
+        KeyboardOptions.Default.copy(
+          imeAction = ImeAction.Next,
+          keyboardType = KeyboardType.Text,
+        ),
+      modifier =
+        Modifier
+          .fillMaxWidth(),
     )
     Spacer(modifier = Modifier.height(15.dp))
     OutlinedTextField(
@@ -61,19 +66,24 @@ fun LoginFieldBlock(
         Text(text = stringResource(id = R.string.login_password))
       },
       visualTransformation = PasswordVisualTransformation(),
-      keyboardOptions = KeyboardOptions.Default.copy(
-        imeAction = ImeAction.Done
-      ),
-      keyboardActions = KeyboardActions(
-        onDone = { onLogin() }
-      ),
-      modifier = Modifier.fillMaxWidth(),
+      keyboardOptions =
+        KeyboardOptions.Default.copy(
+          imeAction = ImeAction.Done,
+          keyboardType = KeyboardType.Password,
+        ),
+      keyboardActions =
+        KeyboardActions(
+          onDone = { onLogin() },
+        ),
+      modifier =
+        Modifier
+          .fillMaxWidth(),
     )
     Spacer(modifier = Modifier.height(15.dp))
     Button(
       modifier =
-      Modifier
-        .size(width = 80.dp, height = 50.dp),
+        Modifier
+          .size(width = 80.dp, height = 50.dp),
       onClick = { onLogin() },
     ) {
       Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = "Login button")
