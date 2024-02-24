@@ -20,7 +20,11 @@ fun AppNavHost(navController: NavHostController = rememberNavController()) {
     }
 
     composable(route = Screen.LoginScreen.route) {
-      LoginScreen(onLogin = { navController.navigate(Screen.DashboardScreen.route) })
+      LoginScreen(onLogin = {
+        /**
+         * TODO: Navigate to some Dashboard screen
+         */
+      })
     }
   }
 }
