@@ -8,6 +8,7 @@ val pagingVersion: String by project
 val hiltNavigationComposeVersion: String by project
 val lifecycleVersion: String by project
 val truthVersion: String by project
+val ktorVersion: String by project
 
 plugins {
   id("com.android.application")
@@ -15,6 +16,7 @@ plugins {
   id("com.google.devtools.ksp")
   id("com.google.dagger.hilt.android")
   id("org.jlleitschuh.gradle.ktlint")
+  id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 subprojects {
@@ -85,6 +87,8 @@ android {
 dependencies {
   implementation("com.google.dagger:dagger-android:$daggerHiltVersion")
   implementation("com.google.dagger:hilt-android:$daggerHiltVersion")
+  implementation("io.ktor:ktor-client-cio:$ktorVersion")
+  implementation("io.ktor:ktor-client-logging:$ktorVersion")
   ksp("com.google.dagger:hilt-android-compiler:$daggerHiltVersion")
   kspAndroidTest("com.google.dagger:hilt-android-compiler:$daggerHiltVersion")
 
@@ -107,10 +111,9 @@ dependencies {
   implementation("androidx.compose.ui:ui-tooling-preview")
   implementation("androidx.compose.material3:material3")
 
-  implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
-  implementation("com.squareup.retrofit2:converter-moshi:$retrofitVersion")
-  implementation("com.squareup.okhttp3:logging-interceptor:$okhttpVersion")
-  implementation("com.squareup.okhttp3:okhttp:$okhttpVersion")
+  implementation("io.ktor:ktor-client-core:$ktorVersion")
+  implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+  implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
   implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
   implementation("androidx.paging:paging-compose:$pagingVersion")
 
