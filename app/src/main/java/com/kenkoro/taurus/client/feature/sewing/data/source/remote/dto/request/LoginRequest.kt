@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.domain.model.request
+package com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request
 
 import kotlinx.serialization.Serializable
 

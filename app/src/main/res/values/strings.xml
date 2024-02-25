@@ -1,12 +1,9 @@
 <resources>
-    <string name="app_name">taurus-mobile-client</string>
-    <string name="welcome_medium">It\'s now time to organize your</string>
-    <string name="welcome_large">Tailor work</string>
-    <string name="welcome_warning">But before, let’s login into your account provided by the administrator</string>
-    <string name="continue_button">Continue</string>
-    <string name="login_forgot_password_top">Forgot your password?</string>
-    <string name="login_forgot_password_bottom">You can always write your administrator</string>
-    <string name="login_credentials_label">Credentials</string>
-    <string name="login_subject">Subject</string>
-    <string name="login_password">Password</string>
+    <string name="app_name">Taurus</string>
+    <string name="continue_button">Продолжить</string>
+    <string name="login_forgot_password_top">Забыли пароль?</string>
+    <string name="login_forgot_password_bottom">Вы всегда можете спросить его у администратора</string>
+    <string name="login_credentials_label">Войти</string>
+    <string name="login_subject">Логин</string>
+    <string name="login_password">Пароль</string>
 </resources>

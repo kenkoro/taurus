@@ -9,30 +9,24 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.
 import com.kenkoro.taurus.client.feature.sewing.data.util.UserDataType
 import io.ktor.client.statement.HttpResponse
 
-class UserRepositoryImpl(
-  private val userApi: UserApi,
-) : UserRepository {
-  override suspend fun login(request: LoginRequest): HttpResponse {
-    return userApi.login(request)
-  }
+interface UserRepository {
+  suspend fun login(request: LoginRequest): HttpResponse
 
-  override suspend fun getUser(): GetUserResponse {
-    return userApi.getUser()
-  }
+  suspend fun getUser(): GetUserResponse
 
-  override suspend fun createUser(request: CreateUserRequest): HttpResponse {
-    return userApi.createUser(request)
-  }
+  suspend fun createUser(request: CreateUserRequest): HttpResponse
 
-  override suspend fun deleteUser(request: DeleteUserRequest): HttpResponse {
-    return userApi.deleteUser(request)
-  }
+  suspend fun deleteUser(request: DeleteUserRequest): HttpResponse
 
-  override suspend fun updateUserData(
+  suspend fun updateUserData(
     request: UpdateUserColumnRequest,
     user: String,
     data: UserDataType,
-  ): HttpResponse {
-    return userApi.updateUserData(request, user, data)
+  ): HttpResponse
+
+  companion object {
+    fun create(userApi: UserApi): UserRepositoryImpl {
+      return UserRepositoryImpl(userApi)
+    }
   }
 }

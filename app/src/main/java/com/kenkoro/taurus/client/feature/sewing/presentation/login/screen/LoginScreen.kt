@@ -1,26 +1,25 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.login.screen
 
-import android.os.Build
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.kenkoro.taurus.client.R
+import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components.HelpBlock
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components.LoginBlock
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
@@ -29,44 +28,42 @@ fun LoginScreen(
   onLogin: () -> Unit,
   viewModel: LoginViewModel = hiltViewModel(),
 ) {
+  val snackbarHostState = remember { SnackbarHostState() }
+
   AppTheme {
-    Surface(
-      modifier = Modifier.fillMaxSize(),
+    Scaffold(
+      snackbarHost = {
+        SnackbarHost(hostState = snackbarHostState) {
+          Snackbar(
+            modifier =
+              Modifier
+                .padding(bottom = 80.dp),
+            snackbarData = it,
+            shape = RoundedCornerShape(30.dp),
+          )
+        }
+      },
     ) {
-      Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+      Surface(
+        modifier =
+          Modifier
+            .fillMaxSize()
+            .padding(it),
       ) {
-        LoginBlock(
-          onLogin = onLogin,
-          modifier =
-            Modifier
-              .width(320.dp)
-              .weight(9F),
-        )
         Column(
-          modifier =
-            Modifier
-              .wrapContentHeight()
-              .weight(1F)
-              .clickable {},
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-          Spacer(modifier = Modifier.height(5.dp))
-          Text(
-            text = stringResource(id = R.string.login_forgot_password_top),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.fillMaxWidth(),
+          LoginBlock(
+            onLogin = onLogin,
+            snackbarHostState = snackbarHostState,
+            modifier =
+              Modifier
+                .width(320.dp)
+                .weight(9F),
           )
-          Text(
-            text = stringResource(id = R.string.login_forgot_password_bottom),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.labelSmall,
-            modifier = Modifier.fillMaxWidth(),
-          )
+          HelpBlock(modifier = Modifier.weight(1F))
           Spacer(modifier = Modifier.height(10.dp))
         }
-        Spacer(modifier = Modifier.height(10.dp))
       }
     }
   }
@@ -76,8 +73,6 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
   AppTheme {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      LoginScreen(onLogin = {})
-    }
+    LoginScreen(onLogin = { /*TODO*/ })
   }
 }
