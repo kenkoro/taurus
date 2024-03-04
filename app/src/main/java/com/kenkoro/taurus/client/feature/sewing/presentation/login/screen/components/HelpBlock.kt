@@ -6,35 +6,45 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.R
+import kotlinx.coroutines.launch
 
 @Composable
-fun HelpBlock(modifier: Modifier = Modifier) {
+fun HelpBlock(
+  modifier: Modifier = Modifier,
+  snackbarHostState: SnackbarHostState,
+) {
+  val scope = rememberCoroutineScope()
+
+  val message = stringResource(id = R.string.login_forgot_password_not_implemented)
   Column(
     modifier =
       modifier
         .wrapContentSize()
-        .clickable {},
+        .clickable {
+          scope.launch {
+            snackbarHostState.showSnackbar(
+              message = message,
+              withDismissAction = true,
+            )
+          }
+        },
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     Spacer(modifier = Modifier.height(5.dp))
     Text(
-      text = stringResource(id = R.string.login_forgot_password_top),
+      text = stringResource(id = R.string.login_forgot_password),
       textAlign = TextAlign.Center,
       style = MaterialTheme.typography.labelSmall,
     )
-    Text(
-      text = stringResource(id = R.string.login_forgot_password_bottom),
-      textAlign = TextAlign.Center,
-      style = MaterialTheme.typography.labelSmall,
-    )
-    Spacer(modifier = Modifier.height(10.dp))
   }
 }

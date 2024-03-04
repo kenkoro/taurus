@@ -4,11 +4,9 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.C
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.DeleteUserRequest
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.UpdateUserColumnRequest
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponse
 import com.kenkoro.taurus.client.feature.sewing.data.util.Urls
 import com.kenkoro.taurus.client.feature.sewing.data.util.UserDataType
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -44,7 +42,7 @@ class UserKtorApi(
     }
   }
 
-  override suspend fun getUser(): GetUserResponse {
+  override suspend fun getUser(): HttpResponse {
     return client.get {
       url {
         protocol = URLProtocol.HTTPS
@@ -55,7 +53,7 @@ class UserKtorApi(
       headers {
         append("Authorization", "Bearer $token")
       }
-    }.body()
+    }
   }
 
   override suspend fun createUser(request: CreateUserRequest): HttpResponse {

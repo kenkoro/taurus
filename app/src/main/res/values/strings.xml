@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Taurus</string>
     <string name="continue_button">Продолжить</string>
-    <string name="login_forgot_password_top">Забыли пароль?</string>
-    <string name="login_forgot_password_bottom">Вы всегда можете спросить его у администратора</string>
+    <string name="login_forgot_password">Забыли пароль?</string>
     <string name="login_credentials_label">Войти</string>
     <string name="login_subject">Логин</string>
     <string name="login_password">Пароль</string>
+    <string name="login_forgot_password_not_implemented">Ещё не имплементировано</string>
 </resources>

@@ -6,8 +6,14 @@ import androidx.lifecycle.ViewModel
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.isSuccess
+import java.nio.channels.UnresolvedAddressException
 import javax.inject.Inject
+
+@JvmInline
+value class Message(val value: String)
 
 @HiltViewModel
 class LoginViewModel
@@ -21,7 +27,20 @@ class LoginViewModel
     private val _password = mutableStateOf("")
     val password: MutableState<String> = _password
 
-    suspend fun login(request: LoginRequest): HttpResponse {
-      return userRepository.login(request)
+    suspend fun login(request: LoginRequest): Message {
+      return try {
+        val response = userRepository.login(request)
+        if (response.status.isSuccess()) {
+          Message("")
+        } else if (response.status == HttpStatusCode.NotFound) {
+          Message("Backend is not running")
+        } else {
+          Message("Authentication failed")
+        }
+      } catch (te: HttpRequestTimeoutException) {
+        Message(HttpStatusCode.RequestTimeout.toString())
+      } catch (uae: UnresolvedAddressException) {
+        Message("Check the Internet connection")
+      }
     }
   }

@@ -16,18 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components.HelpBlock
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components.LoginBlock
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
-fun LoginScreen(
-  onLogin: () -> Unit,
-  viewModel: LoginViewModel = hiltViewModel(),
-) {
+fun LoginScreen(onLogin: () -> Unit) {
   val snackbarHostState = remember { SnackbarHostState() }
 
   AppTheme {
@@ -61,18 +56,13 @@ fun LoginScreen(
                 .width(320.dp)
                 .weight(9F),
           )
-          HelpBlock(modifier = Modifier.weight(1F))
+          HelpBlock(
+            modifier = Modifier.weight(1F),
+            snackbarHostState = snackbarHostState,
+          )
           Spacer(modifier = Modifier.height(10.dp))
         }
       }
     }
-  }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-  AppTheme {
-    LoginScreen(onLogin = { /*TODO*/ })
   }
 }

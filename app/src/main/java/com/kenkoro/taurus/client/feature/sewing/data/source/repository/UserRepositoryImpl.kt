@@ -5,7 +5,6 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.C
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.DeleteUserRequest
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.UpdateUserColumnRequest
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponse
 import com.kenkoro.taurus.client.feature.sewing.data.util.UserDataType
 import io.ktor.client.statement.HttpResponse
 
@@ -16,7 +15,7 @@ class UserRepositoryImpl(
     return userApi.login(request)
   }
 
-  override suspend fun getUser(): GetUserResponse {
+  override suspend fun getUser(): HttpResponse {
     return userApi.getUser()
   }
 
