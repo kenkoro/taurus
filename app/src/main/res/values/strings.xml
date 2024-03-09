@@ -6,4 +6,6 @@
     <string name="login_subject">Логин</string>
     <string name="login_password">Пароль</string>
     <string name="login_forgot_password_not_implemented">Ещё не имплементировано</string>
+    <string name="check_internet_connection">Проверьте соединение с Интернетом</string>
+    <string name="login_timeout">Тайм-аут</string>
 </resources>

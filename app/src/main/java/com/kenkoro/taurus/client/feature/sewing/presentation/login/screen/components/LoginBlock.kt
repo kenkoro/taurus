@@ -1,6 +1,7 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,21 +17,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -40,12 +38,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
+import com.kenkoro.taurus.client.core.CryptoManager
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.UserKtorApi
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import java.nio.channels.UnresolvedAddressException
 
 @Composable
 fun LoginBlock(
@@ -57,7 +62,7 @@ fun LoginBlock(
   val scope = rememberCoroutineScope()
   val subject = viewModel.subject
   val password = viewModel.password
-  var isSigningIn by remember { mutableStateOf(false) }
+  val context = LocalContext.current
 
   val loginFields =
     listOf(
@@ -65,20 +70,20 @@ fun LoginBlock(
         state = subject,
         placeholderText = stringResource(id = R.string.login_subject),
         keyboardOptions =
-          KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Next,
-            keyboardType = KeyboardType.Text,
-          ),
+        KeyboardOptions.Default.copy(
+          imeAction = ImeAction.Next,
+          keyboardType = KeyboardType.Text,
+        ),
         transformation = VisualTransformation.None,
       ),
       FieldData(
         state = password,
         placeholderText = stringResource(id = R.string.login_password),
         keyboardOptions =
-          KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Done,
-            keyboardType = KeyboardType.Password,
-          ),
+        KeyboardOptions.Default.copy(
+          imeAction = ImeAction.Done,
+          keyboardType = KeyboardType.Password,
+        ),
         transformation = PasswordVisualTransformation(),
       ),
     )
@@ -114,42 +119,46 @@ fun LoginBlock(
       horizontalAlignment = Alignment.End,
       modifier = Modifier.fillMaxWidth(),
     ) {
-      if (isSigningIn) {
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.Center,
-          verticalAlignment = Alignment.CenterVertically,
-        ) {
-          CircularProgressIndicator(
-            modifier = Modifier.size(24.dp),
-            strokeWidth = 3.dp,
-          )
-        }
-        Spacer(Modifier.height(10.dp))
-      }
+      val failedInternetConnectionMessage =
+        stringResource(id = R.string.check_internet_connection)
+      val httpRequestTimeoutExceptionMessage = stringResource(id = R.string.login_timeout)
       Button(
         modifier =
-          Modifier
-            .clip(RoundedCornerShape(30.dp))
-            .size(width = 160.dp, height = 80.dp),
+        Modifier
+          .clip(RoundedCornerShape(30.dp))
+          .size(width = 160.dp, height = 80.dp),
         onClick = {
           scope.launch {
-            isSigningIn = true
-            val message =
-              viewModel.login(
+            try {
+              val response = viewModel.login(
                 LoginRequest(
                   subject = subject.value,
                   password = password.value,
                 ),
               )
-            isSigningIn = false
-            if (message.value.isNotBlank()) {
+
+              if (!response.status.isSuccess()) {
+                snackbarHostState.showSnackbar(
+                  message = response.status.toString(),
+                  withDismissAction = true,
+                )
+              } else {
+                encryptCredentials(
+                  credentials = "${subject.value} ${password.value}",
+                  context = context
+                )
+                onLogin()
+              }
+            } catch (_: HttpRequestTimeoutException) {
               snackbarHostState.showSnackbar(
-                message = message.value,
+                message = httpRequestTimeoutExceptionMessage,
                 withDismissAction = true,
               )
-            } else {
-              onLogin()
+            } catch (_: UnresolvedAddressException) {
+              snackbarHostState.showSnackbar(
+                message = failedInternetConnectionMessage,
+                withDismissAction = true,
+              )
             }
           }
         },
@@ -164,20 +173,34 @@ fun LoginBlock(
   }
 }
 
+private fun encryptCredentials(credentials: String, context: Context) {
+  val bytes = credentials.encodeToByteArray()
+  val cryptoManager = CryptoManager()
+  val file = File(context.filesDir, "${LocalCredentials.FILENAME}.txt")
+  if (!file.exists()) {
+    file.createNewFile()
+  }
+  val fos = FileOutputStream(file)
+  cryptoManager.encrypt(
+    bytes = bytes,
+    outputStream = fos
+  )
+}
+
 @Preview(showBackground = true)
 @Composable
 fun LoginBlockPreview() {
   val snackbarHostState = remember { SnackbarHostState() }
   LoginBlock(
     viewModel =
-      LoginViewModel(
-        userRepository =
-          UserRepositoryImpl(
-            UserKtorApi(
-              HttpClient(),
-            ),
-          ),
+    LoginViewModel(
+      userRepository =
+      UserRepositoryImpl(
+        UserKtorApi(
+          HttpClient(),
+        ),
       ),
+    ),
     snackbarHostState = snackbarHostState,
   )
 }

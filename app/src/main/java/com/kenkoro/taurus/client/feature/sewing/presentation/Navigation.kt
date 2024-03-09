@@ -10,8 +10,16 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginS
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.Screen
 
 @Composable
-fun AppNavHost(navController: NavHostController = rememberNavController()) {
-  NavHost(navController = navController, startDestination = Screen.LoginScreen.route) {
+fun AppNavHost(
+  navController: NavHostController = rememberNavController(),
+  isLoginSuccessful: Boolean = false
+) {
+  val startDestination = if (isLoginSuccessful) {
+    Screen.DashboardScreen.route
+  } else {
+    Screen.LoginScreen.route
+  }
+  NavHost(navController = navController, startDestination = startDestination) {
     composable(route = Screen.LoginScreen.route) {
       LoginScreen(
         onLogin = {

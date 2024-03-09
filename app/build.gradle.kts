@@ -9,6 +9,7 @@ val hiltNavigationComposeVersion: String by project
 val lifecycleVersion: String by project
 val truthVersion: String by project
 val ktorVersion: String by project
+val splashScreenVersion: String by project
 
 plugins {
   id("com.android.application")
@@ -104,6 +105,7 @@ dependencies {
   implementation("androidx.hilt:hilt-navigation-compose:$hiltNavigationComposeVersion")
   implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
   implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
+  implementation("androidx.core:core-splashscreen:$splashScreenVersion")
 
   implementation(platform("androidx.compose:compose-bom:2023.10.01"))
   implementation("androidx.compose.ui:ui")
