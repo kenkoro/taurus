@@ -13,7 +13,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.util.Screen
 @Composable
 fun AppNavHost(
   navController: NavHostController = rememberNavController(),
-  loginResponseType: LoginResponseType
+  loginResponseType: LoginResponseType,
 ) {
   val startDestination =
     if (
@@ -37,7 +37,8 @@ fun AppNavHost(
       DashboardScreen(
         onLoginNavigate = {
           navController.navigate(Screen.LoginScreen.route)
-        })
+        },
+      )
     }
   }
 }

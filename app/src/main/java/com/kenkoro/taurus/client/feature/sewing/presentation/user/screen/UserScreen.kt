@@ -31,9 +31,10 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 fun UserScreen() {
   AppTheme {
     Surface(
-      modifier = Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)
+      modifier =
+        Modifier
+          .fillMaxSize()
+          .background(MaterialTheme.colorScheme.background),
     ) {
       Column(modifier = Modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.height(10.dp))
@@ -46,14 +47,15 @@ fun UserScreen() {
         UserScreenButtons { item ->
           Spacer(modifier = Modifier.width(10.dp))
           Button(
-            modifier = Modifier
-              .size(width = 175.dp, height = 90.dp)
-              .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(30.dp)
-              ),
+            modifier =
+              Modifier
+                .size(width = 175.dp, height = 90.dp)
+                .shadow(
+                  elevation = 4.dp,
+                  shape = RoundedCornerShape(30.dp),
+                ),
             onClick = { /*TODO*/ },
-            shape = RoundedCornerShape(30.dp)
+            shape = RoundedCornerShape(30.dp),
           ) {
             Text(text = item.title, textAlign = TextAlign.Center)
           }

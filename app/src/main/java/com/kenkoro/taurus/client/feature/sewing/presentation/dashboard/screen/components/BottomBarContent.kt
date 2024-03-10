@@ -25,15 +25,12 @@ fun BottomBarContent(
   modifier: Modifier = Modifier,
   tabItems: List<TabItem>,
   pagerState: PagerState,
-  content: @Composable (index: Int) -> Unit
+  content: @Composable (index: Int) -> Unit,
 ) {
   var selectedTabIndex by remember {
     mutableIntStateOf(0)
   }
 
-  LaunchedEffect(selectedTabIndex) {
-    pagerState.animateScrollToPage(selectedTabIndex)
-  }
   LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
     if (!pagerState.isScrollInProgress) {
       selectedTabIndex = pagerState.currentPage
@@ -43,10 +40,11 @@ fun BottomBarContent(
   Column(modifier = modifier.fillMaxWidth()) {
     HorizontalPager(
       state = pagerState,
-      modifier = Modifier
-        .fillMaxWidth()
-        .weight(1F),
-      userScrollEnabled = false
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .weight(1F),
+      userScrollEnabled = false,
     ) { index ->
       content(index)
     }
@@ -56,7 +54,7 @@ fun BottomBarContent(
       containerColor = MaterialTheme.colorScheme.background,
       contentColor = MaterialTheme.colorScheme.onBackground,
       divider = {},
-      indicator = {}
+      indicator = {},
     ) {
       tabItems.forEachIndexed { index, tabItem ->
         val selected = selectedTabIndex == index
@@ -68,13 +66,15 @@ fun BottomBarContent(
           text = { Text(text = tabItem.title) },
           icon = {
             Icon(
-              imageVector = if (selected) {
-                tabItem.selectedIcon
-              } else {
-                tabItem.unselectedIcon
-              }, contentDescription = tabItem.title
+              imageVector =
+                if (selected) {
+                  tabItem.selectedIcon
+                } else {
+                  tabItem.unselectedIcon
+                },
+              contentDescription = tabItem.title,
             )
-          }
+          },
         )
       }
     }

@@ -36,48 +36,50 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     installSplashScreen()
 
-    val locallyStoredCredentials = getDecryptedCredentials().value
-      .split(" ")
-      .take(LocalCredentials.CREDENTIALS_LIST_SIZE)
-    val loginResponseType = runBlocking {
-      if (locallyStoredCredentials.size greaterOrEquals 2) {
-        try {
-          val response =
-            loginViewModel.login(
-              LoginRequest(
-                subject = locallyStoredCredentials.first(),
-                password = locallyStoredCredentials.last(),
-              ),
-            )
-          if (response.status.isSuccess()) {
-            LoginResponseType.SUCCESS
-          } else {
+    val locallyStoredCredentials =
+      getDecryptedCredentials().value
+        .split(" ")
+        .take(LocalCredentials.CREDENTIALS_LIST_SIZE)
+    val loginResponseType =
+      runBlocking {
+        if (locallyStoredCredentials.size greaterOrEquals 2) {
+          try {
+            val response =
+              loginViewModel.login(
+                LoginRequest(
+                  subject = locallyStoredCredentials.first(),
+                  password = locallyStoredCredentials.last(),
+                ),
+              )
+            if (response.status.isSuccess()) {
+              LoginResponseType.SUCCESS
+            } else {
+              LoginResponseType.FAILURE
+            }
+          } catch (_: UnresolvedAddressException) {
+            LoginResponseType.NOT_INTERNET_CONNECTION
+          } catch (_: Exception) {
             LoginResponseType.FAILURE
           }
-        } catch (_: UnresolvedAddressException) {
-          LoginResponseType.NOT_INTERNET_CONNECTION
-        } catch (_: Exception) {
-          LoginResponseType.FAILURE
+        } else {
+          LoginResponseType.BAD_ENCRYPTED_CREDENTIALS
         }
-      } else {
-        LoginResponseType.BAD_ENCRYPTED_CREDENTIALS
       }
-    }
 
     setContent {
       enableEdgeToEdge(
         statusBarStyle =
-        SystemBarStyle.auto(
-          lightScrim = Color.Transparent.toArgb(),
-          darkScrim = Color.Transparent.toArgb(),
-          detectDarkMode = { resources ->
-            return@auto if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-              resources.configuration.isNightModeActive
-            } else {
-              false
-            }
-          },
-        ),
+          SystemBarStyle.auto(
+            lightScrim = Color.Transparent.toArgb(),
+            darkScrim = Color.Transparent.toArgb(),
+            detectDarkMode = { resources ->
+              return@auto if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                resources.configuration.isNightModeActive
+              } else {
+                false
+              }
+            },
+          ),
       )
 
       AppTheme {

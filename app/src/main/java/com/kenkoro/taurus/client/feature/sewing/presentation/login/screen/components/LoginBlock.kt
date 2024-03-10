@@ -74,20 +74,20 @@ fun LoginBlock(
         state = subject,
         placeholderText = stringResource(id = R.string.login_subject),
         keyboardOptions =
-        KeyboardOptions.Default.copy(
-          imeAction = ImeAction.Next,
-          keyboardType = KeyboardType.Text,
-        ),
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+          ),
         transformation = VisualTransformation.None,
       ),
       FieldData(
         state = password,
         placeholderText = stringResource(id = R.string.login_password),
         keyboardOptions =
-        KeyboardOptions.Default.copy(
-          imeAction = ImeAction.Done,
-          keyboardType = KeyboardType.Password,
-        ),
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password,
+          ),
         transformation = PasswordVisualTransformation(),
       ),
     )
@@ -129,37 +129,38 @@ fun LoginBlock(
       val requestErrorMessage = stringResource(id = R.string.request_error)
       Button(
         modifier =
-        Modifier
-          .size(width = 160.dp, height = 80.dp),
+          Modifier
+            .size(width = 160.dp, height = 80.dp),
         shape = RoundedCornerShape(30.dp),
         onClick = {
           scope.launch {
-            val responseMessage = try {
-              val response =
-                viewModel.login(
-                  LoginRequest(
-                    subject = subject.value,
-                    password = password.value,
-                  ),
-                )
+            val responseMessage =
+              try {
+                val response =
+                  viewModel.login(
+                    LoginRequest(
+                      subject = subject.value,
+                      password = password.value,
+                    ),
+                  )
 
-              if (!response.status.isSuccess()) {
-                ResponseMessage(response.status.toString())
-              } else {
-                encryptCredentials(
-                  credentials = "${subject.value} ${password.value}",
-                  context = context,
-                )
-                onLoginNavigate()
-                ResponseMessage("")
+                if (!response.status.isSuccess()) {
+                  ResponseMessage(response.status.toString())
+                } else {
+                  encryptCredentials(
+                    credentials = "${subject.value} ${password.value}",
+                    context = context,
+                  )
+                  onLoginNavigate()
+                  ResponseMessage("")
+                }
+              } catch (_: HttpRequestTimeoutException) {
+                ResponseMessage(httpRequestTimeoutExceptionMessage)
+              } catch (_: UnresolvedAddressException) {
+                ResponseMessage(failedInternetConnectionMessage)
+              } catch (_: Exception) {
+                ResponseMessage(requestErrorMessage)
               }
-            } catch (_: HttpRequestTimeoutException) {
-              ResponseMessage(httpRequestTimeoutExceptionMessage)
-            } catch (_: UnresolvedAddressException) {
-              ResponseMessage(failedInternetConnectionMessage)
-            } catch (_: Exception) {
-              ResponseMessage(requestErrorMessage)
-            }
 
             if (responseMessage.isNotSuccess()) {
               snackbarHostState.showSnackbar(
@@ -203,14 +204,14 @@ fun LoginBlockPreview() {
   val snackbarHostState = remember { SnackbarHostState() }
   LoginBlock(
     viewModel =
-    LoginViewModel(
-      userRepository =
-      UserRepositoryImpl(
-        UserKtorApi(
-          HttpClient(),
-        ),
+      LoginViewModel(
+        userRepository =
+          UserRepositoryImpl(
+            UserKtorApi(
+              HttpClient(),
+            ),
+          ),
       ),
-    ),
     snackbarHostState = snackbarHostState,
   )
 }

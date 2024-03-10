@@ -19,31 +19,34 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.ut
 @Composable
 fun BottomBarHost(
   modifier: Modifier = Modifier,
-  content: @Composable (index: Int) -> Unit
+  content: @Composable (index: Int) -> Unit,
 ) {
-  val tabItems = listOf(
-    TabItem(
-      title = stringResource(id = R.string.bottom_bar_host_users),
-      selectedIcon = Icons.Filled.Person,
-      unselectedIcon = Icons.Outlined.Person
-    ),
-    TabItem(
-      title = stringResource(id = R.string.bottom_bar_host_orders),
-      selectedIcon = Icons.Filled.Create,
-      unselectedIcon = Icons.Outlined.Create
+  val tabItems =
+    listOf(
+      TabItem(
+        title = stringResource(id = R.string.bottom_bar_host_users),
+        selectedIcon = Icons.Filled.Person,
+        unselectedIcon = Icons.Outlined.Person,
+      ),
+      TabItem(
+        title = stringResource(id = R.string.bottom_bar_host_orders),
+        selectedIcon = Icons.Filled.Create,
+        unselectedIcon = Icons.Outlined.Create,
+      ),
     )
-  )
 
-  val pagerState = rememberPagerState {
-    tabItems.size
-  }
+  val pagerState =
+    rememberPagerState {
+      tabItems.size
+    }
 
   BottomBarContent(
-    modifier = modifier
-      .statusBarsPadding()
-      .navigationBarsPadding(),
+    modifier =
+      modifier
+        .statusBarsPadding()
+        .navigationBarsPadding(),
     tabItems = tabItems,
-    pagerState = pagerState
+    pagerState = pagerState,
   ) { index ->
     content(index)
   }

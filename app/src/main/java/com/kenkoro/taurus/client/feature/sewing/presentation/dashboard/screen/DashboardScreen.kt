@@ -17,15 +17,13 @@ object BottomBarHostIndices {
 }
 
 @Composable
-fun DashboardScreen(
-  onLoginNavigate: () -> Unit = {}
-) {
+fun DashboardScreen(onLoginNavigate: () -> Unit = {}) {
   AppTheme {
     Surface(
       modifier =
-      Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background),
+        Modifier
+          .fillMaxSize()
+          .background(MaterialTheme.colorScheme.background),
     ) {
       BottomBarHost { index ->
         when (index) {

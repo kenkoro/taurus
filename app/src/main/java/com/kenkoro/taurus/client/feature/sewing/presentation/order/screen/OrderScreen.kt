@@ -16,13 +16,14 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 fun OrderScreen() {
   AppTheme {
     Surface(
-      modifier = Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)
+      modifier =
+        Modifier
+          .fillMaxSize()
+          .background(MaterialTheme.colorScheme.background),
     ) {
       Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
       ) {
         Text(text = "OrderScreen")
       }
