@@ -7,28 +7,37 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.DashboardScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginScreen
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.Screen
 
 @Composable
 fun AppNavHost(
   navController: NavHostController = rememberNavController(),
-  isLoginSuccessful: Boolean = false
+  loginResponseType: LoginResponseType
 ) {
-  val startDestination = if (isLoginSuccessful) {
-    Screen.DashboardScreen.route
-  } else {
-    Screen.LoginScreen.route
-  }
+  val startDestination =
+    if (
+      loginResponseType != LoginResponseType.FAILURE &&
+      loginResponseType != LoginResponseType.BAD_ENCRYPTED_CREDENTIALS
+    ) {
+      Screen.DashboardScreen.route
+    } else {
+      Screen.LoginScreen.route
+    }
+
   NavHost(navController = navController, startDestination = startDestination) {
     composable(route = Screen.LoginScreen.route) {
       LoginScreen(
-        onLogin = {
+        onLoginNavigate = {
           navController.navigate(Screen.DashboardScreen.route)
         },
       )
     }
     composable(route = Screen.DashboardScreen.route) {
-      DashboardScreen()
+      DashboardScreen(
+        onLoginNavigate = {
+          navController.navigate(Screen.LoginScreen.route)
+        })
     }
   }
 }

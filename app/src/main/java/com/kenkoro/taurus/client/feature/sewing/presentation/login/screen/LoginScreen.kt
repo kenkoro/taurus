@@ -22,7 +22,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.compon
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
-fun LoginScreen(onLogin: () -> Unit) {
+fun LoginScreen(onLoginNavigate: () -> Unit) {
   val snackbarHostState = remember { SnackbarHostState() }
 
   AppTheme {
@@ -49,7 +49,7 @@ fun LoginScreen(onLogin: () -> Unit) {
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           LoginBlock(
-            onLogin = onLogin,
+            onLoginNavigate = onLoginNavigate,
             snackbarHostState = snackbarHostState,
             modifier =
               Modifier

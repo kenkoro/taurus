@@ -19,9 +19,9 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.L
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
-import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.runBlocking
 import java.io.File
@@ -32,33 +32,35 @@ import java.nio.channels.UnresolvedAddressException
 class MainActivity : ComponentActivity() {
   private val loginViewModel: LoginViewModel by viewModels()
 
-  companion object {
-    private const val CREDENTIALS_LIST_MAX_ARG = 2
-  }
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     installSplashScreen()
 
-    val credentials = getDecryptedCredentials().value.split(" ").take(CREDENTIALS_LIST_MAX_ARG)
-
-    val isLoginSuccessful = runBlocking {
-      if (credentials.size greaterOrEquals 2) {
+    val locallyStoredCredentials = getDecryptedCredentials().value
+      .split(" ")
+      .take(LocalCredentials.CREDENTIALS_LIST_SIZE)
+    val loginResponseType = runBlocking {
+      if (locallyStoredCredentials.size greaterOrEquals 2) {
         try {
-          val response = loginViewModel.login(
-            LoginRequest(
-              subject = credentials.first(),
-              password = credentials.last()
+          val response =
+            loginViewModel.login(
+              LoginRequest(
+                subject = locallyStoredCredentials.first(),
+                password = locallyStoredCredentials.last(),
+              ),
             )
-          )
-          response.status.isSuccess()
-        } catch (_: HttpRequestTimeoutException) {
-          false
+          if (response.status.isSuccess()) {
+            LoginResponseType.SUCCESS
+          } else {
+            LoginResponseType.FAILURE
+          }
         } catch (_: UnresolvedAddressException) {
-          false
+          LoginResponseType.NOT_INTERNET_CONNECTION
+        } catch (_: Exception) {
+          LoginResponseType.FAILURE
         }
       } else {
-        false
+        LoginResponseType.BAD_ENCRYPTED_CREDENTIALS
       }
     }
 
@@ -83,7 +85,7 @@ class MainActivity : ComponentActivity() {
           modifier = Modifier.fillMaxSize(),
           color = MaterialTheme.colorScheme.background,
         ) {
-          AppNavHost(isLoginSuccessful = isLoginSuccessful)
+          AppNavHost(loginResponseType = loginResponseType)
         }
       }
     }
@@ -98,6 +100,6 @@ class MainActivity : ComponentActivity() {
     val fis = FileInputStream(file)
     return DecryptedCredentials(cryptoManager.decrypt(fis).decodeToString())
   }
-}
 
-private infix fun Int.greaterOrEquals(number: Int): Boolean = this >= number
+  private infix fun Int.greaterOrEquals(number: Int): Boolean = this >= number
+}

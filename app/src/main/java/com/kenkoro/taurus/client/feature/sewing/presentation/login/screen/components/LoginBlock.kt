@@ -27,7 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -52,9 +51,14 @@ import java.io.File
 import java.io.FileOutputStream
 import java.nio.channels.UnresolvedAddressException
 
+@JvmInline
+value class ResponseMessage(val value: String) {
+  fun isNotSuccess(): Boolean = value.isNotBlank()
+}
+
 @Composable
 fun LoginBlock(
-  onLogin: () -> Unit = {},
+  onLoginNavigate: () -> Unit = {},
   snackbarHostState: SnackbarHostState,
   viewModel: LoginViewModel = hiltViewModel(),
   @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
@@ -122,41 +126,44 @@ fun LoginBlock(
       val failedInternetConnectionMessage =
         stringResource(id = R.string.check_internet_connection)
       val httpRequestTimeoutExceptionMessage = stringResource(id = R.string.login_timeout)
+      val requestErrorMessage = stringResource(id = R.string.request_error)
       Button(
         modifier =
         Modifier
-          .clip(RoundedCornerShape(30.dp))
           .size(width = 160.dp, height = 80.dp),
+        shape = RoundedCornerShape(30.dp),
         onClick = {
           scope.launch {
-            try {
-              val response = viewModel.login(
-                LoginRequest(
-                  subject = subject.value,
-                  password = password.value,
-                ),
-              )
+            val responseMessage = try {
+              val response =
+                viewModel.login(
+                  LoginRequest(
+                    subject = subject.value,
+                    password = password.value,
+                  ),
+                )
 
               if (!response.status.isSuccess()) {
-                snackbarHostState.showSnackbar(
-                  message = response.status.toString(),
-                  withDismissAction = true,
-                )
+                ResponseMessage(response.status.toString())
               } else {
                 encryptCredentials(
                   credentials = "${subject.value} ${password.value}",
-                  context = context
+                  context = context,
                 )
-                onLogin()
+                onLoginNavigate()
+                ResponseMessage("")
               }
             } catch (_: HttpRequestTimeoutException) {
-              snackbarHostState.showSnackbar(
-                message = httpRequestTimeoutExceptionMessage,
-                withDismissAction = true,
-              )
+              ResponseMessage(httpRequestTimeoutExceptionMessage)
             } catch (_: UnresolvedAddressException) {
+              ResponseMessage(failedInternetConnectionMessage)
+            } catch (_: Exception) {
+              ResponseMessage(requestErrorMessage)
+            }
+
+            if (responseMessage.isNotSuccess()) {
               snackbarHostState.showSnackbar(
-                message = failedInternetConnectionMessage,
+                message = responseMessage.value,
                 withDismissAction = true,
               )
             }
@@ -173,7 +180,10 @@ fun LoginBlock(
   }
 }
 
-private fun encryptCredentials(credentials: String, context: Context) {
+private fun encryptCredentials(
+  credentials: String,
+  context: Context,
+) {
   val bytes = credentials.encodeToByteArray()
   val cryptoManager = CryptoManager()
   val file = File(context.filesDir, "${LocalCredentials.FILENAME}.txt")
@@ -183,7 +193,7 @@ private fun encryptCredentials(credentials: String, context: Context) {
   val fos = FileOutputStream(file)
   cryptoManager.encrypt(
     bytes = bytes,
-    outputStream = fos
+    outputStream = fos,
   )
 }
 

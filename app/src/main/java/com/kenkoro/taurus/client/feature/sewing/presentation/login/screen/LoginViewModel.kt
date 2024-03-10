@@ -10,17 +10,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel
-@Inject
-constructor(
-  private val userRepository: UserRepositoryImpl,
-) : ViewModel() {
-  private val _subject = mutableStateOf("")
-  val subject = _subject
+  @Inject
+  constructor(
+    private val userRepository: UserRepositoryImpl,
+  ) : ViewModel() {
+    private val _subject = mutableStateOf("")
+    val subject = _subject
 
-  private val _password = mutableStateOf("")
-  val password = _password
+    private val _password = mutableStateOf("")
+    val password = _password
 
-  suspend fun login(request: LoginRequest): HttpResponse {
-    return userRepository.login(request)
+    suspend fun login(request: LoginRequest): HttpResponse {
+      return userRepository.login(request)
+    }
   }
-}
