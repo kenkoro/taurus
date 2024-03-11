@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client.feature.sewing.data.source.remote.api
 
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.UserApi.Companion.token
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.CreateUserRequest
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.DeleteUserRequest
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
@@ -22,14 +23,6 @@ import io.ktor.http.path
 class UserKtorApi(
   private val client: HttpClient,
 ) : UserApi {
-  companion object {
-    lateinit var token: String
-
-    fun token(token: String) {
-      UserKtorApi.token = token
-    }
-  }
-
   override suspend fun login(request: LoginRequest): HttpResponse {
     return client.post {
       url {
@@ -42,12 +35,12 @@ class UserKtorApi(
     }
   }
 
-  override suspend fun getUser(): HttpResponse {
+  override suspend fun getUser(user: String): HttpResponse {
     return client.get {
       url {
         protocol = URLProtocol.HTTPS
         host = Urls.HOST
-        path(Urls.GET_USER)
+        path("${Urls.GET_USER}/@$user")
       }
       contentType(ContentType.Application.Json)
       headers {

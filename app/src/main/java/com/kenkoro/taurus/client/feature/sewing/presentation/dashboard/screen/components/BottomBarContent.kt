@@ -31,6 +31,10 @@ fun BottomBarContent(
     mutableIntStateOf(0)
   }
 
+  LaunchedEffect(selectedTabIndex) {
+    pagerState.animateScrollToPage(selectedTabIndex)
+  }
+
   LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
     if (!pagerState.isScrollInProgress) {
       selectedTabIndex = pagerState.currentPage

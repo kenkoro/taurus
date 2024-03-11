@@ -16,4 +16,5 @@
     <string name="update_user">Обновить данные пользователя</string>
     <string name="login_not_found">Бэкенд не запущен</string>
     <string name="request_error">Ошибка с запросом</string>
+    <string name="retry">Повторить</string>
 </resources>

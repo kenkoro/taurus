@@ -11,7 +11,7 @@ import io.ktor.client.statement.HttpResponse
 interface UserRepository {
   suspend fun login(request: LoginRequest): HttpResponse
 
-  suspend fun getUser(): HttpResponse
+  suspend fun getUser(user: String): HttpResponse
 
   suspend fun createUser(request: CreateUserRequest): HttpResponse
 

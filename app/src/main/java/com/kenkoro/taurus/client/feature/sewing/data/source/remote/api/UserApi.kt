@@ -8,9 +8,17 @@ import com.kenkoro.taurus.client.feature.sewing.data.util.UserDataType
 import io.ktor.client.statement.HttpResponse
 
 interface UserApi {
+  companion object {
+    var token: String = ""
+
+    fun token(token: String) {
+      UserApi.token = token
+    }
+  }
+
   suspend fun login(request: LoginRequest): HttpResponse
 
-  suspend fun getUser(): HttpResponse
+  suspend fun getUser(user: String): HttpResponse
 
   suspend fun createUser(request: CreateUserRequest): HttpResponse
 

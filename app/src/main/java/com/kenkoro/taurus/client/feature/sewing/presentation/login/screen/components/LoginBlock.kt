@@ -1,7 +1,5 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components
 
-import android.annotation.SuppressLint
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +22,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,19 +33,20 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.core.CryptoManager
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.UserKtorApi
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.AuthResponse
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.util.LoginCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.EncryptedCredentials
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
 import java.nio.channels.UnresolvedAddressException
 
 @JvmInline
@@ -60,12 +58,11 @@ value class ResponseMessage(val value: String) {
 fun LoginBlock(
   onLoginNavigate: () -> Unit = {},
   snackbarHostState: SnackbarHostState,
-  viewModel: LoginViewModel = hiltViewModel(),
-  @SuppressLint("ModifierParameter") modifier: Modifier = Modifier,
+  loginViewModel: LoginViewModel = hiltViewModel(),
+  modifier: Modifier,
 ) {
-  val scope = rememberCoroutineScope()
-  val subject = viewModel.subject
-  val password = viewModel.password
+  val subject = loginViewModel.subject
+  val password = loginViewModel.password
   val context = LocalContext.current
 
   val loginFields =
@@ -115,6 +112,7 @@ fun LoginBlock(
           keyboardActions = fieldData.keyboardActions,
           visualTransformation = fieldData.transformation,
           modifier = Modifier.fillMaxWidth(),
+          singleLine = true,
         )
         Spacer(modifier = Modifier.height(15.dp))
       }
@@ -133,11 +131,11 @@ fun LoginBlock(
             .size(width = 160.dp, height = 80.dp),
         shape = RoundedCornerShape(30.dp),
         onClick = {
-          scope.launch {
+          loginViewModel.viewModelScope.launch {
             val responseMessage =
               try {
                 val response =
-                  viewModel.login(
+                  loginViewModel.login(
                     LoginRequest(
                       subject = subject.value,
                       password = password.value,
@@ -147,8 +145,18 @@ fun LoginBlock(
                 if (!response.status.isSuccess()) {
                   ResponseMessage(response.status.toString())
                 } else {
-                  encryptCredentials(
-                    credentials = "${subject.value} ${password.value}",
+                  EncryptedCredentials.encryptCredentials(
+                    credentials =
+                      LoginCredentials(
+                        subject = subject.value,
+                        password = password.value,
+                        token =
+                          try {
+                            response.body<AuthResponse>().token
+                          } catch (_: Exception) {
+                            ""
+                          },
+                      ),
                     context = context,
                   )
                   onLoginNavigate()
@@ -181,29 +189,12 @@ fun LoginBlock(
   }
 }
 
-private fun encryptCredentials(
-  credentials: String,
-  context: Context,
-) {
-  val bytes = credentials.encodeToByteArray()
-  val cryptoManager = CryptoManager()
-  val file = File(context.filesDir, "${LocalCredentials.FILENAME}.txt")
-  if (!file.exists()) {
-    file.createNewFile()
-  }
-  val fos = FileOutputStream(file)
-  cryptoManager.encrypt(
-    bytes = bytes,
-    outputStream = fos,
-  )
-}
-
 @Preview(showBackground = true)
 @Composable
 fun LoginBlockPreview() {
   val snackbarHostState = remember { SnackbarHostState() }
   LoginBlock(
-    viewModel =
+    loginViewModel =
       LoginViewModel(
         userRepository =
           UserRepositoryImpl(
@@ -213,5 +204,6 @@ fun LoginBlockPreview() {
           ),
       ),
     snackbarHostState = snackbarHostState,
+    modifier = Modifier,
   )
 }

@@ -14,57 +14,83 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.kenkoro.taurus.client.core.CryptoManager
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.AuthResponse
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.EncryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
+import io.ktor.client.call.body
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.runBlocking
-import java.io.File
-import java.io.FileInputStream
 import java.nio.channels.UnresolvedAddressException
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
   private val loginViewModel: LoginViewModel by viewModels()
+  private val mainViewModel: MainViewModel by viewModels()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     installSplashScreen()
 
-    val locallyStoredCredentials =
-      getDecryptedCredentials().value
-        .split(" ")
-        .take(LocalCredentials.CREDENTIALS_LIST_SIZE)
+    val locallyStoredSubject =
+      DecryptedCredentials.getDecryptedCredential(
+        filename = LocalCredentials.SUBJECT_FILENAME,
+        context = applicationContext,
+      ).value
+    val locallyStoredPassword =
+      DecryptedCredentials.getDecryptedCredential(
+        filename = LocalCredentials.PASSWORD_FILENAME,
+        context = applicationContext,
+      ).value
     val loginResponseType =
       runBlocking {
-        if (locallyStoredCredentials.size greaterOrEquals 2) {
+        if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
           try {
             val response =
               loginViewModel.login(
                 LoginRequest(
-                  subject = locallyStoredCredentials.first(),
-                  password = locallyStoredCredentials.last(),
+                  subject = locallyStoredSubject,
+                  password = locallyStoredPassword,
                 ),
               )
-            if (response.status.isSuccess()) {
+
+            val status = response.status
+            if (status.isSuccess()) {
+              EncryptedCredentials.encryptCredential(
+                credential =
+                  try {
+                    response.body<AuthResponse>().token
+                  } catch (_: Exception) {
+                    ""
+                  },
+                filename = LocalCredentials.TOKEN_FILENAME,
+                context = applicationContext,
+              )
               LoginResponseType.SUCCESS
             } else {
-              LoginResponseType.FAILURE
+              if (status == HttpStatusCode.NotFound) {
+                LoginResponseType.API_NOT_FOUND
+              } else {
+                LoginResponseType.FAILURE
+              }
             }
           } catch (_: UnresolvedAddressException) {
             LoginResponseType.NOT_INTERNET_CONNECTION
           } catch (_: Exception) {
-            LoginResponseType.FAILURE
+            LoginResponseType.REQUEST_FAILURE
           }
         } else {
-          LoginResponseType.BAD_ENCRYPTED_CREDENTIALS
+          LoginResponseType.BAD_DECRYPTED_CREDENTIALS
         }
       }
+
+    mainViewModel.saveLoginResponseType(loginResponseType)
 
     setContent {
       enableEdgeToEdge(
@@ -87,21 +113,9 @@ class MainActivity : ComponentActivity() {
           modifier = Modifier.fillMaxSize(),
           color = MaterialTheme.colorScheme.background,
         ) {
-          AppNavHost(loginResponseType = loginResponseType)
+          AppNavHost(mainViewModel = mainViewModel)
         }
       }
     }
   }
-
-  private fun getDecryptedCredentials(): DecryptedCredentials {
-    val cryptoManager = CryptoManager()
-    val file = File(filesDir, "${LocalCredentials.FILENAME}.txt")
-    if (!file.exists()) {
-      return DecryptedCredentials("")
-    }
-    val fis = FileInputStream(file)
-    return DecryptedCredentials(cryptoManager.decrypt(fis).decodeToString())
-  }
-
-  private infix fun Int.greaterOrEquals(number: Int): Boolean = this >= number
 }
