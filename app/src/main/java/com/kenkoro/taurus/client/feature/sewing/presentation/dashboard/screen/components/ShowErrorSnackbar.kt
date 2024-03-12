@@ -11,7 +11,7 @@ import com.kenkoro.taurus.client.R
 fun ErrorSnackbar(
   snackbarHostState: SnackbarHostState,
   message: String,
-  onDismissed: () -> Unit,
+  onDismissed: () -> Unit = {},
   onActionPerformed: () -> Unit,
 ) {
   val actionLabel = stringResource(id = R.string.retry)
@@ -20,7 +20,7 @@ fun ErrorSnackbar(
       snackbarHostState.showSnackbar(
         message = message,
         actionLabel = actionLabel,
-        withDismissAction = true,
+        withDismissAction = false,
       )
 
     when (snackbarResult) {
