@@ -14,20 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.AuthResponse
+import androidx.lifecycle.lifecycleScope
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.LoginResponseHandler
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.ResponseHandler
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.EncryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
-import io.ktor.client.call.body
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.isSuccess
-import kotlinx.coroutines.runBlocking
-import java.nio.channels.UnresolvedAddressException
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -48,49 +43,18 @@ class MainActivity : ComponentActivity() {
         filename = LocalCredentials.PASSWORD_FILENAME,
         context = applicationContext,
       ).value
-    val loginResponseType =
-      runBlocking {
-        if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
-          try {
-            val response =
-              loginViewModel.login(
-                LoginRequest(
-                  subject = locallyStoredSubject,
-                  password = locallyStoredPassword,
-                ),
-              )
-
-            val status = response.status
-            if (status.isSuccess()) {
-              EncryptedCredentials.encryptCredential(
-                credential =
-                  try {
-                    response.body<AuthResponse>().token
-                  } catch (_: Exception) {
-                    ""
-                  },
-                filename = LocalCredentials.TOKEN_FILENAME,
-                context = applicationContext,
-              )
-              LoginResponseType.SUCCESS
-            } else {
-              if (status == HttpStatusCode.NotFound) {
-                LoginResponseType.API_NOT_FOUND
-              } else {
-                LoginResponseType.FAILURE
-              }
-            }
-          } catch (_: UnresolvedAddressException) {
-            LoginResponseType.NOT_INTERNET_CONNECTION
-          } catch (_: Exception) {
-            LoginResponseType.REQUEST_FAILURE
-          }
-        } else {
-          LoginResponseType.BAD_DECRYPTED_CREDENTIALS
-        }
-      }
-
-    mainViewModel.saveLoginResponseType(loginResponseType)
+    lifecycleScope.launch {
+      val handler: ResponseHandler = LoginResponseHandler()
+      mainViewModel.loginResponseType(
+        loginResponseType =
+          handler.handle(
+            subject = locallyStoredSubject,
+            password = locallyStoredPassword,
+            context = applicationContext,
+            loginViewModel,
+          ),
+      )
+    }
 
     setContent {
       enableEdgeToEdge(

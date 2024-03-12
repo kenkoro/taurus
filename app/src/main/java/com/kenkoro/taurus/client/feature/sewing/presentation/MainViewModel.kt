@@ -11,16 +11,16 @@ import javax.inject.Inject
 class MainViewModel
   @Inject
   constructor() : ViewModel() {
-    private val _loginResponseType = mutableStateOf(LoginResponseType.SUCCESS)
+    private val _loginResponseType = mutableStateOf(LoginResponseType.PENDING)
     val loginResponseType = _loginResponseType
 
-    fun saveLoginResponseType(loginResponseType: LoginResponseType) {
+    fun loginResponseType(loginResponseType: LoginResponseType) {
       _loginResponseType.value = loginResponseType
     }
 
     fun startDestination(): Screen {
       return if (
-        _loginResponseType.value == LoginResponseType.BAD_DECRYPTED_CREDENTIALS ||
+        _loginResponseType.value == LoginResponseType.BAD_CREDENTIALS ||
         _loginResponseType.value == LoginResponseType.FAILURE
       ) {
         Screen.LoginScreen

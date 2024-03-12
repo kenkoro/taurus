@@ -21,7 +21,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,45 +29,36 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.UserKtorApi
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.AuthResponse
-import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
-import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.util.LoginCredentials
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.EncryptedCredentials
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.plugins.HttpRequestTimeoutException
-import io.ktor.http.isSuccess
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 import kotlinx.coroutines.launch
-import java.nio.channels.UnresolvedAddressException
-
-@JvmInline
-value class ResponseMessage(val value: String) {
-  fun isNotSuccess(): Boolean = value.isNotBlank()
-}
 
 @Composable
 fun LoginBlock(
-  onLoginNavigate: () -> Unit = {},
   snackbarHostState: SnackbarHostState,
-  loginViewModel: LoginViewModel = hiltViewModel(),
+  loginViewModel: LoginViewModel,
+  onLoginNavigate: () -> Unit = {},
   modifier: Modifier,
 ) {
   val subject = loginViewModel.subject
   val password = loginViewModel.password
   val context = LocalContext.current
+  val scope = loginViewModel.viewModelScope
+  val requestErrorMessage = stringResource(id = R.string.request_error)
+  val subjectAndPasswordCannotBeBlank =
+    stringResource(id = R.string.subject_and_password_cannot_be_blank)
 
   val loginFields =
     listOf(
       FieldData(
-        state = subject,
+        value = subject.value,
+        onValueChange = {
+          loginViewModel.subject(it)
+        },
         placeholderText = stringResource(id = R.string.login_subject),
         keyboardOptions =
           KeyboardOptions.Default.copy(
@@ -78,7 +68,10 @@ fun LoginBlock(
         transformation = VisualTransformation.None,
       ),
       FieldData(
-        state = password,
+        value = password.value,
+        onValueChange = {
+          loginViewModel.password(it)
+        },
         placeholderText = stringResource(id = R.string.login_password),
         keyboardOptions =
           KeyboardOptions.Default.copy(
@@ -102,8 +95,10 @@ fun LoginBlock(
     ) {
       items(loginFields) { fieldData: FieldData ->
         OutlinedTextField(
-          value = fieldData.state.value,
-          onValueChange = { fieldData.state.value = it },
+          value = fieldData.value,
+          onValueChange = {
+            fieldData.onValueChange(it)
+          },
           shape = RoundedCornerShape(50),
           placeholder = {
             Text(text = fieldData.placeholderText)
@@ -121,58 +116,38 @@ fun LoginBlock(
       horizontalAlignment = Alignment.End,
       modifier = Modifier.fillMaxWidth(),
     ) {
-      val failedInternetConnectionMessage =
-        stringResource(id = R.string.check_internet_connection)
-      val httpRequestTimeoutExceptionMessage = stringResource(id = R.string.login_timeout)
-      val requestErrorMessage = stringResource(id = R.string.request_error)
       Button(
         modifier =
           Modifier
             .size(width = 160.dp, height = 80.dp),
         shape = RoundedCornerShape(30.dp),
         onClick = {
-          loginViewModel.viewModelScope.launch {
-            val responseMessage =
-              try {
-                val response =
-                  loginViewModel.login(
+          scope.launch {
+            val response =
+              if (subject.value.isNotBlank() && password.value.isNotBlank()) {
+                loginViewModel.loginAndGetLoginResponseType(
+                  request =
                     LoginRequest(
                       subject = subject.value,
                       password = password.value,
                     ),
-                  )
-
-                if (!response.status.isSuccess()) {
-                  ResponseMessage(response.status.toString())
-                } else {
-                  EncryptedCredentials.encryptCredentials(
-                    credentials =
-                      LoginCredentials(
-                        subject = subject.value,
-                        password = password.value,
-                        token =
-                          try {
-                            response.body<AuthResponse>().token
-                          } catch (_: Exception) {
-                            ""
-                          },
-                      ),
-                    context = context,
-                  )
-                  onLoginNavigate()
-                  ResponseMessage("")
-                }
-              } catch (_: HttpRequestTimeoutException) {
-                ResponseMessage(httpRequestTimeoutExceptionMessage)
-              } catch (_: UnresolvedAddressException) {
-                ResponseMessage(failedInternetConnectionMessage)
-              } catch (_: Exception) {
-                ResponseMessage(requestErrorMessage)
+                  context = context,
+                  encryptSubjectAndPassword = true,
+                )
+              } else {
+                LoginResponseType.BAD_CREDENTIALS
               }
 
-            if (responseMessage.isNotSuccess()) {
+            if (response != LoginResponseType.SUCCESS) {
+              val message =
+                if (response == LoginResponseType.BAD_CREDENTIALS) {
+                  subjectAndPasswordCannotBeBlank
+                } else {
+                  requestErrorMessage
+                }
+
               snackbarHostState.showSnackbar(
-                message = responseMessage.value,
+                message = message,
                 withDismissAction = true,
               )
             }
@@ -187,23 +162,4 @@ fun LoginBlock(
       }
     }
   }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginBlockPreview() {
-  val snackbarHostState = remember { SnackbarHostState() }
-  LoginBlock(
-    loginViewModel =
-      LoginViewModel(
-        userRepository =
-          UserRepositoryImpl(
-            UserKtorApi(
-              HttpClient(),
-            ),
-          ),
-      ),
-    snackbarHostState = snackbarHostState,
-    modifier = Modifier,
-  )
 }

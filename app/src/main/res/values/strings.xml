@@ -7,14 +7,13 @@
     <string name="login_password">Пароль</string>
     <string name="login_forgot_password_not_implemented">Ещё не имплементировано</string>
     <string name="check_internet_connection">Проверьте соединение с Интернетом</string>
-    <string name="login_timeout">Тайм-аут</string>
     <string name="bottom_bar_host_users">Пользователи</string>
     <string name="bottom_bar_host_orders">Заказы</string>
     <string name="get_user">Посмотреть пользователя</string>
     <string name="delete_user">Удалить пользователя</string>
     <string name="create_user">Создать нового пользователя</string>
     <string name="update_user">Обновить данные пользователя</string>
-    <string name="login_not_found">Бэкенд не запущен</string>
-    <string name="request_error">Ошибка с запросом</string>
     <string name="retry">Повторить</string>
+    <string name="request_error">Упс, что-то пошло не так</string>
+    <string name="subject_and_password_cannot_be_blank">Логин / пароль не могут быть пустыми</string>
 </resources>

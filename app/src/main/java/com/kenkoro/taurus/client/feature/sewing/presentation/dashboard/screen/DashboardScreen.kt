@@ -2,30 +2,41 @@ package com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.sewing.presentation.MainViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.components.BottomBarHost
-import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.components.ErrorSnackbar
+import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.components.showErrorSnackbar
+import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.order.screen.OrderScreen
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.LoginResponseHandler
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.ResponseHandler
 import com.kenkoro.taurus.client.feature.sewing.presentation.user.screen.UserScreen
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 import com.kenkoro.taurus.client.ui.theme.AppTheme
+import kotlinx.coroutines.launch
 
 object BottomBarHostIndices {
   const val ORDER_SCREEN = 1
@@ -37,21 +48,20 @@ fun DashboardScreen(
   onLoginNavigate: () -> Unit = {},
   onNavigateUp: () -> Unit = {},
   mainViewModel: MainViewModel = hiltViewModel(),
+  loginViewModel: LoginViewModel = hiltViewModel(),
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
+  val mainViewModelScope = mainViewModel.viewModelScope
+  val message = stringResource(id = R.string.request_error)
+  val context = LocalContext.current
 
   AppTheme {
     Scaffold(
       snackbarHost = {
         SnackbarHost(hostState = snackbarHostState) {
-          Snackbar(
+          ErrorSnackbar(
             modifier = Modifier.padding(bottom = 20.dp),
             snackbarData = it,
-            shape = RoundedCornerShape(30.dp),
-            containerColor = MaterialTheme.colorScheme.error,
-            contentColor = MaterialTheme.colorScheme.onError,
-            dismissActionContentColor = MaterialTheme.colorScheme.onError,
-            actionColor = MaterialTheme.colorScheme.onError,
           )
         }
       },
@@ -72,33 +82,40 @@ fun DashboardScreen(
             }
           }
 
-          LoginResponseType.NOT_INTERNET_CONNECTION -> {
-            val message = stringResource(id = R.string.check_internet_connection)
-            ErrorSnackbar(
-              snackbarHostState = snackbarHostState,
-              message = message,
-              onDismissed = onNavigateUp,
-              onActionPerformed = {},
-            )
-          }
-
           LoginResponseType.REQUEST_FAILURE -> {
-            val message = stringResource(id = R.string.request_error)
-            ErrorSnackbar(
+            showErrorSnackbar(
               snackbarHostState = snackbarHostState,
+              key = mainViewModel.loginResponseType.value,
               message = message,
-              onDismissed = onNavigateUp,
-              onActionPerformed = {},
-            )
-          }
-
-          LoginResponseType.API_NOT_FOUND -> {
-            val message = stringResource(id = R.string.login_not_found)
-            ErrorSnackbar(
-              snackbarHostState = snackbarHostState,
-              message = message,
-              onDismissed = onNavigateUp,
-              onActionPerformed = {},
+              onActionPerformed = {
+                val locallyStoredSubject =
+                  DecryptedCredentials.getDecryptedCredential(
+                    filename = LocalCredentials.SUBJECT_FILENAME,
+                    context = context,
+                  ).value
+                val locallyStoredPassword =
+                  DecryptedCredentials.getDecryptedCredential(
+                    filename = LocalCredentials.PASSWORD_FILENAME,
+                    context = context,
+                  ).value
+                mainViewModel.loginResponseType(LoginResponseType.PENDING)
+                if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
+                  mainViewModelScope.launch {
+                    val handler: ResponseHandler = LoginResponseHandler()
+                    mainViewModel.loginResponseType(
+                      loginResponseType =
+                        handler.handle(
+                          subject = locallyStoredSubject,
+                          password = locallyStoredPassword,
+                          context = context,
+                          loginViewModel,
+                        ),
+                    )
+                  }
+                } else {
+                  LoginResponseType.BAD_CREDENTIALS
+                }
+              },
             )
           }
 
@@ -106,8 +123,18 @@ fun DashboardScreen(
             onLoginNavigate()
           }
 
-          LoginResponseType.BAD_DECRYPTED_CREDENTIALS -> {
+          LoginResponseType.BAD_CREDENTIALS -> {
             onLoginNavigate()
+          }
+
+          LoginResponseType.PENDING -> {
+            Column(
+              modifier = Modifier.fillMaxSize(),
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center,
+            ) {
+              CircularProgressIndicator()
+            }
           }
         }
       }
