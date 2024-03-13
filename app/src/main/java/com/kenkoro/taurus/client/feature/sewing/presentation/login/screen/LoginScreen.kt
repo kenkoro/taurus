@@ -14,10 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components.HelpBlock
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components.LoginBlock
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
@@ -29,7 +27,6 @@ fun LoginScreen(
   loginViewModel: LoginViewModel = hiltViewModel(),
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
-  val context = LocalContext.current
 
   AppTheme {
     Scaffold(
@@ -58,8 +55,7 @@ fun LoginScreen(
               .width(320.dp)
               .weight(9F),
             onLoginNavigate = onLoginNavigate,
-            snackbarHostState = snackbarHostState,
-            networkConnectivityObserver = NetworkConnectivityObserver(context)
+            snackbarHostState = snackbarHostState
           )
           HelpBlock(
             modifier = Modifier.weight(1F),

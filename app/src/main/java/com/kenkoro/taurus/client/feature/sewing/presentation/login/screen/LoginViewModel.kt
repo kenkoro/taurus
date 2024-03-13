@@ -40,7 +40,7 @@ class LoginViewModel
       _password.value = password
     }
 
-    suspend fun loginAndGetLoginResponseType(
+    suspend fun loginAndEncryptCredentials(
       request: LoginRequest,
       context: Context,
       encryptSubjectAndPassword: Boolean = false,

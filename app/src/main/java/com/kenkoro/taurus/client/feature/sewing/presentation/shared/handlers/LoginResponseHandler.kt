@@ -13,7 +13,7 @@ class LoginResponseHandler : ResponseHandler {
     loginViewModel: LoginViewModel,
   ): LoginResponseType {
     return if (subject.isNotBlank() && password.isNotBlank()) {
-      loginViewModel.loginAndGetLoginResponseType(
+      loginViewModel.loginAndEncryptCredentials(
         request =
           LoginRequest(
             subject = subject,

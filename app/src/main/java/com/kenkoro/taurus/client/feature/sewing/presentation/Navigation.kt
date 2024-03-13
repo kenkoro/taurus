@@ -17,7 +17,7 @@ fun AppNavHost(
 ) {
   NavHost(
     navController = navController,
-    startDestination = mainViewModel.startDestination().route,
+    startDestination = Screen.LoginScreen.route,
   ) {
     composable(route = Screen.LoginScreen.route) {
       LoginScreen(
@@ -29,7 +29,6 @@ fun AppNavHost(
     composable(route = Screen.DashboardScreen.route) {
       DashboardScreen(
         onLoginNavigate = {
-          navController.popBackStack()
           navController.navigate(Screen.LoginScreen.route)
         },
         mainViewModel = mainViewModel,

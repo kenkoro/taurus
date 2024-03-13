@@ -1,6 +1,7 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.shared.components
 
 import android.annotation.SuppressLint
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
@@ -17,7 +18,7 @@ fun <T> showErrorSnackbar(
   message: String,
   onDismissed: suspend () -> Unit = {},
   onActionPerformed: suspend () -> Unit = {},
-  actionLabel: String = stringResource(id = R.string.retry),
+  actionLabel: String? = stringResource(id = R.string.ok),
   delayInMillis: Long = 100
 ) {
   LaunchedEffect(key) {

@@ -25,10 +25,10 @@ import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.sewing.presentation.MainViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.components.BottomBarHost
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.order.screen.OrderScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.LoginResponseHandler
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.ResponseHandler
 import com.kenkoro.taurus.client.feature.sewing.presentation.user.screen.UserScreen
@@ -36,6 +36,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCrede
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 import com.kenkoro.taurus.client.ui.theme.AppTheme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 object BottomBarHostIndices {
@@ -46,7 +47,6 @@ object BottomBarHostIndices {
 @Composable
 fun DashboardScreen(
   onLoginNavigate: () -> Unit = {},
-  onNavigateUp: () -> Unit = {},
   mainViewModel: MainViewModel = hiltViewModel(),
   loginViewModel: LoginViewModel = hiltViewModel(),
 ) {
@@ -68,9 +68,9 @@ fun DashboardScreen(
     ) {
       Surface(
         modifier =
-          Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+        Modifier
+          .fillMaxSize()
+          .background(MaterialTheme.colorScheme.background),
       ) {
         when (mainViewModel.loginResponseType.value) {
           LoginResponseType.Success -> {
@@ -100,16 +100,16 @@ fun DashboardScreen(
                   ).value
                 mainViewModel.loginResponseType(LoginResponseType.Pending)
                 if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
-                  mainViewModelScope.launch {
+                  mainViewModelScope.launch(Dispatchers.IO) {
                     val handler: ResponseHandler = LoginResponseHandler()
                     mainViewModel.loginResponseType(
                       loginResponseType =
-                        handler.handle(
-                          subject = locallyStoredSubject,
-                          password = locallyStoredPassword,
-                          context = context,
-                          loginViewModel,
-                        ),
+                      handler.handle(
+                        subject = locallyStoredSubject,
+                        password = locallyStoredPassword,
+                        context = context,
+                        loginViewModel,
+                      ),
                     )
                   }
                 } else {

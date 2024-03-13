@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
@@ -39,7 +38,10 @@ import io.ktor.client.call.body
 import kotlinx.coroutines.launch
 
 @Composable
-fun UserScreen(userViewModel: UserViewModel = hiltViewModel()) {
+fun UserScreen(
+  userViewModel: UserViewModel = hiltViewModel(),
+  enabled: Boolean = true
+) {
   val context = LocalContext.current
   val firstName =
     DecryptedCredentials.getDecryptedCredential(
@@ -76,9 +78,9 @@ fun UserScreen(userViewModel: UserViewModel = hiltViewModel()) {
   AppTheme {
     Surface(
       modifier =
-        Modifier
-          .fillMaxSize()
-          .background(MaterialTheme.colorScheme.background),
+      Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colorScheme.background),
     ) {
       Column(modifier = Modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.height(10.dp))
@@ -91,13 +93,14 @@ fun UserScreen(userViewModel: UserViewModel = hiltViewModel()) {
         UserScreenButtons { item ->
           Spacer(modifier = Modifier.width(10.dp))
           Button(
+            enabled = enabled,
             modifier =
-              Modifier
-                .size(width = 175.dp, height = 90.dp)
-                .shadow(
-                  elevation = 4.dp,
-                  shape = RoundedCornerShape(30.dp),
-                ),
+            Modifier
+              .size(width = 175.dp, height = 90.dp)
+              .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(30.dp),
+              ),
             onClick = { /*TODO*/ },
             shape = RoundedCornerShape(30.dp),
           ) {
@@ -108,10 +111,4 @@ fun UserScreen(userViewModel: UserViewModel = hiltViewModel()) {
       }
     }
   }
-}
-
-@Preview
-@Composable
-private fun UserScreenPrev() {
-  UserScreen()
 }
