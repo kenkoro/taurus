@@ -64,7 +64,7 @@ fun UserScreen(userViewModel: UserViewModel = hiltViewModel()) {
             image = "",
             firstName = "None",
             lastName = "",
-            role = UserRole.OTHERS,
+            role = UserRole.Others,
             salt = "",
           )
         }

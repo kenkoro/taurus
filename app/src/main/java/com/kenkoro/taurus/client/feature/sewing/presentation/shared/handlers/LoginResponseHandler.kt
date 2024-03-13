@@ -22,7 +22,7 @@ class LoginResponseHandler : ResponseHandler {
         context = context,
       )
     } else {
-      LoginResponseType.BAD_CREDENTIALS
+      LoginResponseType.BadCredentials
     }
   }
 }

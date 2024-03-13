@@ -25,7 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.sewing.presentation.MainViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.components.BottomBarHost
-import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.components.showErrorSnackbar
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.order.screen.OrderScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
@@ -73,7 +73,7 @@ fun DashboardScreen(
             .background(MaterialTheme.colorScheme.background),
       ) {
         when (mainViewModel.loginResponseType.value) {
-          LoginResponseType.SUCCESS -> {
+          LoginResponseType.Success -> {
             BottomBarHost { index ->
               when (index) {
                 BottomBarHostIndices.ORDER_SCREEN -> OrderScreen()
@@ -82,7 +82,7 @@ fun DashboardScreen(
             }
           }
 
-          LoginResponseType.REQUEST_FAILURE -> {
+          LoginResponseType.RequestFailure -> {
             showErrorSnackbar(
               snackbarHostState = snackbarHostState,
               key = mainViewModel.loginResponseType.value,
@@ -98,7 +98,7 @@ fun DashboardScreen(
                     filename = LocalCredentials.PASSWORD_FILENAME,
                     context = context,
                   ).value
-                mainViewModel.loginResponseType(LoginResponseType.PENDING)
+                mainViewModel.loginResponseType(LoginResponseType.Pending)
                 if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
                   mainViewModelScope.launch {
                     val handler: ResponseHandler = LoginResponseHandler()
@@ -113,21 +113,21 @@ fun DashboardScreen(
                     )
                   }
                 } else {
-                  LoginResponseType.BAD_CREDENTIALS
+                  LoginResponseType.BadCredentials
                 }
               },
             )
           }
 
-          LoginResponseType.FAILURE -> {
+          LoginResponseType.Failure -> {
             onLoginNavigate()
           }
 
-          LoginResponseType.BAD_CREDENTIALS -> {
+          LoginResponseType.BadCredentials -> {
             onLoginNavigate()
           }
 
-          LoginResponseType.PENDING -> {
+          LoginResponseType.Pending -> {
             Column(
               modifier = Modifier.fillMaxSize(),
               horizontalAlignment = Alignment.CenterHorizontally,

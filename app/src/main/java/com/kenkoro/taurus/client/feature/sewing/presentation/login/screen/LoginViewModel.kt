@@ -66,17 +66,17 @@ class LoginViewModel
                 context = context,
               )
             }
-            LoginResponseType.SUCCESS
+            LoginResponseType.Success
           } else {
             if (apiUrlNotFound(status)) {
-              LoginResponseType.REQUEST_FAILURE
+              LoginResponseType.RequestFailure
             } else {
-              LoginResponseType.FAILURE
+              LoginResponseType.Failure
             }
           }
         }
       } catch (_: Exception) {
-        LoginResponseType.REQUEST_FAILURE
+        LoginResponseType.RequestFailure
       }
     }
 

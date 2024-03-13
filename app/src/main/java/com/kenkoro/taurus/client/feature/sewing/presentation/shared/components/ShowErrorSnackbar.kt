@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.shared.components
 
 import android.annotation.SuppressLint
 import androidx.compose.material3.SnackbarHostState
@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.stringResource
 import com.kenkoro.taurus.client.R
+import kotlinx.coroutines.delay
 
 @SuppressLint("ComposableNaming")
 @Composable
@@ -15,10 +16,12 @@ fun <T> showErrorSnackbar(
   key: T,
   message: String,
   onDismissed: suspend () -> Unit = {},
-  onActionPerformed: suspend () -> Unit,
+  onActionPerformed: suspend () -> Unit = {},
+  actionLabel: String = stringResource(id = R.string.retry),
+  delayInMillis: Long = 100
 ) {
-  val actionLabel = stringResource(id = R.string.retry)
   LaunchedEffect(key) {
+    delay(delayInMillis)
     val snackbarResult =
       snackbarHostState.showSnackbar(
         message = message,

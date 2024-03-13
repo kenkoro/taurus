@@ -6,7 +6,7 @@
     <string name="login_subject">Логин</string>
     <string name="login_password">Пароль</string>
     <string name="login_forgot_password_not_implemented">Ещё не имплементировано</string>
-    <string name="check_internet_connection">Проверьте соединение с Интернетом</string>
+    <string name="check_internet_connection">Интернет отсутствует</string>
     <string name="bottom_bar_host_users">Пользователи</string>
     <string name="bottom_bar_host_orders">Заказы</string>
     <string name="get_user">Посмотреть пользователя</string>
@@ -16,4 +16,5 @@
     <string name="retry">Повторить</string>
     <string name="request_error">Упс, что-то пошло не так</string>
     <string name="subject_and_password_cannot_be_blank">Логин / пароль не могут быть пустыми</string>
+    <string name="ok">Хорошо</string>
 </resources>

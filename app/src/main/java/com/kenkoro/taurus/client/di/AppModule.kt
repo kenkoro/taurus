@@ -37,14 +37,14 @@ object AppModule {
     return UserRepository.create(
       UserKtorApi(
         client =
-          HttpClient(CIO) {
-            install(Logging) {
-              level = LogLevel.ALL
-            }
-            install(ContentNegotiation) {
-              json()
-            }
-          },
+        HttpClient(CIO) {
+          install(Logging) {
+            level = LogLevel.ALL
+          }
+          install(ContentNegotiation) {
+            json()
+          }
+        }
       ),
     )
   }

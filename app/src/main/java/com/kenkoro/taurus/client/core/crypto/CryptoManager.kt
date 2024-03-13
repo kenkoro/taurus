@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.core
+package com.kenkoro.taurus.client.core.crypto
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
