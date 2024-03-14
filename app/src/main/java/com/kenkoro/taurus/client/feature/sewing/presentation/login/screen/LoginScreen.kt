@@ -15,17 +15,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components.HelpBlock
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components.LoginBlock
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
-fun LoginScreen(
-  onLoginNavigate: () -> Unit,
-  loginViewModel: LoginViewModel = hiltViewModel(),
-) {
+fun LoginScreen(onLoginNavigate: () -> Unit) {
   val snackbarHostState = remember { SnackbarHostState() }
 
   AppTheme {
@@ -41,21 +37,20 @@ fun LoginScreen(
     ) {
       Surface(
         modifier =
-        Modifier
-          .fillMaxSize()
-          .padding(it),
+          Modifier
+            .fillMaxSize()
+            .padding(it),
       ) {
         Column(
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           LoginBlock(
-            loginViewModel = loginViewModel,
             modifier =
-            Modifier
-              .width(320.dp)
-              .weight(9F),
+              Modifier
+                .width(320.dp)
+                .weight(9F),
             onLoginNavigate = onLoginNavigate,
-            snackbarHostState = snackbarHostState
+            snackbarHostState = snackbarHostState,
           )
           HelpBlock(
             modifier = Modifier.weight(1F),

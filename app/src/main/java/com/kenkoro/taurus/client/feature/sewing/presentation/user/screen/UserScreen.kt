@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun UserScreen(
   userViewModel: UserViewModel = hiltViewModel(),
-  enabled: Boolean = true
+  enabled: Boolean = true,
 ) {
   val context = LocalContext.current
   val firstName =
@@ -78,9 +78,9 @@ fun UserScreen(
   AppTheme {
     Surface(
       modifier =
-      Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background),
+        Modifier
+          .fillMaxSize()
+          .background(MaterialTheme.colorScheme.background),
     ) {
       Column(modifier = Modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.height(10.dp))
@@ -95,12 +95,12 @@ fun UserScreen(
           Button(
             enabled = enabled,
             modifier =
-            Modifier
-              .size(width = 175.dp, height = 90.dp)
-              .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(30.dp),
-              ),
+              Modifier
+                .size(width = 175.dp, height = 90.dp)
+                .shadow(
+                  elevation = 4.dp,
+                  shape = RoundedCornerShape(30.dp),
+                ),
             onClick = { /*TODO*/ },
             shape = RoundedCornerShape(30.dp),
           ) {

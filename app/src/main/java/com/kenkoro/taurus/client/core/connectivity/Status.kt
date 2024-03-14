@@ -4,5 +4,5 @@ enum class Status {
   Available,
   Lost,
   Unavailable,
-  Losing
+  Losing,
 }

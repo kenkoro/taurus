@@ -13,6 +13,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,9 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.feature.sewing.presentation.MainViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.components.BottomBarHost
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.order.screen.OrderScreen
@@ -36,8 +35,6 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCrede
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 import com.kenkoro.taurus.client.ui.theme.AppTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 object BottomBarHostIndices {
   const val ORDER_SCREEN = 1
@@ -46,14 +43,26 @@ object BottomBarHostIndices {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun DashboardScreen(
-  onLoginNavigate: () -> Unit = {},
-  mainViewModel: MainViewModel = hiltViewModel(),
+  onDashboardNavigate: () -> Unit = {},
   loginViewModel: LoginViewModel = hiltViewModel(),
+  dashboardViewModel: DashboardViewModel = hiltViewModel(),
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
-  val mainViewModelScope = mainViewModel.viewModelScope
+
   val message = stringResource(id = R.string.request_error)
   val context = LocalContext.current
+  val handler: ResponseHandler = LoginResponseHandler()
+
+  val locallyStoredSubject =
+    DecryptedCredentials.getDecryptedCredential(
+      filename = LocalCredentials.SUBJECT_FILENAME,
+      context = context,
+    ).value
+  val locallyStoredPassword =
+    DecryptedCredentials.getDecryptedCredential(
+      filename = LocalCredentials.PASSWORD_FILENAME,
+      context = context,
+    ).value
 
   AppTheme {
     Scaffold(
@@ -68,11 +77,26 @@ fun DashboardScreen(
     ) {
       Surface(
         modifier =
-        Modifier
-          .fillMaxSize()
-          .background(MaterialTheme.colorScheme.background),
+          Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
       ) {
-        when (mainViewModel.loginResponseType.value) {
+        LaunchedEffect(Unit) {
+          if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
+            handler.handle(
+              subject = locallyStoredSubject,
+              password = locallyStoredPassword,
+              context = context,
+              loginViewModel = loginViewModel,
+            ).run {
+              dashboardViewModel.onResponse(this)
+            }
+          } else {
+            onDashboardNavigate()
+          }
+        }
+
+        when (dashboardViewModel.loginResponseType.value) {
           LoginResponseType.Success -> {
             BottomBarHost { index ->
               when (index) {
@@ -85,46 +109,29 @@ fun DashboardScreen(
           LoginResponseType.RequestFailure -> {
             showErrorSnackbar(
               snackbarHostState = snackbarHostState,
-              key = mainViewModel.loginResponseType.value,
+              key = dashboardViewModel.loginResponseType.value,
               message = message,
               onActionPerformed = {
-                val locallyStoredSubject =
-                  DecryptedCredentials.getDecryptedCredential(
-                    filename = LocalCredentials.SUBJECT_FILENAME,
-                    context = context,
-                  ).value
-                val locallyStoredPassword =
-                  DecryptedCredentials.getDecryptedCredential(
-                    filename = LocalCredentials.PASSWORD_FILENAME,
-                    context = context,
-                  ).value
-                mainViewModel.loginResponseType(LoginResponseType.Pending)
                 if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
-                  mainViewModelScope.launch(Dispatchers.IO) {
-                    val handler: ResponseHandler = LoginResponseHandler()
-                    mainViewModel.loginResponseType(
-                      loginResponseType =
-                      handler.handle(
-                        subject = locallyStoredSubject,
-                        password = locallyStoredPassword,
-                        context = context,
-                        loginViewModel,
-                      ),
-                    )
+                  handler.handle(
+                    subject = locallyStoredSubject,
+                    password = locallyStoredPassword,
+                    context = context,
+                    loginViewModel,
+                  ).run {
+                    dashboardViewModel.onResponse(this)
                   }
-                } else {
-                  LoginResponseType.BadCredentials
                 }
               },
             )
           }
 
           LoginResponseType.Failure -> {
-            onLoginNavigate()
+            onDashboardNavigate()
           }
 
           LoginResponseType.BadCredentials -> {
-            onLoginNavigate()
+            onDashboardNavigate()
           }
 
           LoginResponseType.Pending -> {

@@ -30,18 +30,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
 fun LoginBlock(
   snackbarHostState: SnackbarHostState,
-  loginViewModel: LoginViewModel,
+  loginViewModel: LoginViewModel = hiltViewModel(),
   onLoginNavigate: () -> Unit,
   modifier: Modifier,
 ) {
@@ -63,10 +63,10 @@ fun LoginBlock(
         },
         placeholderText = stringResource(id = R.string.login_subject),
         keyboardOptions =
-        KeyboardOptions.Default.copy(
-          imeAction = ImeAction.Next,
-          keyboardType = KeyboardType.Text,
-        ),
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+          ),
         transformation = VisualTransformation.None,
       ),
       FieldData(
@@ -76,10 +76,10 @@ fun LoginBlock(
         },
         placeholderText = stringResource(id = R.string.login_password),
         keyboardOptions =
-        KeyboardOptions.Default.copy(
-          imeAction = ImeAction.Done,
-          keyboardType = KeyboardType.Password,
-        ),
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password,
+          ),
         transformation = PasswordVisualTransformation(),
       ),
     )
@@ -120,42 +120,41 @@ fun LoginBlock(
     ) {
       Button(
         modifier =
-        Modifier
-          .size(width = 160.dp, height = 80.dp),
+          Modifier
+            .size(width = 160.dp, height = 80.dp),
         shape = RoundedCornerShape(30.dp),
         onClick = {
-          loginViewModelScope.launch(Dispatchers.IO) {
-            onLoginNavigate()
-//            val response =
-//              if (subject.value.isNotBlank() && password.value.isNotBlank()) {
-//                loginViewModel.loginAndEncryptCredentials(
-//                  request =
-//                  LoginRequest(
-//                    subject = subject.value,
-//                    password = password.value,
-//                  ),
-//                  context = context,
-//                  encryptSubjectAndPassword = true,
-//                )
-//              } else {
-//                LoginResponseType.BadCredentials
-//              }
-//
-//            if (response != LoginResponseType.Success) {
-//              val message =
-//                if (response == LoginResponseType.BadCredentials) {
-//                  subjectAndPasswordCannotBeBlankMessage
-//                } else {
-//                  requestErrorMessage
-//                }
-//
-//              snackbarHostState.showSnackbar(
-//                message = message,
-//                withDismissAction = true,
-//              )
-//            } else {
-//              onLoginNavigate()
-//            }
+          loginViewModelScope.launch {
+            val response =
+              if (subject.value.isNotBlank() && password.value.isNotBlank()) {
+                loginViewModel.loginAndEncryptCredentials(
+                  request =
+                    LoginRequest(
+                      subject = subject.value,
+                      password = password.value,
+                    ),
+                  context = context,
+                  encryptSubjectAndPassword = true,
+                )
+              } else {
+                LoginResponseType.BadCredentials
+              }
+
+            if (response != LoginResponseType.Success) {
+              val message =
+                if (response == LoginResponseType.BadCredentials) {
+                  subjectAndPasswordCannotBeBlankMessage
+                } else {
+                  requestErrorMessage
+                }
+
+              snackbarHostState.showSnackbar(
+                message = message,
+                withDismissAction = true,
+              )
+            } else {
+              onLoginNavigate()
+            }
           }
         },
       ) {
