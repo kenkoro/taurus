@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +21,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,8 +35,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
+import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
+import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
+import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
-import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginViewModel
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 import kotlinx.coroutines.launch
 
@@ -53,6 +59,8 @@ fun LoginBlock(
   val requestErrorMessage = stringResource(id = R.string.request_error)
   val subjectAndPasswordCannotBeBlankMessage =
     stringResource(id = R.string.subject_and_password_cannot_be_blank)
+
+  val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
 
   val loginFields =
     listOf(
@@ -87,6 +95,18 @@ fun LoginBlock(
     modifier = modifier,
     verticalArrangement = Arrangement.Center,
   ) {
+    val networkStatus by networkConnectivityObserver
+      .observer()
+      .collectAsState(initial = Status.Unavailable)
+    if (networkStatus != Status.Available) {
+      showErrorSnackbar(
+        snackbarHostState = snackbarHostState,
+        key = networkStatus,
+        message = stringResource(id = R.string.check_internet_connection),
+        actionLabel = null,
+      )
+    }
+
     Text(
       text = stringResource(id = R.string.login_credentials_label),
       style = MaterialTheme.typography.headlineLarge,
@@ -119,6 +139,7 @@ fun LoginBlock(
       modifier = Modifier.fillMaxWidth(),
     ) {
       Button(
+        enabled = networkStatus == Status.Available,
         modifier =
           Modifier
             .size(width = 160.dp, height = 80.dp),

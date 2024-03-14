@@ -6,8 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.DashboardScreen
-import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginScreen
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard.DashboardScreen
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.Screen

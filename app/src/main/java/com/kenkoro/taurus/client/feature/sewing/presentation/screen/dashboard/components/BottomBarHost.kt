@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.util.TabItem
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard.util.TabItem
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

@@ -2,7 +2,7 @@ package com.kenkoro.taurus.client.feature.sewing.presentation.util
 
 import android.content.Context
 import com.kenkoro.taurus.client.core.crypto.CryptoManager
-import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.util.LoginCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.LoginCredentials
 import java.io.File
 import java.io.FileOutputStream
 

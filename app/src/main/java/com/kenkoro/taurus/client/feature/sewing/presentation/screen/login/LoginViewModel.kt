@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.login.screen
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf
@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.AuthResponse
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
-import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.util.LoginCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.LoginCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.EncryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType

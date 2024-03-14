@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column

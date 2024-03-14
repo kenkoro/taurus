@@ -4,16 +4,11 @@ import android.content.Context
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
-fun handleLogin(
+suspend fun handleLogin(
   login: suspend (String, String, Boolean) -> LoginResponseType,
-  onResponse: (LoginResponseType) -> Unit,
-  onDashboardNavigate: () -> Unit,
-  scope: CoroutineScope,
   context: Context,
-) {
+): LoginResponseType {
   val handler: ResponseHandler = LoginResponseHandler()
   val locallyStoredSubject =
     DecryptedCredentials.getDecryptedCredential(
@@ -27,17 +22,13 @@ fun handleLogin(
     ).value
 
   if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
-    scope.launch {
-      handler.handle(
-        subject = locallyStoredSubject,
-        password = locallyStoredPassword,
-        encryptSubjectAndPassword = false,
-        login = login,
-      ).run {
-        onResponse(this)
-      }
-    }
-  } else {
-    onDashboardNavigate()
+    return handler.handle(
+      subject = locallyStoredSubject,
+      password = locallyStoredPassword,
+      encryptSubjectAndPassword = false,
+      login = login,
+    )
   }
+
+  return LoginResponseType.BadCredentials
 }

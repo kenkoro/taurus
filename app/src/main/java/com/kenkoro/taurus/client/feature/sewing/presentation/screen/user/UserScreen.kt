@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.user.screen
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.user
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -30,7 +30,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponse
 import com.kenkoro.taurus.client.feature.sewing.data.util.UserRole
-import com.kenkoro.taurus.client.feature.sewing.presentation.user.screen.components.UserScreenButtons
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.components.UserScreenButtons
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.ui.theme.AppTheme

@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.user.screen.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.lazy.LazyRow
@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.feature.sewing.presentation.user.screen.util.ButtonItem
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.util.ButtonItem
 
 @Composable
 fun UserScreenButtons(

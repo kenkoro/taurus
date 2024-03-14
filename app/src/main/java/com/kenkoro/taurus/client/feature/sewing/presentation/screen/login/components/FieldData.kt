@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions

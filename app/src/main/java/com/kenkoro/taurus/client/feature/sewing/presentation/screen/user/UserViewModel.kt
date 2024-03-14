@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.user.screen
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.user
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel

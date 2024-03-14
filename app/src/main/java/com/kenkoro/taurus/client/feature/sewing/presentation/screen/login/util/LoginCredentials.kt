@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.util
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util
 
 data class LoginCredentials(
   val subject: String,

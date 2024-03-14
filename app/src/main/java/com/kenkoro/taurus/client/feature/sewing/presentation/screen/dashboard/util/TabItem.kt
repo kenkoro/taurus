@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.util
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard.util
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

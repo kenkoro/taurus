@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
@@ -17,7 +17,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.util.TabItem
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard.util.TabItem
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

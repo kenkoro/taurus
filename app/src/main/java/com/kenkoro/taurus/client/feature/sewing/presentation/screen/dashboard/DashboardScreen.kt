@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -14,6 +14,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,16 +24,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
+import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
+import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
+import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
-import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.components.BottomBarHost
-import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
-import com.kenkoro.taurus.client.feature.sewing.presentation.order.screen.OrderScreen
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard.components.BottomBarHost
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginViewModel
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderScreen
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.UserScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.handleLogin
-import com.kenkoro.taurus.client.feature.sewing.presentation.user.screen.UserScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
@@ -51,6 +55,8 @@ fun DashboardScreen(
   val message = stringResource(id = R.string.request_error)
   val context = LocalContext.current
 
+  val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
+
   AppTheme {
     Scaffold(
       snackbarHost = {
@@ -68,6 +74,34 @@ fun DashboardScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
       ) {
+        val networkStatus by networkConnectivityObserver
+          .observer()
+          .collectAsState(initial = Status.Unavailable)
+        if (networkStatus != Status.Available) {
+          showErrorSnackbar(
+            snackbarHostState = snackbarHostState,
+            key = networkStatus,
+            message = stringResource(id = R.string.check_internet_connection),
+            actionLabel = null,
+          )
+        } else {
+          LaunchedEffect(Unit) {
+            dashboardViewModel.onResponse(LoginResponseType.Pending)
+            handleLogin(
+              login = { subject, password, encryptSubjectAndPassword ->
+                loginViewModel.loginAndEncryptCredentials(
+                  request = LoginRequest(subject, password),
+                  context = context,
+                  encryptSubjectAndPassword = encryptSubjectAndPassword,
+                )
+              },
+              context = context,
+            ).run {
+              dashboardViewModel.onResponse(this)
+            }
+          }
+        }
+
         LaunchedEffect(Unit) {
           handleLogin(
             login = { subject, password, encryptSubjectAndPassword ->
@@ -77,11 +111,10 @@ fun DashboardScreen(
                 encryptSubjectAndPassword = encryptSubjectAndPassword,
               )
             },
-            onResponse = { dashboardViewModel.onResponse(it) },
-            onDashboardNavigate = onDashboardNavigate,
-            scope = loginViewModel.viewModelScope,
             context = context,
-          )
+          ).run {
+            dashboardViewModel.onResponse(this)
+          }
         }
 
         when (dashboardViewModel.loginResponseType.value) {
@@ -100,6 +133,7 @@ fun DashboardScreen(
               key = dashboardViewModel.loginResponseType.value,
               message = message,
               onActionPerformed = {
+                dashboardViewModel.onResponse(LoginResponseType.Pending)
                 handleLogin(
                   login = { subject, password, encryptSubjectAndPassword ->
                     loginViewModel.loginAndEncryptCredentials(
@@ -108,11 +142,10 @@ fun DashboardScreen(
                       encryptSubjectAndPassword = encryptSubjectAndPassword,
                     )
                   },
-                  onResponse = { dashboardViewModel.onResponse(it) },
-                  onDashboardNavigate = onDashboardNavigate,
-                  scope = loginViewModel.viewModelScope,
                   context = context,
-                )
+                ).run {
+                  dashboardViewModel.onResponse(this)
+                }
               },
             )
           }

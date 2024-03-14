@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.login.screen
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,8 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components.HelpBlock
-import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.components.LoginBlock
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.HelpBlock
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginBlock
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
