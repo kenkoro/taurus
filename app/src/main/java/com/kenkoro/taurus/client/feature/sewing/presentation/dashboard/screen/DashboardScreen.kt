@@ -22,17 +22,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
 import com.kenkoro.taurus.client.feature.sewing.presentation.dashboard.screen.components.BottomBarHost
 import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.order.screen.OrderScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.LoginResponseHandler
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.ResponseHandler
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.handleLogin
 import com.kenkoro.taurus.client.feature.sewing.presentation.user.screen.UserScreen
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
@@ -51,18 +50,6 @@ fun DashboardScreen(
 
   val message = stringResource(id = R.string.request_error)
   val context = LocalContext.current
-  val handler: ResponseHandler = LoginResponseHandler()
-
-  val locallyStoredSubject =
-    DecryptedCredentials.getDecryptedCredential(
-      filename = LocalCredentials.SUBJECT_FILENAME,
-      context = context,
-    ).value
-  val locallyStoredPassword =
-    DecryptedCredentials.getDecryptedCredential(
-      filename = LocalCredentials.PASSWORD_FILENAME,
-      context = context,
-    ).value
 
   AppTheme {
     Scaffold(
@@ -82,18 +69,19 @@ fun DashboardScreen(
             .background(MaterialTheme.colorScheme.background),
       ) {
         LaunchedEffect(Unit) {
-          if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
-            handler.handle(
-              subject = locallyStoredSubject,
-              password = locallyStoredPassword,
-              context = context,
-              loginViewModel = loginViewModel,
-            ).run {
-              dashboardViewModel.onResponse(this)
-            }
-          } else {
-            onDashboardNavigate()
-          }
+          handleLogin(
+            login = { subject, password, encryptSubjectAndPassword ->
+              loginViewModel.loginAndEncryptCredentials(
+                request = LoginRequest(subject, password),
+                context = context,
+                encryptSubjectAndPassword = encryptSubjectAndPassword,
+              )
+            },
+            onResponse = { dashboardViewModel.onResponse(it) },
+            onDashboardNavigate = onDashboardNavigate,
+            scope = loginViewModel.viewModelScope,
+            context = context,
+          )
         }
 
         when (dashboardViewModel.loginResponseType.value) {
@@ -112,16 +100,19 @@ fun DashboardScreen(
               key = dashboardViewModel.loginResponseType.value,
               message = message,
               onActionPerformed = {
-                if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
-                  handler.handle(
-                    subject = locallyStoredSubject,
-                    password = locallyStoredPassword,
-                    context = context,
-                    loginViewModel,
-                  ).run {
-                    dashboardViewModel.onResponse(this)
-                  }
-                }
+                handleLogin(
+                  login = { subject, password, encryptSubjectAndPassword ->
+                    loginViewModel.loginAndEncryptCredentials(
+                      request = LoginRequest(subject, password),
+                      context = context,
+                      encryptSubjectAndPassword = encryptSubjectAndPassword,
+                    )
+                  },
+                  onResponse = { dashboardViewModel.onResponse(it) },
+                  onDashboardNavigate = onDashboardNavigate,
+                  scope = loginViewModel.viewModelScope,
+                  context = context,
+                )
               },
             )
           }

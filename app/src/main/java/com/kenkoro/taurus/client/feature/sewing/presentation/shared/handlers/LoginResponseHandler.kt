@@ -1,26 +1,16 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers
 
-import android.content.Context
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
-import com.kenkoro.taurus.client.feature.sewing.presentation.login.screen.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 
 class LoginResponseHandler : ResponseHandler {
   override suspend fun handle(
     subject: String,
     password: String,
-    context: Context,
-    loginViewModel: LoginViewModel,
+    encryptSubjectAndPassword: Boolean,
+    login: suspend (String, String, Boolean) -> LoginResponseType,
   ): LoginResponseType {
     return if (subject.isNotBlank() && password.isNotBlank()) {
-      loginViewModel.loginAndEncryptCredentials(
-        request =
-          LoginRequest(
-            subject = subject,
-            password = password,
-          ),
-        context = context,
-      )
+      login(subject, password, encryptSubjectAndPassword)
     } else {
       LoginResponseType.BadCredentials
     }
