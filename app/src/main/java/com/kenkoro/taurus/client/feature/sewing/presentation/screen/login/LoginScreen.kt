@@ -15,8 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.HelpBlock
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginBlock
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginFieldsContent
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginHelpContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
@@ -44,7 +44,7 @@ fun LoginScreen(onLoginNavigate: () -> Unit) {
         Column(
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-          LoginBlock(
+          LoginFieldsContent(
             modifier =
               Modifier
                 .width(320.dp)
@@ -52,7 +52,7 @@ fun LoginScreen(onLoginNavigate: () -> Unit) {
             onLoginNavigate = onLoginNavigate,
             snackbarHostState = snackbarHostState,
           )
-          HelpBlock(
+          LoginHelpContent(
             modifier = Modifier.weight(1F),
             snackbarHostState = snackbarHostState,
           )

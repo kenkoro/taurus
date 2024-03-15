@@ -19,7 +19,7 @@ import com.kenkoro.taurus.client.R
 import kotlinx.coroutines.launch
 
 @Composable
-fun HelpBlock(
+fun LoginHelpContent(
   modifier: Modifier = Modifier,
   snackbarHostState: SnackbarHostState,
 ) {

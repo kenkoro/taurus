@@ -122,7 +122,10 @@ fun DashboardScreen(
             BottomBarHost { index ->
               when (index) {
                 BottomBarHostIndices.ORDER_SCREEN -> OrderScreen()
-                else -> UserScreen()
+                else ->
+                  UserScreen(
+                    networkStatus = networkStatus,
+                  )
               }
             }
           }

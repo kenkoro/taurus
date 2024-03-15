@@ -45,7 +45,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseT
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginBlock(
+fun LoginFieldsContent(
   snackbarHostState: SnackbarHostState,
   loginViewModel: LoginViewModel = hiltViewModel(),
   onLoginNavigate: () -> Unit,
