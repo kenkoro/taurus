@@ -32,11 +32,11 @@ class UserViewModel
       )
       private set
 
-    var isLoading by mutableStateOf(true)
+    var isUserDataLoading by mutableStateOf(true)
       private set
 
-    fun onLoad(isLoading: Boolean) {
-      this.isLoading = isLoading
+    fun onLoad(isUserDataLoading: Boolean) {
+      this.isUserDataLoading = isUserDataLoading
     }
 
     fun onGetUserResponse(userResponse: GetUserResponse) {

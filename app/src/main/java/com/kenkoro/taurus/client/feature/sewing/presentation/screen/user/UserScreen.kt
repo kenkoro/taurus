@@ -1,6 +1,5 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.user
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,60 +14,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.core.connectivity.Status
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponse
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.components.UserScreenButtons
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.components.UserTopBar
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.ui.theme.AppTheme
-import io.ktor.client.call.body
 
 @Composable
 fun UserScreen(
   userViewModel: UserViewModel = hiltViewModel(),
   networkStatus: Status,
 ) {
-  val context = LocalContext.current
-  val firstName =
-    DecryptedCredentials.getDecryptedCredential(
-      filename = LocalCredentials.SUBJECT_FILENAME,
-      context = context,
-    ).value
-  val token =
-    DecryptedCredentials.getDecryptedCredential(
-      filename = LocalCredentials.TOKEN_FILENAME,
-      context = context,
-    ).value
-
-  LaunchedEffect(Unit) {
-    try {
-      userViewModel.getUser(firstName, token).body<GetUserResponse>().run {
-        userViewModel.onGetUserResponse(this)
-      }
-    } catch (e: Exception) {
-      Log.d("kenkoro", e.message!!)
-    }
-    userViewModel.onLoad(isLoading = false)
-  }
-
+  userViewModel.onLoad(isUserDataLoading = false)
   AppTheme {
     Surface(
       modifier =
-        Modifier
-          .fillMaxSize()
-          .background(MaterialTheme.colorScheme.background),
+      Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colorScheme.background),
     ) {
       Column(modifier = Modifier.fillMaxWidth()) {
         UserTopBar(
-          isLoading = userViewModel.isLoading,
+          isLoading = userViewModel.isUserDataLoading,
           firstName = userViewModel.user.firstName,
         )
         Spacer(modifier = Modifier.height(40.dp))
@@ -77,12 +48,12 @@ fun UserScreen(
           Button(
             enabled = networkStatus == Status.Available,
             modifier =
-              Modifier
-                .size(width = 175.dp, height = 90.dp)
-                .shadow(
-                  elevation = 4.dp,
-                  shape = RoundedCornerShape(30.dp),
-                ),
+            Modifier
+              .size(width = 175.dp, height = 90.dp)
+              .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(30.dp),
+              ),
             onClick = { /*TODO*/ },
             shape = RoundedCornerShape(30.dp),
           ) {

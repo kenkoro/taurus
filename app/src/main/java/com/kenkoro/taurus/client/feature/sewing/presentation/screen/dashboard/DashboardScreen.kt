@@ -1,6 +1,7 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,18 +29,23 @@ import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponse
+import com.kenkoro.taurus.client.feature.sewing.data.util.UserRole
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard.components.BottomBarHost
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.UserScreen
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.UserViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.handleLogin
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.handleUserGet
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 import com.kenkoro.taurus.client.ui.theme.AppTheme
+import io.ktor.client.call.body
 
 object BottomBarHostIndices {
-  const val ORDER_SCREEN = 1
+  const val USER_SCREEN = 1
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -48,6 +54,7 @@ fun DashboardScreen(
   onDashboardNavigate: () -> Unit = {},
   loginViewModel: LoginViewModel = hiltViewModel(),
   dashboardViewModel: DashboardViewModel = hiltViewModel(),
+  userViewModel: UserViewModel = hiltViewModel()
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val message = stringResource(id = R.string.request_error)
@@ -70,9 +77,9 @@ fun DashboardScreen(
     ) {
       Surface(
         modifier =
-          Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+        Modifier
+          .fillMaxSize()
+          .background(MaterialTheme.colorScheme.background),
       ) {
         if (networkStatus != Status.Available) {
           showErrorSnackbar(
@@ -96,37 +103,30 @@ fun DashboardScreen(
             ).run {
               dashboardViewModel.onResponse(this)
             }
-          }
-        }
 
-        LaunchedEffect(Unit) {
-          handleLogin(
-            login = { subject, password, encryptSubjectAndPassword ->
-              loginViewModel.loginAndEncryptCredentials(
-                request = LoginRequest(subject, password),
-                context = context,
-                encryptSubjectAndPassword = encryptSubjectAndPassword,
-              )
-            },
-            context = context,
-          ).run {
-            dashboardViewModel.onResponse(this)
+            handleUserGet(context = context) { firstName, token ->
+              try {
+                userViewModel.getUser(firstName, token).body<GetUserResponse>().run {
+                  userViewModel.onGetUserResponse(this)
+                }
+              } catch (e: Exception) {
+                Log.d("kenkoro", e.message!!)
+              }
+              userViewModel.onLoad(isUserDataLoading = false)
+            }
           }
         }
 
         when (dashboardViewModel.loginResponseType) {
           LoginResponseType.Success -> {
-            BottomBarHost { index ->
+            BottomBarHost(
+              isAdmin = userViewModel.user.role == UserRole.Admin
+            ) { index ->
               when (index) {
-                BottomBarHostIndices.ORDER_SCREEN ->
-                  OrderScreen(
-                    networkStatus = networkStatus,
-                  )
+                BottomBarHostIndices.USER_SCREEN ->
+                  UserScreen(networkStatus = networkStatus)
 
-                else ->
-                  UserScreen(
-                    networkStatus = networkStatus,
-                  )
+                else -> OrderScreen(networkStatus = networkStatus)
               }
             }
           }
