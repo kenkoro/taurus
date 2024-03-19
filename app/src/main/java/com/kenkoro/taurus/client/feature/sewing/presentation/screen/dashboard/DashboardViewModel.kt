@@ -13,6 +13,7 @@ class DashboardViewModel
   @Inject
   constructor() : ViewModel() {
     var loginResponseType by mutableStateOf(LoginResponseType.Pending)
+      private set
 
     fun onResponse(response: LoginResponseType) {
       loginResponseType = response

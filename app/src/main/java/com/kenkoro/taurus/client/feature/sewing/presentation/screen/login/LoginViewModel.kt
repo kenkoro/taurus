@@ -29,8 +29,10 @@ class LoginViewModel
     private val userRepository: UserRepositoryImpl,
   ) : ViewModel() {
     var subject by mutableStateOf("")
+      private set
 
     var password by mutableStateOf("")
+      private set
 
     fun subject(subject: String) {
       this.subject = subject

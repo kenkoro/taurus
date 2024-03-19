@@ -30,8 +30,10 @@ class UserViewModel
           salt = "None",
         ),
       )
+      private set
 
     var isLoading by mutableStateOf(true)
+      private set
 
     fun onLoad(isLoading: Boolean) {
       this.isLoading = isLoading
