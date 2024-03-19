@@ -1,7 +1,9 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login
 
 import android.content.Context
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.AuthResponse
@@ -26,18 +28,16 @@ class LoginViewModel
   constructor(
     private val userRepository: UserRepositoryImpl,
   ) : ViewModel() {
-    private val _subject = mutableStateOf("")
-    val subject = _subject
+    var subject by mutableStateOf("")
 
-    private val _password = mutableStateOf("")
-    val password = _password
+    var password by mutableStateOf("")
 
     fun subject(subject: String) {
-      _subject.value = subject
+      this.subject = subject
     }
 
     fun password(password: String) {
-      _password.value = password
+      this.password = password
     }
 
     suspend fun loginAndEncryptCredentials(

@@ -65,7 +65,7 @@ fun LoginFieldsContent(
   val loginFields =
     listOf(
       FieldData(
-        value = subject.value,
+        value = subject,
         onValueChange = {
           loginViewModel.subject(it)
         },
@@ -78,7 +78,7 @@ fun LoginFieldsContent(
         transformation = VisualTransformation.None,
       ),
       FieldData(
-        value = password.value,
+        value = password,
         onValueChange = {
           loginViewModel.password(it)
         },
@@ -147,12 +147,12 @@ fun LoginFieldsContent(
         onClick = {
           loginViewModelScope.launch {
             val response =
-              if (subject.value.isNotBlank() && password.value.isNotBlank()) {
+              if (subject.isNotBlank() && password.isNotBlank()) {
                 loginViewModel.loginAndEncryptCredentials(
                   request =
                     LoginRequest(
-                      subject = subject.value,
-                      password = password.value,
+                      subject = subject,
+                      password = password,
                     ),
                   context = context,
                   encryptSubjectAndPassword = true,

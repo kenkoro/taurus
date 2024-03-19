@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
@@ -51,11 +50,12 @@ fun DashboardScreen(
   dashboardViewModel: DashboardViewModel = hiltViewModel(),
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
-
   val message = stringResource(id = R.string.request_error)
   val context = LocalContext.current
-
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
+  val networkStatus by networkConnectivityObserver
+    .observer()
+    .collectAsState(initial = Status.Unavailable)
 
   AppTheme {
     Scaffold(
@@ -74,9 +74,6 @@ fun DashboardScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
       ) {
-        val networkStatus by networkConnectivityObserver
-          .observer()
-          .collectAsState(initial = Status.Unavailable)
         if (networkStatus != Status.Available) {
           showErrorSnackbar(
             snackbarHostState = snackbarHostState,
@@ -117,11 +114,15 @@ fun DashboardScreen(
           }
         }
 
-        when (dashboardViewModel.loginResponseType.value) {
+        when (dashboardViewModel.loginResponseType) {
           LoginResponseType.Success -> {
             BottomBarHost { index ->
               when (index) {
-                BottomBarHostIndices.ORDER_SCREEN -> OrderScreen()
+                BottomBarHostIndices.ORDER_SCREEN ->
+                  OrderScreen(
+                    networkStatus = networkStatus,
+                  )
+
                 else ->
                   UserScreen(
                     networkStatus = networkStatus,
@@ -133,7 +134,7 @@ fun DashboardScreen(
           LoginResponseType.RequestFailure -> {
             showErrorSnackbar(
               snackbarHostState = snackbarHostState,
-              key = dashboardViewModel.loginResponseType.value,
+              key = dashboardViewModel.loginResponseType,
               message = message,
               onActionPerformed = {
                 dashboardViewModel.onResponse(LoginResponseType.Pending)
@@ -174,10 +175,4 @@ fun DashboardScreen(
       }
     }
   }
-}
-
-@Preview
-@Composable
-private fun DashboardScreenPrev() {
-  DashboardScreen()
 }

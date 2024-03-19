@@ -1,6 +1,8 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.user
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponse
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
@@ -15,7 +17,7 @@ class UserViewModel
   constructor(
     private val userRepository: UserRepositoryImpl,
   ) : ViewModel() {
-    private val _user =
+    var user by
       mutableStateOf(
         GetUserResponse(
           id = -1,
@@ -28,17 +30,15 @@ class UserViewModel
           salt = "None",
         ),
       )
-    val user = _user
 
-    private val _isLoading = mutableStateOf(true)
-    val isLoading = _isLoading
+    var isLoading by mutableStateOf(true)
 
     fun onLoad(isLoading: Boolean) {
-      _isLoading.value = isLoading
+      this.isLoading = isLoading
     }
 
     fun onGetUserResponse(userResponse: GetUserResponse) {
-      _user.value = userResponse
+      user = userResponse
     }
 
     suspend fun getUser(

@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponse
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.components.TopBar
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.components.UserScreenButtons
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.components.UserTopBar
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.ui.theme.AppTheme
@@ -67,9 +67,9 @@ fun UserScreen(
           .background(MaterialTheme.colorScheme.background),
     ) {
       Column(modifier = Modifier.fillMaxWidth()) {
-        TopBar(
-          isLoading = userViewModel.isLoading.value,
-          firstName = userViewModel.user.value.firstName,
+        UserTopBar(
+          isLoading = userViewModel.isLoading,
+          firstName = userViewModel.user.firstName,
         )
         Spacer(modifier = Modifier.height(40.dp))
         UserScreenButtons { item ->
