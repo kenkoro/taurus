@@ -82,6 +82,7 @@ fun DashboardScreen(
           .background(MaterialTheme.colorScheme.background),
       ) {
         if (networkStatus != Status.Available) {
+          dashboardViewModel.onResponse(LoginResponseType.RequestFailure)
           showErrorSnackbar(
             snackbarHostState = snackbarHostState,
             key = networkStatus,
@@ -91,7 +92,7 @@ fun DashboardScreen(
         } else {
           LaunchedEffect(Unit) {
             dashboardViewModel.onResponse(LoginResponseType.Pending)
-            handleLogin(
+            val loginResponse = handleLogin(
               login = { subject, password, encryptSubjectAndPassword ->
                 loginViewModel.loginAndEncryptCredentials(
                   request = LoginRequest(subject, password),
@@ -100,10 +101,7 @@ fun DashboardScreen(
                 )
               },
               context = context,
-            ).run {
-              dashboardViewModel.onResponse(this)
-            }
-
+            )
             handleUserGet(context = context) { firstName, token ->
               try {
                 userViewModel.getUser(firstName, token).body<GetUserResponse>().run {
@@ -114,6 +112,8 @@ fun DashboardScreen(
               }
               userViewModel.onLoad(isUserDataLoading = false)
             }
+
+            dashboardViewModel.onResponse(loginResponse)
           }
         }
 
