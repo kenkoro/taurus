@@ -15,6 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kenkoro.taurus.client.core.local.LocalContentHeight
+import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginFieldsContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginHelpContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
@@ -23,6 +25,8 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 @Composable
 fun LoginScreen(onLoginNavigate: () -> Unit) {
   val snackbarHostState = remember { SnackbarHostState() }
+  val contentWidth = LocalContentWidth.current
+  val contentHeight = LocalContentHeight.current
 
   AppTheme {
     Scaffold(
@@ -37,18 +41,18 @@ fun LoginScreen(onLoginNavigate: () -> Unit) {
     ) {
       Surface(
         modifier =
-          Modifier
-            .fillMaxSize()
-            .padding(it),
+        Modifier
+          .fillMaxSize()
+          .padding(it),
       ) {
         Column(
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           LoginFieldsContent(
             modifier =
-              Modifier
-                .width(320.dp)
-                .weight(9F),
+            Modifier
+              .width(contentWidth.standard)
+              .weight(9F),
             onLoginNavigate = onLoginNavigate,
             snackbarHostState = snackbarHostState,
           )
@@ -56,7 +60,7 @@ fun LoginScreen(onLoginNavigate: () -> Unit) {
             modifier = Modifier.weight(1F),
             snackbarHostState = snackbarHostState,
           )
-          Spacer(modifier = Modifier.height(10.dp))
+          Spacer(modifier = Modifier.height(contentHeight.medium))
         }
       }
     }

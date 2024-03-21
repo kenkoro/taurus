@@ -31,13 +31,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.Status
+import com.kenkoro.taurus.client.core.local.LocalContentHeight
+import com.kenkoro.taurus.client.core.local.LocalContentWidth
+import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
@@ -51,9 +53,13 @@ fun LoginFieldsContent(
   onLoginNavigate: () -> Unit,
   modifier: Modifier,
 ) {
+  val context = LocalContext.current
+  val shape = LocalShape.current
+  val contentWidth = LocalContentWidth.current
+  val contentHeight = LocalContentHeight.current
+
   val subject = loginViewModel.subject
   val password = loginViewModel.password
-  val context = LocalContext.current
   val loginViewModelScope = loginViewModel.viewModelScope
 
   val requestErrorMessage = stringResource(id = R.string.request_error)
@@ -71,10 +77,10 @@ fun LoginFieldsContent(
         },
         placeholderText = stringResource(id = R.string.login_subject),
         keyboardOptions =
-          KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Next,
-            keyboardType = KeyboardType.Text,
-          ),
+        KeyboardOptions.Default.copy(
+          imeAction = ImeAction.Next,
+          keyboardType = KeyboardType.Text,
+        ),
         transformation = VisualTransformation.None,
       ),
       FieldData(
@@ -84,10 +90,10 @@ fun LoginFieldsContent(
         },
         placeholderText = stringResource(id = R.string.login_password),
         keyboardOptions =
-          KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Done,
-            keyboardType = KeyboardType.Password,
-          ),
+        KeyboardOptions.Default.copy(
+          imeAction = ImeAction.Done,
+          keyboardType = KeyboardType.Password,
+        ),
         transformation = PasswordVisualTransformation(),
       ),
     )
@@ -111,7 +117,7 @@ fun LoginFieldsContent(
       text = stringResource(id = R.string.login_credentials_label),
       style = MaterialTheme.typography.headlineLarge,
     )
-    Spacer(modifier = Modifier.height(30.dp))
+    Spacer(modifier = Modifier.height(contentHeight.large * 2))
     LazyColumn(
       horizontalAlignment = Alignment.End,
     ) {
@@ -121,7 +127,7 @@ fun LoginFieldsContent(
           onValueChange = {
             fieldData.onValueChange(it)
           },
-          shape = RoundedCornerShape(50),
+          shape = RoundedCornerShape(shape.large),
           placeholder = {
             Text(text = fieldData.placeholderText)
           },
@@ -131,7 +137,7 @@ fun LoginFieldsContent(
           modifier = Modifier.fillMaxWidth(),
           singleLine = true,
         )
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(contentHeight.large))
       }
     }
     Column(
@@ -141,19 +147,19 @@ fun LoginFieldsContent(
       Button(
         enabled = networkStatus == Status.Available,
         modifier =
-          Modifier
-            .size(width = 160.dp, height = 80.dp),
-        shape = RoundedCornerShape(30.dp),
+        Modifier
+          .size(width = contentWidth.halfStandard, height = contentHeight.standard),
+        shape = RoundedCornerShape(shape.medium),
         onClick = {
           loginViewModelScope.launch {
             val response =
               if (subject.isNotBlank() && password.isNotBlank()) {
                 loginViewModel.loginAndEncryptCredentials(
                   request =
-                    LoginRequest(
-                      subject = subject,
-                      password = password,
-                    ),
+                  LoginRequest(
+                    subject = subject,
+                    password = password,
+                  ),
                   context = context,
                   encryptSubjectAndPassword = true,
                 )
@@ -181,7 +187,7 @@ fun LoginFieldsContent(
       ) {
         Row {
           Text(text = stringResource(id = R.string.continue_button))
-          Spacer(modifier = Modifier.width(5.dp))
+          Spacer(modifier = Modifier.width(contentWidth.small))
           Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = "Login button")
         }
       }

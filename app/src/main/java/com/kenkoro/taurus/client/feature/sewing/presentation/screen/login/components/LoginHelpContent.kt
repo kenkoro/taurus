@@ -14,8 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.R
+import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import kotlinx.coroutines.launch
 
 @Composable
@@ -24,23 +24,24 @@ fun LoginHelpContent(
   snackbarHostState: SnackbarHostState,
 ) {
   val scope = rememberCoroutineScope()
+  val contentHeight = LocalContentHeight.current
 
   val message = stringResource(id = R.string.login_forgot_password_not_implemented)
   Column(
     modifier =
-      modifier
-        .wrapContentSize()
-        .clickable {
-          scope.launch {
-            snackbarHostState.showSnackbar(
-              message = message,
-              withDismissAction = true,
-            )
-          }
-        },
+    modifier
+      .wrapContentSize()
+      .clickable {
+        scope.launch {
+          snackbarHostState.showSnackbar(
+            message = message,
+            withDismissAction = true,
+          )
+        }
+      },
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    Spacer(modifier = Modifier.height(5.dp))
+    Spacer(modifier = Modifier.height(contentHeight.small))
     Text(
       text = stringResource(id = R.string.login_forgot_password),
       textAlign = TextAlign.Center,

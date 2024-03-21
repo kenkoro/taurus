@@ -5,21 +5,27 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarData
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kenkoro.taurus.client.core.local.LocalShape
+import com.kenkoro.taurus.client.core.local.Shape
 
 @Composable
 fun ErrorSnackbar(
   modifier: Modifier = Modifier,
   snackbarData: SnackbarData,
 ) {
-  Snackbar(
-    modifier = modifier,
-    snackbarData = snackbarData,
-    shape = RoundedCornerShape(30.dp),
-    containerColor = MaterialTheme.colorScheme.error,
-    contentColor = MaterialTheme.colorScheme.onError,
-    dismissActionContentColor = MaterialTheme.colorScheme.onError,
-    actionColor = MaterialTheme.colorScheme.onError,
-  )
+  CompositionLocalProvider(LocalShape provides Shape()) {
+    val shape = LocalShape.current
+    Snackbar(
+      modifier = modifier,
+      snackbarData = snackbarData,
+      shape = RoundedCornerShape(shape.medium),
+      containerColor = MaterialTheme.colorScheme.error,
+      contentColor = MaterialTheme.colorScheme.onError,
+      dismissActionContentColor = MaterialTheme.colorScheme.onError,
+      actionColor = MaterialTheme.colorScheme.onError,
+    )
+  }
 }
