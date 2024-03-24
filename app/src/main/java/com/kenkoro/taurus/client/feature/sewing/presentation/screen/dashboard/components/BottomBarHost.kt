@@ -20,7 +20,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard.ut
 fun BottomBarHost(
   modifier: Modifier = Modifier,
   isAdmin: Boolean = false,
-  content: @Composable (index: Int) -> Unit
+  content: @Composable (index: Int) -> Unit,
 ) {
   val tabItems =
     mutableListOf(
@@ -28,7 +28,7 @@ fun BottomBarHost(
         title = stringResource(id = R.string.bottom_bar_host_orders),
         selectedIcon = Icons.Filled.Create,
         unselectedIcon = Icons.Outlined.Create,
-      )
+      ),
     )
   if (isAdmin) {
     tabItems +=
@@ -46,9 +46,9 @@ fun BottomBarHost(
 
   BottomBarContent(
     modifier =
-    modifier
-      .statusBarsPadding()
-      .navigationBarsPadding(),
+      modifier
+        .statusBarsPadding()
+        .navigationBarsPadding(),
     tabItems = tabItems,
     pagerState = pagerState,
   ) { index ->

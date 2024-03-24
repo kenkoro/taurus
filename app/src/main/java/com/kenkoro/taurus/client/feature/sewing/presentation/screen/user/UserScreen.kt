@@ -17,9 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.core.connectivity.Status
+import com.kenkoro.taurus.client.core.local.LocalContentHeight
+import com.kenkoro.taurus.client.core.local.LocalContentWidth
+import com.kenkoro.taurus.client.core.local.LocalElevation
+import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.components.UserScreenButtons
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.components.UserTopBar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
@@ -29,37 +32,42 @@ fun UserScreen(
   userViewModel: UserViewModel = hiltViewModel(),
   networkStatus: Status,
 ) {
+  val shape = LocalShape.current
+  val contentWidth = LocalContentWidth.current
+  val contentHeight = LocalContentHeight.current
+  val elevation = LocalElevation.current
+
   userViewModel.onLoad(isUserDataLoading = false)
   AppTheme {
     Surface(
       modifier =
-      Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background),
+        Modifier
+          .fillMaxSize()
+          .background(MaterialTheme.colorScheme.background),
     ) {
       Column(modifier = Modifier.fillMaxWidth()) {
         UserTopBar(
           isLoading = userViewModel.isUserDataLoading,
           firstName = userViewModel.user.firstName,
         )
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(contentHeight.halfStandard))
         UserScreenButtons { item ->
-          Spacer(modifier = Modifier.width(10.dp))
+          Spacer(modifier = Modifier.width(contentWidth.medium))
           Button(
             enabled = networkStatus == Status.Available,
             modifier =
-            Modifier
-              .size(width = 175.dp, height = 90.dp)
-              .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(30.dp),
-              ),
+              Modifier
+                .size(width = contentWidth.halfStandard, height = contentHeight.standard)
+                .shadow(
+                  elevation = elevation.standard,
+                  shape = RoundedCornerShape(shape.medium),
+                ),
             onClick = { /*TODO*/ },
-            shape = RoundedCornerShape(30.dp),
+            shape = RoundedCornerShape(shape.medium),
           ) {
             Text(text = item.title, textAlign = TextAlign.Center)
           }
-          Spacer(modifier = Modifier.width(10.dp))
+          Spacer(modifier = Modifier.width(contentWidth.medium))
         }
       }
     }

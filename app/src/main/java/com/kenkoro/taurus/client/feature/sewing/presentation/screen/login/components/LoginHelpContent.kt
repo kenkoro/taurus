@@ -29,16 +29,16 @@ fun LoginHelpContent(
   val message = stringResource(id = R.string.login_forgot_password_not_implemented)
   Column(
     modifier =
-    modifier
-      .wrapContentSize()
-      .clickable {
-        scope.launch {
-          snackbarHostState.showSnackbar(
-            message = message,
-            withDismissAction = true,
-          )
-        }
-      },
+      modifier
+        .wrapContentSize()
+        .clickable {
+          scope.launch {
+            snackbarHostState.showSnackbar(
+              message = message,
+              withDismissAction = true,
+            )
+          }
+        },
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     Spacer(modifier = Modifier.height(contentHeight.small))

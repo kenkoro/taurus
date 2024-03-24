@@ -1,14 +1,13 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers
 
 import android.content.Context
-import androidx.compose.ui.platform.LocalContext
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 
 suspend fun handleUserGet(
   context: Context,
-  getUser: suspend (String, String) -> Unit
+  getUser: suspend (String, String) -> Unit,
 ) {
   val firstName =
     DecryptedCredentials.getDecryptedCredential(

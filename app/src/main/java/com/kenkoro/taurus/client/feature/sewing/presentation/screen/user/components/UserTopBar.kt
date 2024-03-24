@@ -14,19 +14,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.kenkoro.taurus.client.core.local.LocalContentHeight
+import com.kenkoro.taurus.client.core.local.LocalContentWidth
 
 @Composable
 fun UserTopBar(
   isLoading: Boolean,
   firstName: String,
 ) {
-  Spacer(modifier = Modifier.height(10.dp))
+  val contentHeight = LocalContentHeight.current
+  val contentWidth = LocalContentWidth.current
+
+  Spacer(modifier = Modifier.height(contentHeight.medium))
   Row(
     modifier = Modifier.fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    Spacer(modifier = Modifier.width(10.dp))
+    Spacer(modifier = Modifier.width(contentWidth.medium))
     if (isLoading) {
       CircularProgressIndicator()
     } else {

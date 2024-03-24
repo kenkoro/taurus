@@ -6,10 +6,14 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import com.kenkoro.taurus.client.core.local.Arrangement
 import com.kenkoro.taurus.client.core.local.ContentHeight
 import com.kenkoro.taurus.client.core.local.ContentWidth
+import com.kenkoro.taurus.client.core.local.Elevation
+import com.kenkoro.taurus.client.core.local.LocalArrangement
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
+import com.kenkoro.taurus.client.core.local.LocalElevation
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.core.local.Shape
 
@@ -83,7 +87,7 @@ private val DarkColors =
 fun AppTheme(
   useDarkTheme: Boolean = isSystemInDarkTheme(),
   content:
-  @Composable()
+    @Composable()
     () -> Unit,
 ) {
   val colors =
@@ -96,7 +100,9 @@ fun AppTheme(
   CompositionLocalProvider(
     LocalShape provides Shape(),
     LocalContentWidth provides ContentWidth(),
-    LocalContentHeight provides ContentHeight()
+    LocalContentHeight provides ContentHeight(),
+    LocalElevation provides Elevation(),
+    LocalArrangement provides Arrangement(),
   ) {
     MaterialTheme(
       colorScheme = colors,

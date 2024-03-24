@@ -54,7 +54,7 @@ fun DashboardScreen(
   onDashboardNavigate: () -> Unit = {},
   loginViewModel: LoginViewModel = hiltViewModel(),
   dashboardViewModel: DashboardViewModel = hiltViewModel(),
-  userViewModel: UserViewModel = hiltViewModel()
+  userViewModel: UserViewModel = hiltViewModel(),
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val message = stringResource(id = R.string.request_error)
@@ -77,9 +77,9 @@ fun DashboardScreen(
     ) {
       Surface(
         modifier =
-        Modifier
-          .fillMaxSize()
-          .background(MaterialTheme.colorScheme.background),
+          Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
       ) {
         if (networkStatus != Status.Available) {
           dashboardViewModel.onResponse(LoginResponseType.RequestFailure)
@@ -92,16 +92,17 @@ fun DashboardScreen(
         } else {
           LaunchedEffect(Unit) {
             dashboardViewModel.onResponse(LoginResponseType.Pending)
-            val loginResponse = handleLogin(
-              login = { subject, password, encryptSubjectAndPassword ->
-                loginViewModel.loginAndEncryptCredentials(
-                  request = LoginRequest(subject, password),
-                  context = context,
-                  encryptSubjectAndPassword = encryptSubjectAndPassword,
-                )
-              },
-              context = context,
-            )
+            val loginResponse =
+              handleLogin(
+                login = { subject, password, encryptSubjectAndPassword ->
+                  loginViewModel.loginAndEncryptCredentials(
+                    request = LoginRequest(subject, password),
+                    context = context,
+                    encryptSubjectAndPassword = encryptSubjectAndPassword,
+                  )
+                },
+                context = context,
+              )
             handleUserGet(context = context) { firstName, token ->
               try {
                 userViewModel.getUser(firstName, token).body<GetUserResponse>().run {
@@ -120,7 +121,7 @@ fun DashboardScreen(
         when (dashboardViewModel.loginResponseType) {
           LoginResponseType.Success -> {
             BottomBarHost(
-              isAdmin = userViewModel.user.role == UserRole.Admin
+              isAdmin = userViewModel.user.role == UserRole.Admin,
             ) { index ->
               when (index) {
                 BottomBarHostIndices.USER_SCREEN ->

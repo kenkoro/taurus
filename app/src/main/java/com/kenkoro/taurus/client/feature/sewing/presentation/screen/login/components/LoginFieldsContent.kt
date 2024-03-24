@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,6 +66,7 @@ fun LoginFieldsContent(
   val requestErrorMessage = stringResource(id = R.string.request_error)
   val subjectAndPasswordCannotBeBlankMessage =
     stringResource(id = R.string.subject_and_password_cannot_be_blank)
+  val actionLabelMessage = stringResource(id = R.string.ok)
 
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
 
@@ -77,10 +79,10 @@ fun LoginFieldsContent(
         },
         placeholderText = stringResource(id = R.string.login_subject),
         keyboardOptions =
-        KeyboardOptions.Default.copy(
-          imeAction = ImeAction.Next,
-          keyboardType = KeyboardType.Text,
-        ),
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+          ),
         transformation = VisualTransformation.None,
       ),
       FieldData(
@@ -90,10 +92,10 @@ fun LoginFieldsContent(
         },
         placeholderText = stringResource(id = R.string.login_password),
         keyboardOptions =
-        KeyboardOptions.Default.copy(
-          imeAction = ImeAction.Done,
-          keyboardType = KeyboardType.Password,
-        ),
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password,
+          ),
         transformation = PasswordVisualTransformation(),
       ),
     )
@@ -147,8 +149,8 @@ fun LoginFieldsContent(
       Button(
         enabled = networkStatus == Status.Available,
         modifier =
-        Modifier
-          .size(width = contentWidth.halfStandard, height = contentHeight.standard),
+          Modifier
+            .size(width = contentWidth.halfStandard, height = contentHeight.standard),
         shape = RoundedCornerShape(shape.medium),
         onClick = {
           loginViewModelScope.launch {
@@ -156,10 +158,10 @@ fun LoginFieldsContent(
               if (subject.isNotBlank() && password.isNotBlank()) {
                 loginViewModel.loginAndEncryptCredentials(
                   request =
-                  LoginRequest(
-                    subject = subject,
-                    password = password,
-                  ),
+                    LoginRequest(
+                      subject = subject,
+                      password = password,
+                    ),
                   context = context,
                   encryptSubjectAndPassword = true,
                 )
@@ -177,7 +179,9 @@ fun LoginFieldsContent(
 
               snackbarHostState.showSnackbar(
                 message = message,
-                withDismissAction = true,
+                actionLabel = actionLabelMessage,
+                withDismissAction = false,
+                duration = SnackbarDuration.Indefinite,
               )
             } else {
               onLoginNavigate()
