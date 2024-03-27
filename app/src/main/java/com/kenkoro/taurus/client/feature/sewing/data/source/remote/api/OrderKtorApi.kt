@@ -1,11 +1,10 @@
 package com.kenkoro.taurus.client.feature.sewing.data.source.remote.api
 
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.UserApi.Companion.token
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.NewUserRequest
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.OrderApi.Companion.token
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.Order
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.UpdateRequest
+import com.kenkoro.taurus.client.feature.sewing.data.util.OrderDataType
 import com.kenkoro.taurus.client.feature.sewing.data.util.Urls
-import com.kenkoro.taurus.client.feature.sewing.data.util.UserDataType
 import io.ktor.client.HttpClient
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
@@ -20,41 +19,32 @@ import io.ktor.http.contentType
 import io.ktor.http.parameters
 import io.ktor.http.path
 
-class UserKtorApi(
-  private val client: HttpClient,
-) : UserApi {
-  override suspend fun login(request: LoginRequest): HttpResponse {
+class OrderKtorApi(
+  private val client: HttpClient
+) : OrderApi {
+  override suspend fun newOrder(request: Order): HttpResponse {
     return client.post {
       url {
         protocol = URLProtocol.HTTPS
         host = Urls.HOST
-        path(Urls.User.LOGIN)
+        path(Urls.Order.NEW_ORDER)
       }
       setBody(request)
       contentType(ContentType.Application.Json)
-    }
-  }
-
-  override suspend fun newUser(request: NewUserRequest): HttpResponse {
-    return client.post {
-      url {
-        protocol = URLProtocol.HTTPS
-        host = Urls.HOST
-        path(Urls.User.NEW_USER)
+      headers {
+        append("Authorization", "Bearer $token")
       }
-      setBody(request)
-      contentType(ContentType.Application.Json)
     }
   }
 
-  override suspend fun getUser(user: String): HttpResponse {
+  override suspend fun getOrder(orderId: Int): HttpResponse {
     return client.get {
       url {
         protocol = URLProtocol.HTTPS
         host = Urls.HOST
-        path(Urls.User.GET_USER)
+        path(Urls.Order.GET_ORDER)
         parameters {
-          append("subject", user)
+          append("order_id", orderId.toString())
         }
       }
       contentType(ContentType.Application.Json)
@@ -64,16 +54,34 @@ class UserKtorApi(
     }
   }
 
-  override suspend fun updateUserData(
+  override suspend fun getOrders(page: Int, perPage: Int): HttpResponse {
+    return client.get {
+      url {
+        protocol = URLProtocol.HTTPS
+        host = Urls.HOST
+        path(Urls.Order.GET_ORDERS)
+        parameters {
+          append("page", page.toString())
+          append("per_page", perPage.toString())
+        }
+      }
+      contentType(ContentType.Application.Json)
+      headers {
+        append("Authorization", "Bearer $token")
+      }
+    }
+  }
+
+  override suspend fun updateOrderData(
     request: UpdateRequest,
-    user: String,
-    data: UserDataType,
+    orderId: Int,
+    data: OrderDataType
   ): HttpResponse {
     return client.put {
       url {
         protocol = URLProtocol.HTTPS
         host = Urls.HOST
-        path("${Urls.User.GET_USER}/$user/edit/${data.toUrl}")
+        path("${Urls.Order.GET_ORDER}/$orderId/edit/${data.toUrl}")
       }
       setBody(request)
       contentType(ContentType.Application.Json)
@@ -83,14 +91,14 @@ class UserKtorApi(
     }
   }
 
-  override suspend fun deleteUser(user: String): HttpResponse {
+  override suspend fun deleteOrder(orderId: Int): HttpResponse {
     return client.delete {
       url {
         protocol = URLProtocol.HTTPS
         host = Urls.HOST
-        path(Urls.User.DELETE_USER)
+        path(Urls.Order.DELETE_ORDER)
         parameters {
-          append("subject", user)
+          append("order_id", orderId.toString())
         }
       }
       contentType(ContentType.Application.Json)

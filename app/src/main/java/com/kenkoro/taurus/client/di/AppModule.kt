@@ -3,7 +3,10 @@ package com.kenkoro.taurus.client.di
 import android.app.Application
 import androidx.room.Room
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.LocalDatabase
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.OrderKtorApi
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.UserKtorApi
+import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepository
+import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepository
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
 import dagger.Module
@@ -21,6 +24,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+  private val client = HttpClient(CIO) {
+    install(Logging) {
+      level = LogLevel.ALL
+    }
+    install(ContentNegotiation) {
+      json()
+    }
+  }
+
   @Provides
   @Singleton
   fun provideLocalDatabase(app: Application): LocalDatabase {
@@ -35,17 +47,15 @@ object AppModule {
   @Singleton
   fun provideUserRepository(): UserRepositoryImpl {
     return UserRepository.create(
-      UserKtorApi(
-        client =
-          HttpClient(CIO) {
-            install(Logging) {
-              level = LogLevel.ALL
-            }
-            install(ContentNegotiation) {
-              json()
-            }
-          },
-      ),
+      userApi = UserKtorApi(client)
+    )
+  }
+
+  @Provides
+  @Singleton
+  fun provideOrderRepository(): OrderRepositoryImpl {
+    return OrderRepository.create(
+      orderApi = OrderKtorApi(client)
     )
   }
 }

@@ -40,7 +40,6 @@ fun OrderScreen(networkStatus: Status) {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
       ) {
-        OrderTopBar()
       }
     }
   }

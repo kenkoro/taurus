@@ -1,6 +1,6 @@
 package com.kenkoro.taurus.client.feature.sewing.data.util
 
-enum class UserRole {
+enum class UserProfile {
   Admin,
   Manager,
   Customer,

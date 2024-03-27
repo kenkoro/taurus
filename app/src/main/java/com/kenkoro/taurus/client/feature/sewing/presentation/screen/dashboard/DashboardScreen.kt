@@ -30,7 +30,7 @@ import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponse
-import com.kenkoro.taurus.client.feature.sewing.data.util.UserRole
+import com.kenkoro.taurus.client.feature.sewing.data.util.UserProfile
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard.components.BottomBarHost
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderScreen
@@ -121,7 +121,7 @@ fun DashboardScreen(
         when (dashboardViewModel.loginResponseType) {
           LoginResponseType.Success -> {
             BottomBarHost(
-              isAdmin = userViewModel.user.role == UserRole.Admin,
+              isAdmin = userViewModel.user.profile == UserProfile.Admin,
             ) { index ->
               when (index) {
                 BottomBarHostIndices.USER_SCREEN ->

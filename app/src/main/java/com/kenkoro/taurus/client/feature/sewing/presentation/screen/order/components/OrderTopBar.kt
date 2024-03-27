@@ -17,17 +17,19 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 
 @Composable
-fun OrderTopBar() {
+fun OrderTopBar(
+  modifier: Modifier = Modifier
+) {
   val contentHeight = LocalContentHeight.current
   val contentWidth = LocalContentWidth.current
 
-  Spacer(modifier = Modifier.height(contentHeight.medium))
+  Spacer(modifier = modifier.height(contentHeight.medium))
   Row(
     modifier = Modifier.fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically,
   ) {
     Spacer(modifier = Modifier.width(contentWidth.medium))
-    Text(text = "Suborbia", style = MaterialTheme.typography.headlineMedium)
+    Text(text = "Здесь будет заказчик", style = MaterialTheme.typography.headlineSmall)
     Icon(imageVector = Icons.Default.ArrowDropDown, contentDescription = "Drop down arrow")
   }
 }

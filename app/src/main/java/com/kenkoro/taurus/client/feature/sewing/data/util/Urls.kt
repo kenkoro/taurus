@@ -1,11 +1,19 @@
 package com.kenkoro.taurus.client.feature.sewing.data.util
 
 object Urls {
-  private const val PREFIX = "api"
-
   const val HOST = "ktor-backend.loca.lt"
-  const val LOGIN = "$PREFIX/login"
-  const val GET_USER = "$PREFIX/user"
-  const val CREATE_USER = "$PREFIX/create/user"
-  const val DELETE_USER = "$PREFIX/delete/user"
+
+  object User {
+    const val LOGIN = "login"
+    const val GET_USER = "user"
+    const val NEW_USER = "new/user"
+    const val DELETE_USER = "delete/user"
+  }
+
+  object Order {
+    const val GET_ORDER = "order"
+    const val GET_ORDERS = "orders"
+    const val NEW_ORDER = "new/order"
+    const val DELETE_ORDER = "delete/order"
+  }
 }

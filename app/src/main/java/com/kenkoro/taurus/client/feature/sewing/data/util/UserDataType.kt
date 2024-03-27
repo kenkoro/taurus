@@ -6,5 +6,6 @@ enum class UserDataType(val toUrl: String) {
   Image("image"),
   FirstName("first_name"),
   LastName("last_name"),
-  Role("role"),
+  Email("email"),
+  Profile("profile"),
 }

@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponse
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
-import com.kenkoro.taurus.client.feature.sewing.data.util.UserRole
+import com.kenkoro.taurus.client.feature.sewing.data.util.UserProfile
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.client.statement.HttpResponse
 import javax.inject.Inject
@@ -26,7 +26,7 @@ class UserViewModel
           image = "None",
           firstName = "None",
           lastName = "None",
-          role = UserRole.Others,
+          profile = UserProfile.Others,
           salt = "None",
         ),
       )

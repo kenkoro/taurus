@@ -1,10 +1,9 @@
 package com.kenkoro.taurus.client.feature.sewing.data.source.repository
 
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.UserApi
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.CreateUserRequest
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.DeleteUserRequest
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.UpdateUserColumnRequest
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.NewUserRequest
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.UpdateRequest
 import com.kenkoro.taurus.client.feature.sewing.data.util.UserDataType
 import io.ktor.client.statement.HttpResponse
 
@@ -20,23 +19,23 @@ class UserRepositoryImpl(
     return userApi.login(request)
   }
 
+  override suspend fun newUser(request: NewUserRequest): HttpResponse {
+    return userApi.newUser(request)
+  }
+
   override suspend fun getUser(user: String): HttpResponse {
     return userApi.getUser(user)
   }
 
-  override suspend fun createUser(request: CreateUserRequest): HttpResponse {
-    return userApi.createUser(request)
-  }
-
-  override suspend fun deleteUser(request: DeleteUserRequest): HttpResponse {
-    return userApi.deleteUser(request)
-  }
-
   override suspend fun updateUserData(
-    request: UpdateUserColumnRequest,
+    request: UpdateRequest,
     user: String,
     data: UserDataType,
   ): HttpResponse {
     return userApi.updateUserData(request, user, data)
+  }
+
+  override suspend fun deleteUser(user: String): HttpResponse {
+    return userApi.deleteUser(user)
   }
 }
