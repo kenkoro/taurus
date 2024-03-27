@@ -13,15 +13,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.Status
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderTopBar
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun OrderScreen(networkStatus: Status) {
+fun OrderScreen(
+  orderViewModel: OrderViewModel = hiltViewModel(),
+  networkStatus: Status
+) {
   val snackbarHostState = remember { SnackbarHostState() }
+  val orders = orderViewModel.orderPagingFlow.collectAsLazyPagingItems()
 
   AppTheme {
     Scaffold(
@@ -36,10 +42,11 @@ fun OrderScreen(networkStatus: Status) {
     ) {
       Surface(
         modifier =
-          Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+        Modifier
+          .fillMaxSize()
+          .background(MaterialTheme.colorScheme.background),
       ) {
+        OrderContent(orders)
       }
     }
   }

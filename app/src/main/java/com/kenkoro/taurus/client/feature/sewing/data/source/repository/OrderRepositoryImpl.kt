@@ -22,6 +22,10 @@ class OrderRepositoryImpl(
     return orderApi.getOrder(orderId)
   }
 
+  override suspend fun getOrders(page: Int, perPage: Int): HttpResponse {
+    return orderApi.getOrders(page, perPage)
+  }
+
   override suspend fun updateOrderData(
     request: UpdateRequest,
     orderId: Int,

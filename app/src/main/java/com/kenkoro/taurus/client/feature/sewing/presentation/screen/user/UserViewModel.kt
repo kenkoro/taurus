@@ -13,43 +13,44 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel
-  @Inject
-  constructor(
-    private val userRepository: UserRepositoryImpl,
-  ) : ViewModel() {
-    var user by
-      mutableStateOf(
-        GetUserResponse(
-          id = -1,
-          subject = "None",
-          password = "None",
-          image = "None",
-          firstName = "None",
-          lastName = "None",
-          profile = UserProfile.Others,
-          salt = "None",
-        ),
-      )
-      private set
+@Inject
+constructor(
+  private val userRepository: UserRepositoryImpl,
+) : ViewModel() {
+  var user by
+  mutableStateOf(
+    GetUserResponse(
+      id = -1,
+      subject = "None",
+      password = "None",
+      image = "None",
+      firstName = "None",
+      lastName = "None",
+      profile = UserProfile.Others,
+      email = "",
+      salt = "None",
+    ),
+  )
+    private set
 
-    var isUserDataLoading by mutableStateOf(true)
-      private set
+  var isUserDataLoading by mutableStateOf(true)
+    private set
 
-    fun onLoad(isUserDataLoading: Boolean) {
-      this.isUserDataLoading = isUserDataLoading
-    }
+  fun onLoad(isUserDataLoading: Boolean) {
+    this.isUserDataLoading = isUserDataLoading
+  }
 
-    fun onGetUserResponse(userResponse: GetUserResponse) {
-      user = userResponse
-    }
+  fun onGetUserResponse(userResponse: GetUserResponse) {
+    user = userResponse
+  }
 
-    suspend fun getUser(
-      subject: String,
-      token: String,
-    ): HttpResponse {
-      return userRepository.run {
-        token(token)
-        getUser(subject)
-      }
+  suspend fun getUser(
+    subject: String,
+    token: String,
+  ): HttpResponse {
+    return userRepository.run {
+      token(token)
+      getUser(subject)
     }
   }
+}

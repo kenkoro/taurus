@@ -1,10 +1,16 @@
 package com.kenkoro.taurus.client.di
 
 import android.app.Application
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import androidx.room.Room
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.LocalDatabase
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.OrderPagingSourceFactory
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.OrderRemoteMediator
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.OrderKtorApi
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.UserKtorApi
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.Order
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepository
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepository
@@ -21,6 +27,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import javax.inject.Singleton
 
+@OptIn(ExperimentalPagingApi::class)
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
@@ -56,6 +63,19 @@ object AppModule {
   fun provideOrderRepository(): OrderRepositoryImpl {
     return OrderRepository.create(
       orderApi = OrderKtorApi(client)
+    )
+  }
+
+  @Provides
+  @Singleton
+  fun provideOrderPager(orderRepository: OrderRepositoryImpl): Pager<Int, Order> {
+    val pageSize = 10
+    return Pager(
+      config = PagingConfig(pageSize = pageSize),
+      remoteMediator = OrderRemoteMediator(orderRepository),
+      pagingSourceFactory = {
+        OrderPagingSourceFactory(orderRepository, pageSize)()
+      }
     )
   }
 }

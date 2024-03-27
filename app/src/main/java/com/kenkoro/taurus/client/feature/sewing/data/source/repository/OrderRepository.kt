@@ -17,6 +17,8 @@ interface OrderRepository {
 
   suspend fun getOrder(orderId: Int): HttpResponse
 
+  suspend fun getOrders(page: Int, perPage: Int): HttpResponse
+
   suspend fun updateOrderData(
     request: UpdateRequest,
     orderId: Int,

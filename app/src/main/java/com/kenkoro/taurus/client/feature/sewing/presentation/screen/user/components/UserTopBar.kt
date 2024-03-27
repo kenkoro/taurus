@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,6 +30,7 @@ fun UserTopBar(
     verticalAlignment = Alignment.CenterVertically,
   ) {
     Spacer(modifier = Modifier.width(contentWidth.medium))
+    /* TODO: do this later
     if (isLoading) {
       CircularProgressIndicator()
     } else {
@@ -40,5 +40,11 @@ fun UserTopBar(
       )
       Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = "Right arrow")
     }
+     */
+    Text(
+      text = "Ваше имя",
+      style = MaterialTheme.typography.headlineLarge,
+    )
+    Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = "Right arrow")
   }
 }
