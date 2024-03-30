@@ -14,6 +14,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,19 +25,42 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.sewing.data.util.OrderStatus
+import com.kenkoro.taurus.client.feature.sewing.data.util.UserProfile
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
-fun OrderItem(order: Order) {
+fun OrderItem(
+  order: Order,
+  profile: UserProfile,
+) {
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
+
+  var isOrderClicked by remember {
+    mutableStateOf(false)
+  }
+
+  if (isOrderClicked) {
+    Dialog(onDismissRequest = { isOrderClicked = !isOrderClicked }) {
+      Column(
+        modifier =
+          Modifier
+            .background(MaterialTheme.colorScheme.background),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+      ) {
+        Text(text = order.toString())
+      }
+    }
+  }
 
   Row(
     modifier =
@@ -42,9 +69,9 @@ fun OrderItem(order: Order) {
         .heightIn(min = 90.dp, max = 150.dp)
         .clip(RoundedCornerShape(shape.medium))
         .background(MaterialTheme.colorScheme.primaryContainer)
-        .clickable { /* TODO */ },
-    horizontalArrangement = Arrangement.SpaceBetween,
+        .clickable { isOrderClicked = !isOrderClicked },
     verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.SpaceBetween,
   ) {
     Row(
       modifier = Modifier.fillMaxHeight(.75F),
@@ -127,6 +154,7 @@ private fun OrderItemPrev() {
           quantity = 0,
           status = OrderStatus.NotStarted,
         ),
+      profile = UserProfile.Customer,
     )
   }
 }

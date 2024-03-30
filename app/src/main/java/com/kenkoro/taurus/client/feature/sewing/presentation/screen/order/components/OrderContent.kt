@@ -18,13 +18,16 @@ import androidx.paging.compose.itemKey
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalArrangement
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
+import com.kenkoro.taurus.client.feature.sewing.data.util.UserProfile
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
+import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
 
 @Composable
 fun OrderContent(
   orders: LazyPagingItems<Order>,
   snackbarHostState: SnackbarHostState,
+  user: User?,
 ) {
   val arrangement = LocalArrangement.current
   val contentHeight = LocalContentHeight.current
@@ -49,12 +52,12 @@ fun OrderContent(
     ) { index ->
       val order = orders[index]
       if (order != null) {
-        OrderItem(order = order)
+        OrderItem(order = order, profile = user?.profile ?: UserProfile.Others)
       }
     }
     item {
       if (orders.loadState.append is LoadState.Loading) {
-        CircularProgressIndicator(strokeWidth = 4.dp)
+        CircularProgressIndicator(strokeWidth = 3.dp)
       }
     }
   }
