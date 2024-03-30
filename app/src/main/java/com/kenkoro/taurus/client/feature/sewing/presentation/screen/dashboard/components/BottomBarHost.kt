@@ -42,11 +42,12 @@ fun BottomBarHost(
 
   BottomBarContent(
     modifier =
-      modifier
-        .statusBarsPadding()
-        .navigationBarsPadding(),
+    modifier
+      .statusBarsPadding()
+      .navigationBarsPadding(),
     tabItems = tabItems,
     pagerState = pagerState,
+    onlyIcons = true
   ) { index ->
     content(index)
   }

@@ -16,6 +16,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.kenkoro.taurus.client.R
+import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.core.local.LocalArrangement
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.feature.sewing.data.util.UserProfile
@@ -28,6 +29,7 @@ fun OrderContent(
   orders: LazyPagingItems<Order>,
   snackbarHostState: SnackbarHostState,
   user: User?,
+  networkStatus: Status
 ) {
   val arrangement = LocalArrangement.current
   val contentHeight = LocalContentHeight.current
@@ -59,6 +61,9 @@ fun OrderContent(
       if (orders.loadState.append is LoadState.Loading) {
         CircularProgressIndicator(strokeWidth = 3.dp)
       }
+    }
+    item {
+      Spacer(modifier = Modifier.height(contentHeight.halfStandard + 10.dp))
     }
   }
 }
