@@ -14,24 +14,24 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserViewModel
-@Inject
-constructor(
-  private val userRepository: UserRepositoryImpl,
-) : ViewModel() {
-  var user by mutableStateOf<User?>(null)
-    private set
+  @Inject
+  constructor(
+    private val userRepository: UserRepositoryImpl,
+  ) : ViewModel() {
+    var user by mutableStateOf<User?>(null)
+      private set
 
-  fun onGetUserResponseDto(userDto: GetUserResponseDto) {
-    user = userDto.toUser()
-  }
+    fun onGetUserResponseDto(userDto: GetUserResponseDto) {
+      user = userDto.toUser()
+    }
 
-  suspend fun getUser(
-    subject: String,
-    token: String,
-  ): HttpResponse {
-    return userRepository.run {
-      token(token)
-      getUser(subject)
+    suspend fun getUser(
+      subject: String,
+      token: String,
+    ): HttpResponse {
+      return userRepository.run {
+        token(token)
+        getUser(subject)
+      }
     }
   }
-}

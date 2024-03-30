@@ -32,7 +32,7 @@ fun BottomBarHost(
         title = stringResource(id = R.string.bottom_bar_host_profile),
         selectedIcon = Icons.Filled.Person,
         unselectedIcon = Icons.Outlined.Person,
-      )
+      ),
     )
 
   val pagerState =
@@ -42,9 +42,9 @@ fun BottomBarHost(
 
   BottomBarContent(
     modifier =
-    modifier
-      .statusBarsPadding()
-      .navigationBarsPadding(),
+      modifier
+        .statusBarsPadding()
+        .navigationBarsPadding(),
     tabItems = tabItems,
     pagerState = pagerState,
   ) { index ->

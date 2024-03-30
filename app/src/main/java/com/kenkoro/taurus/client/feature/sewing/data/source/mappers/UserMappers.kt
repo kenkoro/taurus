@@ -13,6 +13,6 @@ fun GetUserResponseDto.toUser(): User {
     lastName = lastName,
     email = email,
     profile = profile,
-    salt = salt
+    salt = salt,
   )
 }

@@ -81,9 +81,9 @@ fun DashboardScreen(
     ) {
       Surface(
         modifier =
-        Modifier
-          .fillMaxSize()
-          .background(MaterialTheme.colorScheme.background),
+          Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
       ) {
         if (networkStatus != Status.Available) {
           loginResponseType = LoginResponseType.RequestFailure
@@ -130,14 +130,15 @@ fun DashboardScreen(
               BottomBarHostIndices.USER_SCREEN -> {
                 UserScreen(
                   user = userViewModel.user,
-                  networkStatus = networkStatus
+                  networkStatus = networkStatus,
                 )
               }
 
-              else -> OrderScreen(
-                user = userViewModel.user,
-                networkStatus = networkStatus
-              )
+              else ->
+                OrderScreen(
+                  user = userViewModel.user,
+                  networkStatus = networkStatus,
+                )
             }
           }
         }

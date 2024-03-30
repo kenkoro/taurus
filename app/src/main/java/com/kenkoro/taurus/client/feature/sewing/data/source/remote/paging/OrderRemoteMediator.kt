@@ -42,23 +42,24 @@ class OrderRemoteMediator(
           LoadType.APPEND -> this.page
         }
 
-      val (orders, hasNextPage) = scope.async {
-        val token =
-          DecryptedCredentials.getDecryptedCredential(
-            filename = LocalCredentials.TOKEN_FILENAME,
-            context = context,
-          ).value
-        try {
-          orderRepository
-            .token(token)
-            .getOrders(page, state.config.pageSize).body<GetOrdersResponseDto>().run {
-              Pair(this.paginatedOrders, this.hasNextPage)
-            }
-        } catch (e: Exception) {
-          Log.d("kenkoro", e.message!!)
-          Pair(emptyList(), false)
-        }
-      }.await()
+      val (orders, hasNextPage) =
+        scope.async {
+          val token =
+            DecryptedCredentials.getDecryptedCredential(
+              filename = LocalCredentials.TOKEN_FILENAME,
+              context = context,
+            ).value
+          try {
+            orderRepository
+              .token(token)
+              .getOrders(page, state.config.pageSize).body<GetOrdersResponseDto>().run {
+                Pair(this.paginatedOrders, this.hasNextPage)
+              }
+          } catch (e: Exception) {
+            Log.d("kenkoro", e.message!!)
+            Pair(emptyList(), false)
+          }
+        }.await()
 
       if (hasNextPage) {
         this.page++

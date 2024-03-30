@@ -11,5 +11,5 @@ data class User(
   val lastName: String,
   val email: String,
   val profile: UserProfile,
-  val salt: String
+  val salt: String,
 )
