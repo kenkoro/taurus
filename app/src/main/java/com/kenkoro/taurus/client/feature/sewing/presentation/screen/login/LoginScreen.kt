@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,16 +18,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginFieldsContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginHelpContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
-fun LoginScreen(onLoginNavigate: () -> Unit) {
-  val snackbarHostState = remember { SnackbarHostState() }
+fun LoginScreen(
+  onLoginNavigate: () -> Unit,
+  subject: String,
+  onSubjectChange: (String) -> Unit,
+  password: String,
+  onPasswordChange: (String) -> Unit,
+  onLoginAndEncryptCredentials: suspend (LoginRequestDto, Context, Boolean) -> LoginResponse,
+) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
+
+  val snackbarHostState = remember { SnackbarHostState() }
 
   AppTheme {
     Scaffold(
@@ -55,6 +66,11 @@ fun LoginScreen(onLoginNavigate: () -> Unit) {
                 .weight(9F),
             onLoginNavigate = onLoginNavigate,
             snackbarHostState = snackbarHostState,
+            subject = subject,
+            onSubjectChange = onSubjectChange,
+            password = password,
+            onPasswordChange = onPasswordChange,
+            onLoginAndEncryptCredentials = onLoginAndEncryptCredentials,
           )
           LoginHelpContent(
             modifier = Modifier.weight(1F),

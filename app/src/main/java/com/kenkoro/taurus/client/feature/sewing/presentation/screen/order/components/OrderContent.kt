@@ -29,7 +29,7 @@ fun OrderContent(
   orders: LazyPagingItems<Order>,
   snackbarHostState: SnackbarHostState,
   user: User?,
-  networkStatus: Status
+  networkStatus: Status,
 ) {
   val arrangement = LocalArrangement.current
   val contentHeight = LocalContentHeight.current

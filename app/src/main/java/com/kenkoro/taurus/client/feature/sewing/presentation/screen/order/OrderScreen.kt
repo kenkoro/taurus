@@ -25,12 +25,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.LazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
+import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
@@ -39,7 +39,7 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun OrderScreen(
-  orderViewModel: OrderViewModel = hiltViewModel(),
+  orders: LazyPagingItems<Order>,
   user: User?,
   networkStatus: Status,
 ) {
@@ -48,7 +48,6 @@ fun OrderScreen(
   val contentWidth = LocalContentWidth.current
 
   val snackbarHostState = remember { SnackbarHostState() }
-  val orders = orderViewModel.orderPagingFlow.collectAsLazyPagingItems()
 
   AppTheme {
     Scaffold(
@@ -62,18 +61,19 @@ fun OrderScreen(
       },
       bottomBar = {
         Column(
-          modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background),
+          modifier =
+            Modifier
+              .fillMaxWidth()
+              .background(MaterialTheme.colorScheme.background),
           horizontalAlignment = Alignment.CenterHorizontally,
-          verticalArrangement = Arrangement.Center
+          verticalArrangement = Arrangement.Center,
         ) {
           Spacer(modifier = Modifier.height(contentHeight.medium))
           Button(
             enabled = networkStatus == Status.Available,
             modifier =
-            Modifier
-              .size(contentWidth.standard + 30.dp, contentHeight.halfStandard),
+              Modifier
+                .size(contentWidth.standard + 30.dp, contentHeight.halfStandard),
             shape = RoundedCornerShape(shape.small),
             onClick = { /*TODO*/ },
           ) {
@@ -81,19 +81,19 @@ fun OrderScreen(
           }
           Spacer(modifier = Modifier.height(contentHeight.medium))
         }
-      }
+      },
     ) {
       Surface(
         modifier =
-        Modifier
-          .fillMaxSize()
-          .background(MaterialTheme.colorScheme.background),
+          Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
       ) {
         OrderContent(
           orders = orders,
           snackbarHostState = snackbarHostState,
           user = user,
-          networkStatus = networkStatus
+          networkStatus = networkStatus,
         )
       }
     }

@@ -11,7 +11,7 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepos
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.LoginCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.EncryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.ktor.client.call.body
 import io.ktor.client.statement.HttpResponse
@@ -23,7 +23,7 @@ import javax.inject.Inject
 value class JwtToken(val value: String)
 
 @HiltViewModel
-class LoginViewModel
+class LoginFieldsViewModel
   @Inject
   constructor(
     private val userRepository: UserRepositoryImpl,
@@ -46,7 +46,7 @@ class LoginViewModel
       request: LoginRequestDto,
       context: Context,
       encryptSubjectAndPassword: Boolean = false,
-    ): LoginResponseType {
+    ): LoginResponse {
       return try {
         login(request).run {
           val status = this.status
@@ -68,17 +68,17 @@ class LoginViewModel
                 context = context,
               )
             }
-            LoginResponseType.Success
+            LoginResponse.Success
           } else {
             if (apiUrlNotFound(status)) {
-              LoginResponseType.RequestFailure
+              LoginResponse.RequestFailure
             } else {
-              LoginResponseType.Failure
+              LoginResponse.Failure
             }
           }
         }
       } catch (_: Exception) {
-        LoginResponseType.RequestFailure
+        LoginResponse.RequestFailure
       }
     }
 

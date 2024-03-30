@@ -46,9 +46,9 @@ fun BottomBarContent(
     HorizontalPager(
       state = pagerState,
       modifier =
-      Modifier
-        .fillMaxWidth()
-        .weight(1F),
+        Modifier
+          .fillMaxWidth()
+          .weight(1F),
       userScrollEnabled = false,
     ) { index ->
       content(index)
@@ -68,19 +68,20 @@ fun BottomBarContent(
           onClick = {
             selectedTabIndex = index
           },
-          text = if (onlyIcons) {
-            null
-          } else {
-            { Text(text = tabItem.title) }
-          },
+          text =
+            if (onlyIcons) {
+              null
+            } else {
+              { Text(text = tabItem.title) }
+            },
           icon = {
             Icon(
               imageVector =
-              if (selected) {
-                tabItem.selectedIcon
-              } else {
-                tabItem.unselectedIcon
-              },
+                if (selected) {
+                  tabItem.selectedIcon
+                } else {
+                  tabItem.unselectedIcon
+                },
               contentDescription = tabItem.title,
             )
           },

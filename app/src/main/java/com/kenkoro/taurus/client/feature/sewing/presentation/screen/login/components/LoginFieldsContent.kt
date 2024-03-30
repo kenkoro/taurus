@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,8 +33,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
@@ -42,16 +41,21 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
 fun LoginFieldsContent(
   snackbarHostState: SnackbarHostState,
-  loginViewModel: LoginViewModel = hiltViewModel(),
   onLoginNavigate: () -> Unit,
+  subject: String,
+  onSubjectChange: (String) -> Unit,
+  password: String,
+  onPasswordChange: (String) -> Unit,
+  onLoginAndEncryptCredentials: suspend (LoginRequestDto, Context, Boolean) -> LoginResponse,
   modifier: Modifier,
 ) {
   val context = LocalContext.current
@@ -59,9 +63,7 @@ fun LoginFieldsContent(
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
 
-  val subject = loginViewModel.subject
-  val password = loginViewModel.password
-  val loginViewModelScope = loginViewModel.viewModelScope
+  val scope = CoroutineScope(Dispatchers.IO)
 
   val requestErrorMessage = stringResource(id = R.string.request_error)
   val subjectAndPasswordCannotBeBlankMessage =
@@ -75,7 +77,7 @@ fun LoginFieldsContent(
       FieldData(
         value = subject,
         onValueChange = {
-          loginViewModel.subject(it)
+          onSubjectChange(it)
         },
         placeholderText = stringResource(id = R.string.login_subject),
         keyboardOptions =
@@ -88,7 +90,7 @@ fun LoginFieldsContent(
       FieldData(
         value = password,
         onValueChange = {
-          loginViewModel.password(it)
+          onPasswordChange(it)
         },
         placeholderText = stringResource(id = R.string.login_password),
         keyboardOptions =
@@ -153,25 +155,22 @@ fun LoginFieldsContent(
             .size(width = contentWidth.halfStandard, height = contentHeight.standard),
         shape = RoundedCornerShape(shape.medium),
         onClick = {
-          loginViewModelScope.launch {
+          scope.launch(Dispatchers.IO) {
             val response =
               if (subject.isNotBlank() && password.isNotBlank()) {
-                loginViewModel.loginAndEncryptCredentials(
-                  request =
-                    LoginRequestDto(
-                      subject = subject,
-                      password = password,
-                    ),
-                  context = context,
-                  encryptSubjectAndPassword = true,
-                )
+                val request =
+                  LoginRequestDto(
+                    subject = subject,
+                    password = password,
+                  )
+                onLoginAndEncryptCredentials(request, context, true)
               } else {
-                LoginResponseType.BadCredentials
+                LoginResponse.BadCredentials
               }
 
-            if (response != LoginResponseType.Success) {
+            if (response != LoginResponse.Success) {
               val message =
-                if (response == LoginResponseType.BadCredentials) {
+                if (response == LoginResponse.BadCredentials) {
                   subjectAndPasswordCannotBeBlankMessage
                 } else {
                   requestErrorMessage

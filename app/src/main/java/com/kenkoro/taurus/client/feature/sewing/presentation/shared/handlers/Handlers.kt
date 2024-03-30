@@ -3,12 +3,17 @@ package com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers
 import android.content.Context
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 suspend fun handleUserGetWithLocallyScopedCredentials(
   context: Context,
   getUser: suspend (String, String) -> Unit,
 ) {
+  val scope = CoroutineScope(Dispatchers.IO)
   val firstName =
     DecryptedCredentials.getDecryptedCredential(
       filename = LocalCredentials.SUBJECT_FILENAME,
@@ -19,13 +24,17 @@ suspend fun handleUserGetWithLocallyScopedCredentials(
       filename = LocalCredentials.TOKEN_FILENAME,
       context = context,
     ).value
-  getUser(firstName, token)
+
+  scope.launch {
+    getUser(firstName, token)
+  }
 }
 
 suspend fun handleLoginWithLocallyScopedCredentials(
-  login: suspend (String, String, Boolean) -> LoginResponseType,
+  login: suspend (String, String, Boolean) -> LoginResponse,
   context: Context,
-): LoginResponseType {
+): LoginResponse {
+  val scope = CoroutineScope(Dispatchers.IO)
   val locallyStoredSubject =
     DecryptedCredentials.getDecryptedCredential(
       filename = LocalCredentials.SUBJECT_FILENAME,
@@ -38,8 +47,10 @@ suspend fun handleLoginWithLocallyScopedCredentials(
     ).value
 
   return if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
-    login(locallyStoredSubject, locallyStoredPassword, false)
+    scope.async {
+      login(locallyStoredSubject, locallyStoredPassword, false)
+    }.await()
   } else {
-    LoginResponseType.BadCredentials
+    LoginResponse.BadCredentials
   }
 }

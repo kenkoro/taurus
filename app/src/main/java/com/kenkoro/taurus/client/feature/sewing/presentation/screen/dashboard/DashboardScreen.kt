@@ -1,6 +1,7 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,25 +26,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.LazyPagingItems
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponseDto
+import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
+import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard.components.BottomBarHost
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.UserScreen
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.user.UserViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.handleLoginWithLocallyScopedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.handleUserGetWithLocallyScopedCredentials
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
 import com.kenkoro.taurus.client.ui.theme.AppTheme
-import io.ktor.client.call.body
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 object BottomBarHostIndices {
   const val USER_SCREEN = 1
@@ -53,15 +57,17 @@ object BottomBarHostIndices {
 @Composable
 fun DashboardScreen(
   onDashboardNavigate: () -> Unit = {},
-  loginViewModel: LoginViewModel = hiltViewModel(),
-  // dashboardViewModel: DashboardViewModel = hiltViewModel(),
-  userViewModel: UserViewModel = hiltViewModel(),
+  onLoginAndEncryptCredentials: suspend (LoginRequestDto, Context, Boolean) -> LoginResponse,
+  onGetUser: suspend (String, String) -> GetUserResponseDto,
+  onGetUserResponseChange: (GetUserResponseDto) -> Unit,
+  user: User?,
+  orders: LazyPagingItems<Order>,
 ) {
   val context = LocalContext.current
 
   val snackbarHostState = remember { SnackbarHostState() }
-  var loginResponseType by remember {
-    mutableStateOf(LoginResponseType.Pending)
+  var loginResponse by remember {
+    mutableStateOf(LoginResponse.Pending)
   }
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
   val networkStatus by networkConnectivityObserver
@@ -86,7 +92,7 @@ fun DashboardScreen(
             .background(MaterialTheme.colorScheme.background),
       ) {
         if (networkStatus != Status.Available) {
-          loginResponseType = LoginResponseType.RequestFailure
+          loginResponse = LoginResponse.RequestFailure
           showErrorSnackbar(
             snackbarHostState = snackbarHostState,
             key = networkStatus,
@@ -95,71 +101,77 @@ fun DashboardScreen(
           )
         } else {
           LaunchedEffect(Unit) {
-            loginResponseType = LoginResponseType.Pending
-            loginResponseType =
-              handleLoginWithLocallyScopedCredentials(
-                login = { subject, password, encryptSubjectAndPassword ->
-                  loginViewModel.loginAndEncryptCredentials(
-                    request = LoginRequestDto(subject, password),
-                    context = context,
-                    encryptSubjectAndPassword = encryptSubjectAndPassword,
-                  )
-                },
-                context = context,
-              )
+            loginResponse = LoginResponse.Pending
+            withContext(Dispatchers.IO) {
+              launch {
+                loginResponse =
+                  async {
+                    handleLoginWithLocallyScopedCredentials(
+                      login = { subject, password, encryptThese ->
+                        val request =
+                          LoginRequestDto(
+                            subject = subject,
+                            password = password,
+                          )
+                        onLoginAndEncryptCredentials(request, context, encryptThese)
+                      },
+                      context = context,
+                    )
+                  }.await()
 
-            handleUserGetWithLocallyScopedCredentials(context = context) { firstName, token ->
-              try {
-                userViewModel
-                  .getUser(firstName, token)
-                  .body<GetUserResponseDto>().run {
-                    userViewModel.onGetUserResponseDto(this)
+                handleUserGetWithLocallyScopedCredentials(context = context) { subject, token ->
+                  try {
+                    onGetUser(subject, token).run {
+                      onGetUserResponseChange(this)
+                    }
+                  } catch (e: Exception) {
+                    Log.d("kenkoro", e.message!!)
                   }
-              } catch (e: Exception) {
-                Log.d("kenkoro", e.message!!)
+                }
               }
             }
           }
         }
       }
 
-      when (loginResponseType) {
-        LoginResponseType.Success -> {
+      when (loginResponse) {
+        LoginResponse.Success -> {
           BottomBarHost { index ->
             when (index) {
               BottomBarHostIndices.USER_SCREEN -> {
                 UserScreen(
-                  user = userViewModel.user,
+                  user = user,
                   networkStatus = networkStatus,
                 )
               }
 
               else ->
                 OrderScreen(
-                  user = userViewModel.user,
+                  user = user,
                   networkStatus = networkStatus,
+                  orders = orders,
                 )
             }
           }
         }
 
-        LoginResponseType.RequestFailure -> {
+        LoginResponse.RequestFailure -> {
           showErrorSnackbar(
             snackbarHostState = snackbarHostState,
-            key = loginResponseType,
+            key = loginResponse,
             message = stringResource(id = R.string.request_error),
           )
         }
 
-        LoginResponseType.Failure -> {
+        LoginResponse.Failure -> {
           onDashboardNavigate()
         }
 
-        LoginResponseType.BadCredentials -> {
+        LoginResponse.BadCredentials -> {
           onDashboardNavigate()
         }
 
-        LoginResponseType.Pending -> {
+        LoginResponse.Pending -> {
           Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
