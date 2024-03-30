@@ -20,4 +20,5 @@
     <string name="order_status_not_started">Не начато</string>
     <string name="order_status_cutted">Раскроенно</string>
     <string name="order_status_checked">Оприходованно</string>
+    <string name="new_order_button">Добавить</string>
 </resources>
