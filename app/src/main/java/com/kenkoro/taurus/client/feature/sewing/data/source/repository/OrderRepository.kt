@@ -1,8 +1,8 @@
 package com.kenkoro.taurus.client.feature.sewing.data.source.repository
 
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.OrderApi
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.Order
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.UpdateRequest
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.OrderRequestDto
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.UpdateRequestDto
 import com.kenkoro.taurus.client.feature.sewing.data.util.OrderDataType
 import io.ktor.client.statement.HttpResponse
 
@@ -13,16 +13,19 @@ interface OrderRepository {
     }
   }
 
-  suspend fun newOrder(request: Order): HttpResponse
+  suspend fun newOrder(request: OrderRequestDto): HttpResponse
 
   suspend fun getOrder(orderId: Int): HttpResponse
 
-  suspend fun getOrders(page: Int, perPage: Int): HttpResponse
+  suspend fun getOrders(
+    page: Int,
+    perPage: Int,
+  ): HttpResponse
 
   suspend fun updateOrderData(
-    request: UpdateRequest,
+    request: UpdateRequestDto,
     orderId: Int,
-    data: OrderDataType
+    data: OrderDataType,
   ): HttpResponse
 
   suspend fun deleteOrder(orderId: Int): HttpResponse

@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.Create
+import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,25 +19,21 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.screen.dashboard.ut
 @Composable
 fun BottomBarHost(
   modifier: Modifier = Modifier,
-  isAdmin: Boolean = false,
   content: @Composable (index: Int) -> Unit,
 ) {
   val tabItems =
-    mutableListOf(
+    listOf(
       TabItem(
         title = stringResource(id = R.string.bottom_bar_host_orders),
-        selectedIcon = Icons.Filled.Create,
-        unselectedIcon = Icons.Outlined.Create,
+        selectedIcon = Icons.Filled.List,
+        unselectedIcon = Icons.Outlined.List,
       ),
-    )
-  if (isAdmin) {
-    tabItems +=
       TabItem(
-        title = stringResource(id = R.string.bottom_bar_host_users),
+        title = stringResource(id = R.string.bottom_bar_host_profile),
         selectedIcon = Icons.Filled.Person,
         unselectedIcon = Icons.Outlined.Person,
       )
-  }
+    )
 
   val pagerState =
     rememberPagerState {
@@ -46,9 +42,9 @@ fun BottomBarHost(
 
   BottomBarContent(
     modifier =
-      modifier
-        .statusBarsPadding()
-        .navigationBarsPadding(),
+    modifier
+      .statusBarsPadding()
+      .navigationBarsPadding(),
     tabItems = tabItems,
     pagerState = pagerState,
   ) { index ->

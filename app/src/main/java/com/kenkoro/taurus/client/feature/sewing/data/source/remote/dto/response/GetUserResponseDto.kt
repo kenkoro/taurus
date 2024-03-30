@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GetUserResponse(
+data class GetUserResponseDto(
   val id: Int,
   var subject: String,
   var password: String,

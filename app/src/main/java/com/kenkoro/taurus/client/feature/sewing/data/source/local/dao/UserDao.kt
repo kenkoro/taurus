@@ -9,10 +9,10 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.local.UserEntity
 @Dao
 interface UserDao {
   @Upsert
-  suspend fun upsert(user: UserEntity)
+  suspend fun upsert(userEntity: UserEntity)
 
   @Delete
-  suspend fun delete(user: UserEntity)
+  suspend fun delete(userEntity: UserEntity)
 
   @Query("select * from userentity where id = :id")
   suspend fun getUserById(id: Int): UserEntity?

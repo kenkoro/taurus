@@ -5,7 +5,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCrede
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
 
-suspend fun handleUserGet(
+suspend fun handleUserGetWithLocallyScopedCredentials(
   context: Context,
   getUser: suspend (String, String) -> Unit,
 ) {
@@ -22,11 +22,10 @@ suspend fun handleUserGet(
   getUser(firstName, token)
 }
 
-suspend fun handleLogin(
+suspend fun handleLoginWithLocallyScopedCredentials(
   login: suspend (String, String, Boolean) -> LoginResponseType,
   context: Context,
 ): LoginResponseType {
-  val handler: ResponseHandler = LoginResponseHandler()
   val locallyStoredSubject =
     DecryptedCredentials.getDecryptedCredential(
       filename = LocalCredentials.SUBJECT_FILENAME,
@@ -38,14 +37,9 @@ suspend fun handleLogin(
       context = context,
     ).value
 
-  if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
-    return handler.handle(
-      subject = locallyStoredSubject,
-      password = locallyStoredPassword,
-      encryptSubjectAndPassword = false,
-      login = login,
-    )
+  return if (locallyStoredSubject.isNotBlank() && locallyStoredPassword.isNotBlank()) {
+    login(locallyStoredSubject, locallyStoredPassword, false)
+  } else {
+    LoginResponseType.BadCredentials
   }
-
-  return LoginResponseType.BadCredentials
 }

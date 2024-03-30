@@ -9,5 +9,5 @@ enum class OrderDataType(val toUrl: String) {
   Color("color"),
   Category("category"),
   Quantity("quantity"),
-  Status("status")
+  Status("status"),
 }

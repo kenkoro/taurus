@@ -41,7 +41,7 @@ import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponseType
@@ -158,7 +158,7 @@ fun LoginFieldsContent(
               if (subject.isNotBlank() && password.isNotBlank()) {
                 loginViewModel.loginAndEncryptCredentials(
                   request =
-                    LoginRequest(
+                    LoginRequestDto(
                       subject = subject,
                       password = password,
                     ),

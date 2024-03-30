@@ -3,7 +3,7 @@ package com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LoginRequest(
-  val subject: String,
-  val password: String,
+data class UpdateRequestDto(
+  val updater: String,
+  val value: String,
 )

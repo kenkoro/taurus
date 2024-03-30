@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Order(
+data class OrderRequestDto(
   @SerialName("order_id") val orderId: Int,
   val customer: String,
   val date: String,
@@ -15,5 +15,5 @@ data class Order(
   val color: String,
   val category: String,
   val quantity: Int,
-  val status: OrderStatus
+  val status: OrderStatus,
 )

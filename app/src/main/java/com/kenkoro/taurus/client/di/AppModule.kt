@@ -6,11 +6,10 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.room.Room
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.LocalDatabase
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.OrderPagingSourceFactory
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.OrderRemoteMediator
+import com.kenkoro.taurus.client.feature.sewing.data.source.local.OrderEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.OrderKtorApi
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.UserKtorApi
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.Order
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.paging.OrderRemoteMediator
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepository
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepository
@@ -31,14 +30,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-  private val client = HttpClient(CIO) {
-    install(Logging) {
-      level = LogLevel.ALL
+  private val client =
+    HttpClient(CIO) {
+      install(Logging) {
+        level = LogLevel.ALL
+      }
+      install(ContentNegotiation) {
+        json()
+      }
     }
-    install(ContentNegotiation) {
-      json()
-    }
-  }
 
   @Provides
   @Singleton
@@ -54,7 +54,7 @@ object AppModule {
   @Singleton
   fun provideUserRepository(): UserRepositoryImpl {
     return UserRepository.create(
-      userApi = UserKtorApi(client)
+      userApi = UserKtorApi(client),
     )
   }
 
@@ -62,20 +62,29 @@ object AppModule {
   @Singleton
   fun provideOrderRepository(): OrderRepositoryImpl {
     return OrderRepository.create(
-      orderApi = OrderKtorApi(client)
+      orderApi = OrderKtorApi(client),
     )
   }
 
   @Provides
   @Singleton
-  fun provideOrderPager(orderRepository: OrderRepositoryImpl): Pager<Int, Order> {
+  fun provideOrderPager(
+    app: Application,
+    localDb: LocalDatabase,
+    orderRepository: OrderRepositoryImpl,
+  ): Pager<Int, OrderEntity> {
     val pageSize = 10
     return Pager(
       config = PagingConfig(pageSize = pageSize),
-      remoteMediator = OrderRemoteMediator(orderRepository),
+      remoteMediator =
+        OrderRemoteMediator(
+          localDb = localDb,
+          orderRepository = orderRepository,
+          context = app,
+        ),
       pagingSourceFactory = {
-        OrderPagingSourceFactory(orderRepository, pageSize)()
-      }
+        localDb.orderDao.pagingSource()
+      },
     )
   }
 }

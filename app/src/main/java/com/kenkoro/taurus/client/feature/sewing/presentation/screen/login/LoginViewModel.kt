@@ -5,8 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequest
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.AuthResponse
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.LoginResponseDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.LoginCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.EncryptedCredentials
@@ -43,7 +43,7 @@ class LoginViewModel
     }
 
     suspend fun loginAndEncryptCredentials(
-      request: LoginRequest,
+      request: LoginRequestDto,
       context: Context,
       encryptSubjectAndPassword: Boolean = false,
     ): LoginResponseType {
@@ -90,14 +90,14 @@ class LoginViewModel
       return JwtToken(
         value =
           try {
-            response.body<AuthResponse>().token
+            response.body<LoginResponseDto>().token
           } catch (_: Exception) {
             ""
           },
       )
     }
 
-    private suspend fun login(request: LoginRequest): HttpResponse {
+    private suspend fun login(request: LoginRequestDto): HttpResponse {
       return userRepository.login(request)
     }
   }

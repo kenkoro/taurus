@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.Status
+import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
@@ -24,7 +25,8 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 @Composable
 fun OrderScreen(
   orderViewModel: OrderViewModel = hiltViewModel(),
-  networkStatus: Status
+  user: User?,
+  networkStatus: Status,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val orders = orderViewModel.orderPagingFlow.collectAsLazyPagingItems()
@@ -42,11 +44,11 @@ fun OrderScreen(
     ) {
       Surface(
         modifier =
-        Modifier
-          .fillMaxSize()
-          .background(MaterialTheme.colorScheme.background),
+          Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
       ) {
-        OrderContent(orders)
+        OrderContent(orders, snackbarHostState)
       }
     }
   }
