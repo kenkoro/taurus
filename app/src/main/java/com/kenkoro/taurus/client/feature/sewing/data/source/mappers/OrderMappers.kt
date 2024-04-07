@@ -33,3 +33,18 @@ fun OrderEntity.toOrder(): Order {
     status = status,
   )
 }
+
+fun Order.toOrderEntity(): OrderEntity {
+  return OrderEntity(
+    orderId = orderId,
+    customer = customer,
+    date = date,
+    title = title,
+    model = model,
+    size = size,
+    color = color,
+    category = category,
+    quantity = quantity,
+    status = status,
+  )
+}

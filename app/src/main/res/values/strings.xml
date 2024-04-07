@@ -21,6 +21,16 @@
     <string name="order_status_cutted">Раскроенно</string>
     <string name="order_status_checked">Оприходованно</string>
     <string name="new_order_button">Добавить</string>
-    <string name="select_a_customer">Выбрать заказчика</string>
     <string name="no_orders">Заказов пока нет</string>
+    <string name="delete_button">Удалить</string>
+    <string name="order_id">Номер</string>
+    <string name="order_size">Размер</string>
+    <string name="order_model">Модель</string>
+    <string name="order_category">Категория</string>
+    <string name="order_color">Цвет</string>
+    <string name="order_customer">Заказчик</string>
+    <string name="order_quantity">Количество</string>
+    <string name="cancel">Отмена</string>
+    <string name="order_was_deleted">Заказ удален</string>
+    <string name="all_orders">Все заказы</string>
 </resources>

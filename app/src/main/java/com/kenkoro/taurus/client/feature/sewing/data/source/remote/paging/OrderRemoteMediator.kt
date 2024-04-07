@@ -15,9 +15,6 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepo
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import io.ktor.client.call.body
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 
 @OptIn(ExperimentalPagingApi::class)
 class OrderRemoteMediator(
@@ -31,7 +28,6 @@ class OrderRemoteMediator(
     state: PagingState<Int, OrderEntity>,
   ): MediatorResult {
     return try {
-      val scope = CoroutineScope(Dispatchers.IO)
       val page =
         when (loadType) {
           LoadType.REFRESH -> 1
@@ -42,25 +38,22 @@ class OrderRemoteMediator(
           LoadType.APPEND -> this.page
         }
 
+      val token =
+        DecryptedCredentials.getDecryptedCredential(
+          filename = LocalCredentials.TOKEN_FILENAME,
+          context = context,
+        ).value
       val (orders, hasNextPage) =
-        scope.async {
-          val token =
-            DecryptedCredentials.getDecryptedCredential(
-              filename = LocalCredentials.TOKEN_FILENAME,
-              context = context,
-            ).value
-          Log.d("kenkoro", token)
-          try {
-            orderRepository
-              .token(token)
-              .getOrders(page, state.config.pageSize).body<GetOrdersResponseDto>().run {
-                Pair(this.paginatedOrders, this.hasNextPage)
-              }
-          } catch (e: Exception) {
-            Log.d("kenkoro", e.message!!)
-            Pair(emptyList(), false)
-          }
-        }.await()
+        try {
+          orderRepository
+            .token(token)
+            .getOrders(page, state.config.pageSize).body<GetOrdersResponseDto>().run {
+              Pair(this.paginatedOrders, this.hasNextPage)
+            }
+        } catch (e: Exception) {
+          Log.d("kenkoro", e.message!!)
+          Pair(emptyList(), false)
+        }
 
       if (hasNextPage) {
         this.page++

@@ -12,29 +12,32 @@ import kotlinx.coroutines.delay
 
 @SuppressLint("ComposableNaming")
 @Composable
-fun <T> showErrorSnackbar(
+fun <T> showSnackbar(
   snackbarHostState: SnackbarHostState,
   key: T,
   message: String,
   onDismissed: suspend () -> Unit = {},
   onActionPerformed: suspend () -> Unit = {},
   actionLabel: String? = stringResource(id = R.string.ok),
-  delayInMillis: Long = 100,
+  delayInMillis: Long = 100L,
   duration: SnackbarDuration = SnackbarDuration.Indefinite,
+  extraCondition: Boolean = true,
 ) {
   LaunchedEffect(key) {
-    delay(delayInMillis)
-    val snackbarResult =
-      snackbarHostState.showSnackbar(
-        message = message,
-        actionLabel = actionLabel,
-        withDismissAction = false,
-        duration = duration,
-      )
+    if (extraCondition) {
+      delay(delayInMillis)
+      val snackbarResult =
+        snackbarHostState.showSnackbar(
+          message = message,
+          actionLabel = actionLabel,
+          withDismissAction = false,
+          duration = duration,
+        )
 
-    when (snackbarResult) {
-      SnackbarResult.Dismissed -> onDismissed()
-      SnackbarResult.ActionPerformed -> onActionPerformed()
+      when (snackbarResult) {
+        SnackbarResult.Dismissed -> onDismissed()
+        SnackbarResult.ActionPerformed -> onActionPerformed()
+      }
     }
   }
 }

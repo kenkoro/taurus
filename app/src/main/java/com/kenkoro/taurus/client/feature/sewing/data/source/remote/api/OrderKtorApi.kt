@@ -1,6 +1,7 @@
 package com.kenkoro.taurus.client.feature.sewing.data.source.remote.api
 
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.OrderApi.Companion.token
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.DeleteRequestDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.OrderRequestDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.UpdateRequestDto
 import com.kenkoro.taurus.client.feature.sewing.data.util.OrderDataType
@@ -98,7 +99,10 @@ class OrderKtorApi(
       }
     }
 
-  override suspend fun deleteOrder(orderId: Int): HttpResponse =
+  override suspend fun deleteOrder(
+    orderId: Int,
+    request: DeleteRequestDto,
+  ): HttpResponse =
     client.delete {
       url {
         protocol = URLProtocol.HTTP
@@ -111,6 +115,7 @@ class OrderKtorApi(
           },
         )
       }
+      setBody(request)
       contentType(ContentType.Application.Json)
       headers {
         append("Authorization", "Bearer $token")

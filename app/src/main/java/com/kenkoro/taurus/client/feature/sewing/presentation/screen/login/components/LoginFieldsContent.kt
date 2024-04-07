@@ -23,8 +23,14 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -37,7 +43,7 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -50,6 +56,7 @@ fun LoginFieldsContent(
   networkStatus: Status,
   modifier: Modifier,
   scope: CoroutineScope,
+  focusRequester: FocusRequester,
   onSubjectChange: (String) -> Unit,
   onLoginNavigate: () -> Unit,
   onPasswordChange: (String) -> Unit,
@@ -66,6 +73,10 @@ fun LoginFieldsContent(
     stringResource(id = R.string.subject_and_password_cannot_be_blank)
   val actionLabelMessage = stringResource(id = R.string.ok)
 
+  var isError by rememberSaveable {
+    mutableStateOf(false)
+  }
+
   val loginFields =
     listOf(
       FieldData(
@@ -75,10 +86,10 @@ fun LoginFieldsContent(
         },
         placeholderText = stringResource(id = R.string.login_subject),
         keyboardOptions =
-          KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Next,
-            keyboardType = KeyboardType.Text,
-          ),
+        KeyboardOptions.Default.copy(
+          imeAction = ImeAction.Next,
+          keyboardType = KeyboardType.Text,
+        ),
         transformation = VisualTransformation.None,
       ),
       FieldData(
@@ -88,10 +99,10 @@ fun LoginFieldsContent(
         },
         placeholderText = stringResource(id = R.string.login_password),
         keyboardOptions =
-          KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Done,
-            keyboardType = KeyboardType.Password,
-          ),
+        KeyboardOptions.Default.copy(
+          imeAction = ImeAction.Done,
+          keyboardType = KeyboardType.Password,
+        ),
         transformation = PasswordVisualTransformation(),
       ),
     )
@@ -100,7 +111,7 @@ fun LoginFieldsContent(
     verticalArrangement = Arrangement.Center,
   ) {
     if (networkStatus != Status.Available) {
-      showErrorSnackbar(
+      showSnackbar(
         snackbarHostState = snackbarHostState,
         key = networkStatus,
         message = stringResource(id = R.string.check_internet_connection),
@@ -118,8 +129,12 @@ fun LoginFieldsContent(
     ) {
       items(loginFields) { fieldData: FieldData ->
         OutlinedTextField(
+          isError = isError,
           value = fieldData.value,
           onValueChange = {
+            if (isError) {
+              isError = false
+            }
             fieldData.onValueChange(it)
           },
           shape = RoundedCornerShape(shape.large),
@@ -129,7 +144,10 @@ fun LoginFieldsContent(
           keyboardOptions = fieldData.keyboardOptions,
           keyboardActions = fieldData.keyboardActions,
           visualTransformation = fieldData.transformation,
-          modifier = Modifier.fillMaxWidth(),
+          modifier =
+          Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester),
           singleLine = true,
         )
         Spacer(modifier = Modifier.height(contentHeight.large))
@@ -142,8 +160,8 @@ fun LoginFieldsContent(
       Button(
         enabled = networkStatus == Status.Available,
         modifier =
-          Modifier
-            .size(width = contentWidth.halfStandard, height = contentHeight.standard),
+        Modifier
+          .size(width = contentWidth.halfStandard, height = contentHeight.standard),
         shape = RoundedCornerShape(shape.medium),
         onClick = {
           scope.launch {
@@ -152,10 +170,12 @@ fun LoginFieldsContent(
                 val request = LoginRequestDto(subject, password)
                 onLogin(request, context, true)
               } else {
+                isError = true
                 LoginResponse.BadCredentials
               }
 
             if (response != LoginResponse.Success) {
+              isError = true
               val message =
                 if (response == LoginResponse.BadCredentials) {
                   subjectAndPasswordCannotBeBlankMessage
@@ -170,6 +190,7 @@ fun LoginFieldsContent(
                 duration = SnackbarDuration.Indefinite,
               )
             } else {
+              isError = false
               onLoginResponseChange(response)
               onLoginNavigate()
             }
@@ -179,7 +200,7 @@ fun LoginFieldsContent(
         Row {
           Text(text = stringResource(id = R.string.continue_button))
           Spacer(modifier = Modifier.width(contentWidth.small))
-          Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = "Login button")
+          Icon(imageVector = Icons.Default.KeyboardArrowRight, contentDescription = "LoginButton")
         }
       }
     }

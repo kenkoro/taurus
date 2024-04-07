@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client.feature.sewing.data.source.remote.api
 
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.DeleteRequestDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.OrderRequestDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.UpdateRequestDto
 import com.kenkoro.taurus.client.feature.sewing.data.util.OrderDataType
@@ -29,5 +30,8 @@ interface OrderApi {
     data: OrderDataType,
   ): HttpResponse
 
-  suspend fun deleteOrder(orderId: Int): HttpResponse
+  suspend fun deleteOrder(
+    orderId: Int,
+    request: DeleteRequestDto,
+  ): HttpResponse
 }

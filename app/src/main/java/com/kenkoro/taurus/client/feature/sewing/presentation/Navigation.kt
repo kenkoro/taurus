@@ -16,12 +16,12 @@ import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponseDto
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginScreen
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.UserViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderScreen
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.Screen
-import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodel.OrderViewModel
-import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodel.UserViewModel
 import io.ktor.client.call.body
 
 @Composable
@@ -44,7 +44,7 @@ fun AppNavHost(
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
   val networkStatus by networkConnectivityObserver
     .observer()
-    .collectAsState(initial = Status.Available)
+    .collectAsState(initial = Status.Unavailable)
 
   val userViewModel: UserViewModel = hiltViewModel()
   val orderViewModel: OrderViewModel = hiltViewModel()
@@ -80,6 +80,7 @@ fun AppNavHost(
         networkStatus = networkStatus,
         loginResponse = userViewModel.loginResponse,
         isLoginFailed = userViewModel.isLoginFailed,
+        scope = orderViewModel.viewModelScope,
         onLogin = { loginRequestDto, context, encryptSubjectAndPassword ->
           userViewModel.login(
             loginRequestDto,
@@ -94,6 +95,11 @@ fun AppNavHost(
         },
         onGetUserResponseChange = userViewModel::onGetUserResponseDto,
         onLoginResponseChange = userViewModel::loginResponse,
+        onDeleteOrderRemotely = { orderId, token, deleterSubject ->
+          orderViewModel.deleteOrderRemotely(orderId, token, deleterSubject)
+        },
+        onDeleteOrderLocally = orderViewModel::deleteOrderLocally,
+        onUpsertOrderLocally = orderViewModel::upsertOrderLocally,
       )
     }
   }

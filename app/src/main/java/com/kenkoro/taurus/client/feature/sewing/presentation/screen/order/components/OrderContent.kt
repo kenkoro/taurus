@@ -1,6 +1,5 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -16,15 +15,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.itemKey
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.Status
-import com.kenkoro.taurus.client.core.local.LocalArrangement
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
-import com.kenkoro.taurus.client.feature.sewing.data.util.UserProfile
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showSnackbar
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun OrderContent(
@@ -33,12 +30,15 @@ fun OrderContent(
   user: User?,
   networkStatus: Status,
   isLoginFailed: Boolean,
+  scope: CoroutineScope,
+  onDeleteOrderRemotely: suspend (Int, String, String) -> Unit,
+  onDeleteOrderLocally: suspend (Order) -> Unit,
+  onUpsertOrderLocally: suspend (Order) -> Unit,
 ) {
-  val arrangement = LocalArrangement.current
   val contentHeight = LocalContentHeight.current
 
   if (orders.loadState.append is LoadState.Error) {
-    showErrorSnackbar(
+    showSnackbar(
       snackbarHostState = snackbarHostState,
       key = orders.loadState,
       message = stringResource(id = R.string.request_error),
@@ -46,7 +46,7 @@ fun OrderContent(
   }
 
   if (isLoginFailed) {
-    showErrorSnackbar(
+    showSnackbar(
       snackbarHostState = snackbarHostState,
       key = Unit,
       message = stringResource(id = R.string.request_error),
@@ -56,18 +56,24 @@ fun OrderContent(
   LazyColumn(
     modifier = Modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(arrangement.standard),
   ) {
     item {
       Spacer(modifier = Modifier.height(contentHeight.large))
     }
-    items(
-      count = orders.itemCount,
-      key = orders.itemKey { it.orderId },
-    ) { index ->
+    items(count = orders.itemCount) { index ->
       val order = orders[index]
       if (order != null) {
-        OrderItem(order = order, profile = user?.profile ?: UserProfile.Others)
+        OrderItem(
+          order = order,
+          user = user,
+          networkStatus = networkStatus,
+          isLoginFailed = isLoginFailed,
+          onDeleteOrderRemotely = onDeleteOrderRemotely,
+          onDeleteOrderLocally = onDeleteOrderLocally,
+          scope = scope,
+          onUpsertOrderLocally = onUpsertOrderLocally,
+          snackbarHostState = snackbarHostState,
+        )
       }
     }
     item {

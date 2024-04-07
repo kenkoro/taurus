@@ -73,7 +73,7 @@ object AppModule {
     localDb: LocalDatabase,
     orderRepository: OrderRepositoryImpl,
   ): Pager<Int, OrderEntity> {
-    val pageSize = 20
+    val pageSize = 25
     return Pager(
       config = PagingConfig(pageSize = pageSize),
       remoteMediator =

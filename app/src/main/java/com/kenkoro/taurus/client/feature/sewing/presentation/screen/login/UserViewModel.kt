@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.viewmodel
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login
 
 import android.content.Context
 import androidx.compose.runtime.getValue
@@ -12,6 +12,7 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.LoginCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.inline.JwtToken
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.EncryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
@@ -21,9 +22,6 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import javax.inject.Inject
-
-@JvmInline
-value class JwtToken(val value: String)
 
 @HiltViewModel
 class UserViewModel
@@ -78,7 +76,7 @@ class UserViewModel
                   LoginCredentials(
                     subject = request.subject,
                     password = request.password,
-                    token = takeToken(this).value,
+                    token = takeToken(this),
                   ),
                 context = context,
               )

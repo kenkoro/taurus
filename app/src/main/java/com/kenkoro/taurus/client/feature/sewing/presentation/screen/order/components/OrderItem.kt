@@ -1,137 +1,238 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
 
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.kenkoro.taurus.client.R
+import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.sewing.data.util.OrderStatus
-import com.kenkoro.taurus.client.feature.sewing.data.util.UserProfile
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
+import com.kenkoro.taurus.client.feature.sewing.domain.model.User
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showSnackbar
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.remotelyDeleteOrderWithLocallyScopedCredentials
 import com.kenkoro.taurus.client.ui.theme.AppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun OrderItem(
   order: Order,
-  profile: UserProfile,
+  user: User?,
+  networkStatus: Status,
+  isLoginFailed: Boolean,
+  scope: CoroutineScope,
+  snackbarHostState: SnackbarHostState,
+  onDeleteOrderRemotely: suspend (Int, String, String) -> Unit,
+  onDeleteOrderLocally: suspend (Order) -> Unit,
+  onUpsertOrderLocally: suspend (Order) -> Unit,
 ) {
+  val context = LocalContext.current
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
 
-  var isOrderClicked by remember {
+  var isOrderItemClicked by rememberSaveable {
     mutableStateOf(false)
   }
+  var isOrderItemVisible by rememberSaveable {
+    mutableStateOf(true)
+  }
+  val orderItemHeightAnimation by animateDpAsState(
+    targetValue =
+      if (isOrderItemClicked) {
+        contentHeight.standard * 4
+      } else {
+        contentHeight.standard + 10.dp
+      },
+    label = "AnimatedHeightOfOrderItem",
+    animationSpec =
+      tween(500),
+  )
+  showSnackbar(
+    snackbarHostState = snackbarHostState,
+    key = isOrderItemVisible,
+    message = stringResource(id = R.string.order_was_deleted),
+    actionLabel = stringResource(id = R.string.cancel),
+    extraCondition = !isOrderItemVisible,
+    duration = SnackbarDuration.Short,
+    onActionPerformed = {
+      scope.launch(Dispatchers.IO) {
+        onUpsertOrderLocally(order)
+      }
+      isOrderItemVisible = !isOrderItemVisible
+    },
+  )
 
-  if (isOrderClicked) {
-    Dialog(onDismissRequest = { isOrderClicked = !isOrderClicked }) {
+  AnimatedVisibility(visible = isOrderItemVisible) {
+    Column {
+      Spacer(modifier = Modifier.height(contentHeight.medium))
       Column(
         modifier =
           Modifier
-            .background(MaterialTheme.colorScheme.background),
+            .width(contentWidth.standard + 30.dp)
+            .height(orderItemHeightAnimation)
+            .clip(RoundedCornerShape(shape.medium))
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clickable { isOrderItemClicked = !isOrderItemClicked },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.spacedBy(contentHeight.large),
       ) {
-        Text(text = order.toString())
-      }
-    }
-  }
-
-  Row(
-    modifier =
-      Modifier
-        .width(contentWidth.standard + 30.dp)
-        .heightIn(min = 90.dp, max = 150.dp)
-        .clip(RoundedCornerShape(shape.medium))
-        .background(MaterialTheme.colorScheme.primaryContainer)
-        .clickable { isOrderClicked = !isOrderClicked },
-    verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.SpaceBetween,
-  ) {
-    Row(
-      modifier = Modifier.fillMaxHeight(.75F),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.Start,
-    ) {
-      Spacer(modifier = Modifier.width(contentWidth.medium * 2))
-      Column(modifier = Modifier.width(contentWidth.halfStandard)) {
-        Text(
-          text = "${order.date} | ${order.orderId}",
-          color = MaterialTheme.colorScheme.onPrimaryContainer,
-          style = MaterialTheme.typography.bodySmall,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-        )
         Spacer(modifier = Modifier.height(contentHeight.small))
-        Text(
-          text = order.title,
-          color = MaterialTheme.colorScheme.onBackground,
-          style = MaterialTheme.typography.bodyMedium,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-        )
-        Spacer(modifier = Modifier.height(contentHeight.small))
-        Text(
-          text = "${order.model} - ${order.size} (${order.quantity})",
-          color = MaterialTheme.colorScheme.onBackground,
-          style = MaterialTheme.typography.bodySmall,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-        )
-      }
-    }
-    Row {
-      when (order.status) {
-        OrderStatus.NotStarted -> {
-          Text(
-            text = stringResource(id = R.string.order_status_not_started),
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            style = MaterialTheme.typography.labelMedium,
-          )
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceEvenly,
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Column(
+            modifier = Modifier.width(contentWidth.halfStandard),
+            horizontalAlignment = Alignment.Start,
+          ) {
+            Text(
+              text = order.date,
+              color = MaterialTheme.colorScheme.onPrimaryContainer,
+              style = MaterialTheme.typography.bodySmall,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+            )
+            Spacer(modifier = Modifier.height(contentHeight.small))
+            Text(
+              text = order.title,
+              color = MaterialTheme.colorScheme.onBackground,
+              style = MaterialTheme.typography.bodyMedium,
+              maxLines = 1,
+              overflow = TextOverflow.Ellipsis,
+            )
+          }
+
+          when (order.status) {
+            OrderStatus.NotStarted -> {
+              Text(
+                text = stringResource(id = R.string.order_status_not_started),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                style = MaterialTheme.typography.labelMedium,
+              )
+            }
+
+            OrderStatus.Cutted -> {
+              Text(
+                text = stringResource(id = R.string.order_status_cutted),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                style = MaterialTheme.typography.labelMedium,
+              )
+            }
+
+            OrderStatus.Checked -> {
+              Text(
+                text = stringResource(id = R.string.order_status_checked),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                style = MaterialTheme.typography.labelMedium,
+              )
+            }
+          }
         }
 
-        OrderStatus.Cutted -> {
-          Text(
-            text = stringResource(id = R.string.order_status_cutted),
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            style = MaterialTheme.typography.labelMedium,
-          )
-        }
+        if (isOrderItemClicked) {
+          val orderInfo =
+            listOf(
+              Pair(stringResource(id = R.string.order_id), order.orderId.toString()),
+              Pair(stringResource(id = R.string.order_size), order.size),
+              Pair(stringResource(id = R.string.order_model), order.model),
+              Pair(stringResource(id = R.string.order_category), order.category),
+              Pair(stringResource(id = R.string.order_color), order.color),
+              Pair(stringResource(id = R.string.order_customer), order.customer),
+              Pair(stringResource(id = R.string.order_quantity), order.quantity.toString()),
+            )
+          LazyColumn(modifier = Modifier.width(contentWidth.standard)) {
+            item {
+              Spacer(modifier = Modifier.height(contentHeight.large))
+            }
+            items(orderInfo) { pair ->
+              Row {
+                Spacer(modifier = Modifier.width(contentWidth.large))
+                Text(
+                  text = "${pair.first}: ${pair.second}",
+                  color = MaterialTheme.colorScheme.onBackground,
+                  style = MaterialTheme.typography.bodyMedium,
+                  maxLines = 1,
+                  overflow = TextOverflow.Ellipsis,
+                )
+              }
+            }
+          }
 
-        OrderStatus.Checked -> {
-          Text(
-            text = stringResource(id = R.string.order_status_checked),
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            style = MaterialTheme.typography.labelMedium,
-          )
+          Spacer(modifier = Modifier.height(contentHeight.large))
+          Button(
+            enabled = networkStatus == Status.Available && !isLoginFailed,
+            modifier =
+              Modifier
+                .size(contentWidth.standard, contentHeight.halfStandard),
+            shape = RoundedCornerShape(shape.small),
+            onClick = {
+              scope.launch(Dispatchers.IO) {
+                isOrderItemVisible = !isOrderItemVisible
+
+                delay(5000L)
+                if (!isOrderItemVisible) {
+                  onDeleteOrderLocally(order)
+                  try {
+                    remotelyDeleteOrderWithLocallyScopedCredentials(
+                      context,
+                      order.orderId,
+                      user?.subject ?: "",
+                    ) { orderId, token, deleterSubject ->
+                      onDeleteOrderRemotely(orderId, token, deleterSubject)
+                    }
+                  } catch (e: Exception) {
+                    Log.d("kenkoro", e.message!!)
+                  }
+                }
+              }
+            },
+          ) {
+            Row {
+              Text(text = stringResource(id = R.string.delete_button))
+            }
+          }
         }
       }
-      Spacer(modifier = Modifier.width(contentWidth.medium * 2))
     }
   }
 }
@@ -139,6 +240,7 @@ fun OrderItem(
 @Preview(showBackground = true)
 @Composable
 private fun OrderItemPrev() {
+  val snackbarHostState = remember { SnackbarHostState() }
   AppTheme {
     OrderItem(
       order =
@@ -154,7 +256,14 @@ private fun OrderItemPrev() {
           quantity = 0,
           status = OrderStatus.NotStarted,
         ),
-      profile = UserProfile.Customer,
+      user = null,
+      networkStatus = Status.Available,
+      isLoginFailed = false,
+      onDeleteOrderRemotely = { _, _, _ -> },
+      onDeleteOrderLocally = { _ -> },
+      scope = CoroutineScope(Dispatchers.IO),
+      snackbarHostState = snackbarHostState,
+      onUpsertOrderLocally = { _ -> },
     )
   }
 }

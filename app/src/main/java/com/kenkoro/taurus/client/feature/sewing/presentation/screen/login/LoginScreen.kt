@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
@@ -43,6 +44,7 @@ fun LoginScreen(
   val contentHeight = LocalContentHeight.current
 
   val snackbarHostState = remember { SnackbarHostState() }
+  val focusRequester = remember { FocusRequester() }
 
   AppTheme {
     Scaffold(
@@ -57,18 +59,18 @@ fun LoginScreen(
     ) {
       Surface(
         modifier =
-          Modifier
-            .fillMaxSize()
-            .padding(it),
+        Modifier
+          .fillMaxSize()
+          .padding(it),
       ) {
         Column(
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           LoginFieldsContent(
             modifier =
-              Modifier
-                .width(contentWidth.standard)
-                .weight(9F),
+            Modifier
+              .width(contentWidth.standard)
+              .weight(9F),
             onLoginNavigate = onLoginNavigate,
             snackbarHostState = snackbarHostState,
             subject = subject,
@@ -79,6 +81,7 @@ fun LoginScreen(
             onLoginResponseChange = onLoginResponseChange,
             networkStatus = networkStatus,
             scope = scope,
+            focusRequester = focusRequester,
           )
           LoginHelpContent(
             modifier = Modifier.weight(1F),

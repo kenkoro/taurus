@@ -9,6 +9,7 @@ data class ContentWidth(
   val halfStandard: Dp = 160.dp,
   val small: Dp = 5.dp,
   val medium: Dp = 10.dp,
+  val large: Dp = 40.dp,
 )
 
 val LocalContentWidth = compositionLocalOf { ContentWidth() }
