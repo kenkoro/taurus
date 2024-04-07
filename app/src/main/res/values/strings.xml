@@ -21,4 +21,6 @@
     <string name="order_status_cutted">Раскроенно</string>
     <string name="order_status_checked">Оприходованно</string>
     <string name="new_order_button">Добавить</string>
+    <string name="select_a_customer">Выбрать заказчика</string>
+    <string name="no_orders">Заказов пока нет</string>
 </resources>

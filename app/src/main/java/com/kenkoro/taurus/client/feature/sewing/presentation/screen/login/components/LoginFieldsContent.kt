@@ -23,8 +23,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,8 +32,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
-import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
@@ -44,33 +40,31 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.L
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
 fun LoginFieldsContent(
   snackbarHostState: SnackbarHostState,
-  onLoginNavigate: () -> Unit,
   subject: String,
-  onSubjectChange: (String) -> Unit,
   password: String,
-  onPasswordChange: (String) -> Unit,
-  onLoginAndEncryptCredentials: suspend (LoginRequestDto, Context, Boolean) -> LoginResponse,
+  networkStatus: Status,
   modifier: Modifier,
+  scope: CoroutineScope,
+  onSubjectChange: (String) -> Unit,
+  onLoginNavigate: () -> Unit,
+  onPasswordChange: (String) -> Unit,
+  onLogin: suspend (LoginRequestDto, Context, encryptSubjectAndPassword: Boolean) -> LoginResponse,
+  onLoginResponseChange: (LoginResponse) -> Unit,
 ) {
   val context = LocalContext.current
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
 
-  val scope = CoroutineScope(Dispatchers.IO)
-
   val requestErrorMessage = stringResource(id = R.string.request_error)
   val subjectAndPasswordCannotBeBlankMessage =
     stringResource(id = R.string.subject_and_password_cannot_be_blank)
   val actionLabelMessage = stringResource(id = R.string.ok)
-
-  val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
 
   val loginFields =
     listOf(
@@ -105,9 +99,6 @@ fun LoginFieldsContent(
     modifier = modifier,
     verticalArrangement = Arrangement.Center,
   ) {
-    val networkStatus by networkConnectivityObserver
-      .observer()
-      .collectAsState(initial = Status.Unavailable)
     if (networkStatus != Status.Available) {
       showErrorSnackbar(
         snackbarHostState = snackbarHostState,
@@ -155,15 +146,11 @@ fun LoginFieldsContent(
             .size(width = contentWidth.halfStandard, height = contentHeight.standard),
         shape = RoundedCornerShape(shape.medium),
         onClick = {
-          scope.launch(Dispatchers.IO) {
+          scope.launch {
             val response =
               if (subject.isNotBlank() && password.isNotBlank()) {
-                val request =
-                  LoginRequestDto(
-                    subject = subject,
-                    password = password,
-                  )
-                onLoginAndEncryptCredentials(request, context, true)
+                val request = LoginRequestDto(subject, password)
+                onLogin(request, context, true)
               } else {
                 LoginResponse.BadCredentials
               }
@@ -183,6 +170,7 @@ fun LoginFieldsContent(
                 duration = SnackbarDuration.Indefinite,
               )
             } else {
+              onLoginResponseChange(response)
               onLoginNavigate()
             }
           }

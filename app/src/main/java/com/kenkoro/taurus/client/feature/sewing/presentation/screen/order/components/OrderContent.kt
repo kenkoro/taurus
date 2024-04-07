@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -30,6 +32,7 @@ fun OrderContent(
   snackbarHostState: SnackbarHostState,
   user: User?,
   networkStatus: Status,
+  isLoginFailed: Boolean,
 ) {
   val arrangement = LocalArrangement.current
   val contentHeight = LocalContentHeight.current
@@ -42,12 +45,22 @@ fun OrderContent(
     )
   }
 
+  if (isLoginFailed) {
+    showErrorSnackbar(
+      snackbarHostState = snackbarHostState,
+      key = Unit,
+      message = stringResource(id = R.string.request_error),
+    )
+  }
+
   LazyColumn(
     modifier = Modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(arrangement.standard),
   ) {
-    item { Spacer(modifier = Modifier.height(contentHeight.medium)) }
+    item {
+      Spacer(modifier = Modifier.height(contentHeight.large))
+    }
     items(
       count = orders.itemCount,
       key = orders.itemKey { it.orderId },
@@ -59,11 +72,19 @@ fun OrderContent(
     }
     item {
       if (orders.loadState.append is LoadState.Loading) {
-        CircularProgressIndicator(strokeWidth = 3.dp)
+        CircularProgressIndicator(strokeWidth = 4.dp)
       }
     }
     item {
-      Spacer(modifier = Modifier.height(contentHeight.halfStandard + 10.dp))
+      if (orders.itemCount == 0 && orders.loadState.append is LoadState.NotLoading) {
+        Text(
+          text = stringResource(id = R.string.no_orders),
+          fontWeight = FontWeight.Light,
+        )
+      }
+    }
+    item {
+      Spacer(modifier = Modifier.height(contentHeight.large))
     }
   }
 }

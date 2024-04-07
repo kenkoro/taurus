@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kenkoro.taurus.client.core.connectivity.Status
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
@@ -24,15 +25,19 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.compon
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
 import com.kenkoro.taurus.client.ui.theme.AppTheme
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun LoginScreen(
-  onLoginNavigate: () -> Unit,
   subject: String,
-  onSubjectChange: (String) -> Unit,
   password: String,
+  networkStatus: Status,
+  scope: CoroutineScope,
+  onLoginNavigate: () -> Unit,
+  onSubjectChange: (String) -> Unit,
   onPasswordChange: (String) -> Unit,
-  onLoginAndEncryptCredentials: suspend (LoginRequestDto, Context, Boolean) -> LoginResponse,
+  onLogin: suspend (LoginRequestDto, Context, encryptSubjectAndPassword: Boolean) -> LoginResponse,
+  onLoginResponseChange: (LoginResponse) -> Unit,
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
@@ -70,7 +75,10 @@ fun LoginScreen(
             onSubjectChange = onSubjectChange,
             password = password,
             onPasswordChange = onPasswordChange,
-            onLoginAndEncryptCredentials = onLoginAndEncryptCredentials,
+            onLogin = onLogin,
+            onLoginResponseChange = onLoginResponseChange,
+            networkStatus = networkStatus,
+            scope = scope,
           )
           LoginHelpContent(
             modifier = Modifier.weight(1F),

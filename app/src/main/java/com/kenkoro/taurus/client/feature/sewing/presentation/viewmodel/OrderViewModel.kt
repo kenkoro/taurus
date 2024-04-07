@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order
+package com.kenkoro.taurus.client.feature.sewing.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

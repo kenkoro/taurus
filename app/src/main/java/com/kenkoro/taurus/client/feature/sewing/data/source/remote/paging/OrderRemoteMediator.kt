@@ -49,6 +49,7 @@ class OrderRemoteMediator(
               filename = LocalCredentials.TOKEN_FILENAME,
               context = context,
             ).value
+          Log.d("kenkoro", token)
           try {
             orderRepository
               .token(token)

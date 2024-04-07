@@ -1,13 +1,16 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login
+package com.kenkoro.taurus.client.feature.sewing.presentation.viewmodel
 
 import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toUser
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponseDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.LoginResponseDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
+import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.LoginCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.EncryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
@@ -23,7 +26,7 @@ import javax.inject.Inject
 value class JwtToken(val value: String)
 
 @HiltViewModel
-class LoginFieldsViewModel
+class UserViewModel
   @Inject
   constructor(
     private val userRepository: UserRepositoryImpl,
@@ -34,6 +37,15 @@ class LoginFieldsViewModel
     var password by mutableStateOf("")
       private set
 
+    var loginResponse by mutableStateOf(LoginResponse.Pending)
+      private set
+
+    var user by mutableStateOf<User?>(null)
+      private set
+
+    var isLoginFailed by mutableStateOf(false)
+      private set
+
     fun subject(subject: String) {
       this.subject = subject
     }
@@ -42,13 +54,22 @@ class LoginFieldsViewModel
       this.password = password
     }
 
-    suspend fun loginAndEncryptCredentials(
-      request: LoginRequestDto,
+    fun loginResponse(loginResponse: LoginResponse) {
+      this.loginResponse = loginResponse
+      isLoginFailed = isLoginFailed(this.loginResponse)
+    }
+
+    fun onGetUserResponseDto(userDto: GetUserResponseDto) {
+      user = userDto.toUser()
+    }
+
+    suspend fun login(
+      request: LoginRequestDto = LoginRequestDto(subject, password),
       context: Context,
       encryptSubjectAndPassword: Boolean = false,
     ): LoginResponse {
       return try {
-        login(request).run {
+        loginWithRequest(request).run {
           val status = this.status
           if (status.isSuccess()) {
             if (encryptSubjectAndPassword) {
@@ -82,6 +103,16 @@ class LoginFieldsViewModel
       }
     }
 
+    suspend fun getUser(
+      subject: String,
+      token: String,
+    ): HttpResponse {
+      return userRepository.run {
+        token(token)
+        getUser(subject)
+      }
+    }
+
     private fun apiUrlNotFound(statusCode: HttpStatusCode): Boolean {
       return statusCode == HttpStatusCode.NotFound
     }
@@ -97,7 +128,13 @@ class LoginFieldsViewModel
       )
     }
 
-    private suspend fun login(request: LoginRequestDto): HttpResponse {
+    private suspend fun loginWithRequest(request: LoginRequestDto): HttpResponse {
       return userRepository.login(request)
+    }
+
+    private fun isLoginFailed(loginResponse: LoginResponse): Boolean {
+      return loginResponse == LoginResponse.Failure ||
+        loginResponse == LoginResponse.BadCredentials ||
+        loginResponse == LoginResponse.RequestFailure
     }
   }

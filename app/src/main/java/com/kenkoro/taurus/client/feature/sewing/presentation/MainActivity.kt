@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
           AppNavHost(
             startDestination = { subject, password ->
               if (subject.isNotBlank() && password.isNotBlank()) {
-                Screen.DashboardScreen
+                Screen.OrderScreen
               } else {
                 Screen.LoginScreen
               }
