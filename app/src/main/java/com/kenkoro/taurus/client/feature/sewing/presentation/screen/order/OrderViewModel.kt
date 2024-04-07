@@ -21,41 +21,41 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OrderViewModel
-@Inject
-constructor(
-  pager: Pager<Int, OrderEntity>,
-  private val localDb: LocalDatabase,
-  private val orderRepository: OrderRepositoryImpl,
-) : ViewModel() {
-  val orderPagingFlow =
-    pager
-      .flow
-      .map { pagingData ->
-        pagingData.map { it.toOrder() }
+  @Inject
+  constructor(
+    pager: Pager<Int, OrderEntity>,
+    private val localDb: LocalDatabase,
+    private val orderRepository: OrderRepositoryImpl,
+  ) : ViewModel() {
+    val orderPagingFlow =
+      pager
+        .flow
+        .map { pagingData ->
+          pagingData.map { it.toOrder() }
+        }
+        .flowOn(Dispatchers.IO)
+        .cachedIn(viewModelScope)
+
+    suspend fun deleteOrderLocally(order: Order) {
+      localDb.withTransaction {
+        localDb.orderDao.delete(order.toOrderEntity())
       }
-      .flowOn(Dispatchers.IO)
-      .cachedIn(viewModelScope)
+    }
 
-  suspend fun deleteOrderLocally(order: Order) {
-    localDb.withTransaction {
-      localDb.orderDao.delete(order.toOrderEntity())
+    suspend fun upsertOrderLocally(order: Order) {
+      localDb.withTransaction {
+        localDb.orderDao.upsert(order.toOrderEntity())
+      }
+    }
+
+    suspend fun deleteOrderRemotely(
+      orderId: Int,
+      token: String,
+      deleterSubject: String,
+    ) {
+      orderRepository.run {
+        token(token)
+        deleteOrder(orderId, DeleteRequestDto(deleterSubject))
+      }
     }
   }
-
-  suspend fun upsertOrderLocally(order: Order) {
-    localDb.withTransaction {
-      localDb.orderDao.upsert(order.toOrderEntity())
-    }
-  }
-
-  suspend fun deleteOrderRemotely(
-    orderId: Int,
-    token: String,
-    deleterSubject: String,
-  ) {
-    orderRepository.run {
-      token(token)
-      deleteOrder(orderId, DeleteRequestDto(deleterSubject))
-    }
-  }
-}

@@ -86,10 +86,10 @@ fun LoginFieldsContent(
         },
         placeholderText = stringResource(id = R.string.login_subject),
         keyboardOptions =
-        KeyboardOptions.Default.copy(
-          imeAction = ImeAction.Next,
-          keyboardType = KeyboardType.Text,
-        ),
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+          ),
         transformation = VisualTransformation.None,
       ),
       FieldData(
@@ -99,10 +99,10 @@ fun LoginFieldsContent(
         },
         placeholderText = stringResource(id = R.string.login_password),
         keyboardOptions =
-        KeyboardOptions.Default.copy(
-          imeAction = ImeAction.Done,
-          keyboardType = KeyboardType.Password,
-        ),
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password,
+          ),
         transformation = PasswordVisualTransformation(),
       ),
     )
@@ -145,9 +145,9 @@ fun LoginFieldsContent(
           keyboardActions = fieldData.keyboardActions,
           visualTransformation = fieldData.transformation,
           modifier =
-          Modifier
-            .fillMaxWidth()
-            .focusRequester(focusRequester),
+            Modifier
+              .fillMaxWidth()
+              .focusRequester(focusRequester),
           singleLine = true,
         )
         Spacer(modifier = Modifier.height(contentHeight.large))
@@ -160,8 +160,8 @@ fun LoginFieldsContent(
       Button(
         enabled = networkStatus == Status.Available,
         modifier =
-        Modifier
-          .size(width = contentWidth.halfStandard, height = contentHeight.standard),
+          Modifier
+            .size(width = contentWidth.halfStandard, height = contentHeight.standard),
         shape = RoundedCornerShape(shape.medium),
         onClick = {
           scope.launch {

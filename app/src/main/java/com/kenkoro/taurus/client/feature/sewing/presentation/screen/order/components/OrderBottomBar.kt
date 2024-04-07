@@ -45,13 +45,14 @@ fun OrderBottomBar(
     mutableStateOf(false)
   }
   val orderBottomBarHeightAnimation by animateDpAsState(
-    targetValue = if (expanded) {
-      contentHeight.standard * 7
-    } else {
-      contentHeight.standard
-    },
+    targetValue =
+      if (expanded) {
+        contentHeight.standard * 7
+      } else {
+        contentHeight.standard
+      },
     animationSpec = tween(500),
-    label = "OrderBottomBarHeightAnimation"
+    label = "OrderBottomBarHeightAnimation",
   )
 
   LaunchedEffect(isLoginFailed, networkStatus) {
@@ -62,10 +63,10 @@ fun OrderBottomBar(
 
   Column(
     modifier =
-    Modifier
-      .fillMaxWidth()
-      .height(orderBottomBarHeightAnimation)
-      .background(MaterialTheme.colorScheme.background),
+      Modifier
+        .fillMaxWidth()
+        .height(orderBottomBarHeightAnimation)
+        .background(MaterialTheme.colorScheme.background),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.spacedBy(contentHeight.small),
   ) {
@@ -73,15 +74,15 @@ fun OrderBottomBar(
     Button(
       enabled = networkStatus == Status.Available && !isLoginFailed,
       modifier =
-      Modifier
-        .size(contentWidth.standard + 30.dp, contentHeight.halfStandard),
+        Modifier
+          .size(contentWidth.standard + 30.dp, contentHeight.halfStandard),
       shape = RoundedCornerShape(shape.small),
       onClick = { expanded = !expanded },
     ) {
       if (expanded) {
         Icon(
           imageVector = Icons.Default.KeyboardArrowUp,
-          contentDescription = "CancelTheCreationOfANewOrder"
+          contentDescription = "CancelTheCreationOfANewOrder",
         )
       } else {
         Icon(imageVector = Icons.Default.Add, contentDescription = "AddANewOrder")

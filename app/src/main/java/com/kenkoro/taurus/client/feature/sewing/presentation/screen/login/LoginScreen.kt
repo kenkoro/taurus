@@ -59,18 +59,18 @@ fun LoginScreen(
     ) {
       Surface(
         modifier =
-        Modifier
-          .fillMaxSize()
-          .padding(it),
+          Modifier
+            .fillMaxSize()
+            .padding(it),
       ) {
         Column(
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           LoginFieldsContent(
             modifier =
-            Modifier
-              .width(contentWidth.standard)
-              .weight(9F),
+              Modifier
+                .width(contentWidth.standard)
+                .weight(9F),
             onLoginNavigate = onLoginNavigate,
             snackbarHostState = snackbarHostState,
             subject = subject,
