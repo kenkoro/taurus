@@ -15,13 +15,13 @@ class NetworkConnectivityObserver(
   private val connectivityManager =
     context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-  override fun observer(): Flow<Status> {
+  override fun observer(): Flow<NetworkStatus> {
     return callbackFlow {
       val callback =
         object : ConnectivityManager.NetworkCallback() {
           override fun onAvailable(network: Network) {
             super.onAvailable(network)
-            launch { send(Status.Available) }
+            launch { send(NetworkStatus.Available) }
           }
 
           override fun onLosing(
@@ -29,17 +29,17 @@ class NetworkConnectivityObserver(
             maxMsToLive: Int,
           ) {
             super.onLosing(network, maxMsToLive)
-            launch { send(Status.Losing) }
+            launch { send(NetworkStatus.Losing) }
           }
 
           override fun onLost(network: Network) {
             super.onLost(network)
-            launch { send(Status.Lost) }
+            launch { send(NetworkStatus.Lost) }
           }
 
           override fun onUnavailable() {
             super.onUnavailable()
-            launch { send(Status.Unavailable) }
+            launch { send(NetworkStatus.Unavailable) }
           }
         }
 

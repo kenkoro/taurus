@@ -11,6 +11,7 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.local.OrderEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toOrder
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toOrderEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.DeleteRequestDto
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.OrderRequestDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -56,6 +57,16 @@ class OrderViewModel
       orderRepository.run {
         token(token)
         deleteOrder(orderId, DeleteRequestDto(deleterSubject))
+      }
+    }
+
+    suspend fun upsertOrderRemotely(
+      request: OrderRequestDto,
+      token: String,
+    ) {
+      orderRepository.run {
+        token(token)
+        newOrder(request)
       }
     }
   }

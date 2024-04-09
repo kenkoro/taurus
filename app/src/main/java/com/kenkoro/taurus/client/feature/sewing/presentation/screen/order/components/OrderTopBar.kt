@@ -23,12 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.core.connectivity.Status
+import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 
 @Composable
-fun OrderTopBar(networkStatus: Status) {
+fun OrderTopBar(networkStatus: NetworkStatus) {
   val contentHeight = LocalContentHeight.current
   val contentWidth = LocalContentWidth.current
 
@@ -51,7 +51,7 @@ fun OrderTopBar(networkStatus: Status) {
     Column(
       modifier =
         Modifier
-          .clickable(enabled = networkStatus == Status.Available) {
+          .clickable(enabled = networkStatus == NetworkStatus.Available) {
             expanded = !expanded
           },
     ) {

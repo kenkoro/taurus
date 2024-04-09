@@ -23,8 +23,9 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.core.connectivity.Status
+import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.OrderRequestDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponseDto
 import com.kenkoro.taurus.client.feature.sewing.data.util.UserProfile
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
@@ -42,13 +43,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun OrderScreen(
   orders: LazyPagingItems<Order>,
   user: User?,
-  networkStatus: Status,
+  networkStatus: NetworkStatus,
   isLoginFailed: Boolean,
   loginResponse: LoginResponse,
   scope: CoroutineScope,
@@ -57,6 +57,7 @@ fun OrderScreen(
   onDeleteOrderRemotely: suspend (Int, String, String) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
   onUpsertOrderLocally: suspend (Order) -> Unit,
+  onUpsertOrderRemotely: suspend (OrderRequestDto, String) -> Unit,
   onGetUserResponseChange: (GetUserResponseDto) -> Unit,
   onLoginResponseChange: (LoginResponse) -> Unit,
 ) {
@@ -83,6 +84,10 @@ fun OrderScreen(
         OrderBottomBar(
           networkStatus = networkStatus,
           isLoginFailed = isLoginFailed,
+          scope = scope,
+          onUpsertOrderLocally = onUpsertOrderLocally,
+          onUpsertOrderRemotely = onUpsertOrderRemotely,
+          snackbarHostState = snackbarHostState,
         )
       },
     ) {
@@ -93,7 +98,7 @@ fun OrderScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(it),
       ) {
-        if (networkStatus != Status.Available) {
+        if (networkStatus != NetworkStatus.Available) {
           onLoginResponseChange(LoginResponse.RequestFailure)
           showSnackbar(
             snackbarHostState = snackbarHostState,
@@ -103,33 +108,30 @@ fun OrderScreen(
           )
         } else {
           LaunchedEffect(Unit) {
-            onLoginResponseChange(LoginResponse.Pending)
-            withContext(Dispatchers.IO) {
-              launch {
-                if (loginResponse != LoginResponse.Success) {
-                  loginWithLocallyScopedCredentials(
-                    login = { subject, password, encryptThese ->
-                      val request =
-                        LoginRequestDto(
-                          subject = subject,
-                          password = password,
-                        )
-                      onLogin(request, context, encryptThese)
-                    },
-                    context = context,
-                  ).run {
-                    onLoginResponseChange(this)
-                  }
+            scope.launch {
+              if (loginResponse != LoginResponse.Success) {
+                loginWithLocallyScopedCredentials(
+                  login = { subject, password, encryptThese ->
+                    val request =
+                      LoginRequestDto(
+                        subject = subject,
+                        password = password,
+                      )
+                    onLogin(request, context, encryptThese)
+                  },
+                  context = context,
+                ).run {
+                  onLoginResponseChange(this)
                 }
+              }
 
-                remotelyGetUserWithLocallyScopedCredentials(context = context) { subject, token ->
-                  try {
-                    onGetUser(subject, token).run {
-                      onGetUserResponseChange(this)
-                    }
-                  } catch (e: Exception) {
-                    Log.d("kenkoro", e.message!!)
+              remotelyGetUserWithLocallyScopedCredentials(context = context) { subject, token ->
+                try {
+                  onGetUser(subject, token).run {
+                    onGetUserResponseChange(this)
                   }
+                } catch (e: Exception) {
+                  Log.d("kenkoro", e.message!!)
                 }
               }
             }
@@ -160,7 +162,7 @@ private fun OrderScreenPrev() {
     OrderScreen(
       orders = orders,
       user = null,
-      networkStatus = Status.Available,
+      networkStatus = NetworkStatus.Available,
       loginResponse = LoginResponse.Success,
       onLogin = { _, _, _ -> LoginResponse.Success },
       onGetUser = { _, _ ->
@@ -183,6 +185,7 @@ private fun OrderScreenPrev() {
       onDeleteOrderLocally = { _ -> },
       onUpsertOrderLocally = { _ -> },
       scope = CoroutineScope(Dispatchers.IO),
+      onUpsertOrderRemotely = { _, _ -> },
     )
   }
 }

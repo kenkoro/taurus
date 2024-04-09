@@ -48,3 +48,18 @@ fun Order.toOrderEntity(): OrderEntity {
     status = status,
   )
 }
+
+fun Order.toOrderDto(): OrderRequestDto {
+  return OrderRequestDto(
+    orderId = orderId,
+    customer = customer,
+    date = date,
+    title = title,
+    model = model,
+    size = size,
+    color = color,
+    category = category,
+    quantity = quantity,
+    status = status,
+  )
+}

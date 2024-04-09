@@ -29,16 +29,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.core.connectivity.Status
+import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
@@ -53,10 +50,9 @@ fun LoginFieldsContent(
   snackbarHostState: SnackbarHostState,
   subject: String,
   password: String,
-  networkStatus: Status,
+  networkStatus: NetworkStatus,
   modifier: Modifier,
   scope: CoroutineScope,
-  focusRequester: FocusRequester,
   onSubjectChange: (String) -> Unit,
   onLoginNavigate: () -> Unit,
   onPasswordChange: (String) -> Unit,
@@ -85,12 +81,6 @@ fun LoginFieldsContent(
           onSubjectChange(it)
         },
         placeholderText = stringResource(id = R.string.login_subject),
-        keyboardOptions =
-          KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Next,
-            keyboardType = KeyboardType.Text,
-          ),
-        transformation = VisualTransformation.None,
       ),
       FieldData(
         value = password,
@@ -110,7 +100,7 @@ fun LoginFieldsContent(
     modifier = modifier,
     verticalArrangement = Arrangement.Center,
   ) {
-    if (networkStatus != Status.Available) {
+    if (networkStatus != NetworkStatus.Available) {
       showSnackbar(
         snackbarHostState = snackbarHostState,
         key = networkStatus,
@@ -146,8 +136,7 @@ fun LoginFieldsContent(
           visualTransformation = fieldData.transformation,
           modifier =
             Modifier
-              .fillMaxWidth()
-              .focusRequester(focusRequester),
+              .fillMaxWidth(),
           singleLine = true,
         )
         Spacer(modifier = Modifier.height(contentHeight.large))
@@ -158,7 +147,7 @@ fun LoginFieldsContent(
       modifier = Modifier.fillMaxWidth(),
     ) {
       Button(
-        enabled = networkStatus == Status.Available,
+        enabled = networkStatus == NetworkStatus.Available,
         modifier =
           Modifier
             .size(width = contentWidth.halfStandard, height = contentHeight.standard),

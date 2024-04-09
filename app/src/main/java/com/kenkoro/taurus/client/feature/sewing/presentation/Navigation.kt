@@ -13,7 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
-import com.kenkoro.taurus.client.core.connectivity.Status
+import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponseDto
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.UserViewModel
@@ -44,7 +44,7 @@ fun AppNavHost(
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
   val networkStatus by networkConnectivityObserver
     .observer()
-    .collectAsState(initial = Status.Unavailable)
+    .collectAsState(initial = NetworkStatus.Unavailable)
 
   val userViewModel: UserViewModel = hiltViewModel()
   val orderViewModel: OrderViewModel = hiltViewModel()
@@ -100,6 +100,9 @@ fun AppNavHost(
         },
         onDeleteOrderLocally = orderViewModel::deleteOrderLocally,
         onUpsertOrderLocally = orderViewModel::upsertOrderLocally,
+        onUpsertOrderRemotely = { request, token ->
+          orderViewModel.upsertOrderRemotely(request, token)
+        },
       )
     }
   }

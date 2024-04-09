@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.core.connectivity.Status
+import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
@@ -56,7 +56,7 @@ import kotlinx.coroutines.launch
 fun OrderItem(
   order: Order,
   user: User?,
-  networkStatus: Status,
+  networkStatus: NetworkStatus,
   isLoginFailed: Boolean,
   scope: CoroutineScope,
   snackbarHostState: SnackbarHostState,
@@ -111,7 +111,9 @@ fun OrderItem(
             .height(orderItemHeightAnimation)
             .clip(RoundedCornerShape(shape.medium))
             .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable { isOrderItemClicked = !isOrderItemClicked },
+            .clickable {
+              isOrderItemClicked = !isOrderItemClicked
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(contentHeight.large),
       ) {
@@ -200,7 +202,7 @@ fun OrderItem(
 
           Spacer(modifier = Modifier.height(contentHeight.large))
           Button(
-            enabled = networkStatus == Status.Available && !isLoginFailed,
+            enabled = networkStatus == NetworkStatus.Available && !isLoginFailed,
             modifier =
               Modifier
                 .size(contentWidth.standard, contentHeight.halfStandard),
@@ -257,7 +259,7 @@ private fun OrderItemPrev() {
           status = OrderStatus.NotStarted,
         ),
       user = null,
-      networkStatus = Status.Available,
+      networkStatus = NetworkStatus.Available,
       isLoginFailed = false,
       onDeleteOrderRemotely = { _, _, _ -> },
       onDeleteOrderLocally = { _ -> },

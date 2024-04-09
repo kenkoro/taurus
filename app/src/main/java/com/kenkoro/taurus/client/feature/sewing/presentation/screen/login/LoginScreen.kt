@@ -15,9 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.unit.dp
-import com.kenkoro.taurus.client.core.connectivity.Status
+import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
@@ -32,7 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 fun LoginScreen(
   subject: String,
   password: String,
-  networkStatus: Status,
+  networkStatus: NetworkStatus,
   scope: CoroutineScope,
   onLoginNavigate: () -> Unit,
   onSubjectChange: (String) -> Unit,
@@ -44,7 +43,6 @@ fun LoginScreen(
   val contentHeight = LocalContentHeight.current
 
   val snackbarHostState = remember { SnackbarHostState() }
-  val focusRequester = remember { FocusRequester() }
 
   AppTheme {
     Scaffold(
@@ -81,7 +79,6 @@ fun LoginScreen(
             onLoginResponseChange = onLoginResponseChange,
             networkStatus = networkStatus,
             scope = scope,
-            focusRequester = focusRequester,
           )
           LoginHelpContent(
             modifier = Modifier.weight(1F),
