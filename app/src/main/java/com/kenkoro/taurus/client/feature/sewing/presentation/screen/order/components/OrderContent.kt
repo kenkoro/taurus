@@ -22,6 +22,8 @@ import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import kotlinx.coroutines.launch
 
+private fun getOrderKey(order: Order): Int = order.orderId
+
 @Composable
 fun OrderContent(
   orders: LazyPagingItems<Order>,
@@ -59,7 +61,10 @@ fun OrderContent(
     item {
       Spacer(modifier = Modifier.height(contentHeight.large))
     }
-    items(count = orders.itemCount) { index ->
+    items(
+      count = orders.itemCount,
+      key = { index -> orders[index]?.orderId ?: 0 },
+    ) { index ->
       val order = orders[index]
       if (order != null) {
         OrderItem(

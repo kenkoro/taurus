@@ -204,9 +204,6 @@ fun OrderItem(
                   } catch (e: Exception) {
                     Log.d("kenkoro", e.message!!)
                   }
-
-                  visible = true
-                  clicked = false
                 }
 
                 launch {
