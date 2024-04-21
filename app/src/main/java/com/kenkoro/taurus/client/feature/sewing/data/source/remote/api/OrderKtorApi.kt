@@ -26,7 +26,7 @@ class OrderKtorApi(
   override suspend fun newOrder(request: OrderRequestDto): HttpResponse =
     client.post {
       url {
-        protocol = URLProtocol.HTTP
+        protocol = URLProtocol.HTTPS
         host = Urls.HOST
         port = Urls.PORT
         path(Urls.Order.NEW_ORDER)
@@ -41,7 +41,7 @@ class OrderKtorApi(
   override suspend fun getOrder(orderId: Int): HttpResponse =
     client.get {
       url {
-        protocol = URLProtocol.HTTP
+        protocol = URLProtocol.HTTPS
         host = Urls.HOST
         port = Urls.PORT
         path(Urls.Order.GET_ORDER)
@@ -63,7 +63,7 @@ class OrderKtorApi(
   ): HttpResponse =
     client.get {
       url {
-        protocol = URLProtocol.HTTP
+        protocol = URLProtocol.HTTPS
         host = Urls.HOST
         port = Urls.PORT
         path(Urls.Order.GET_ORDERS)
@@ -87,7 +87,7 @@ class OrderKtorApi(
   ): HttpResponse =
     client.put {
       url {
-        protocol = URLProtocol.HTTP
+        protocol = URLProtocol.HTTPS
         host = Urls.HOST
         port = Urls.PORT
         path("${Urls.Order.GET_ORDER}/$orderId/edit/${data.toUrl}")
@@ -105,7 +105,7 @@ class OrderKtorApi(
   ): HttpResponse =
     client.delete {
       url {
-        protocol = URLProtocol.HTTP
+        protocol = URLProtocol.HTTPS
         host = Urls.HOST
         port = Urls.PORT
         path(Urls.Order.DELETE_ORDER)

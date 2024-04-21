@@ -1,6 +1,7 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -112,6 +113,7 @@ class UserViewModel
     }
 
     private fun apiUrlNotFound(statusCode: HttpStatusCode): Boolean {
+      Log.d("kenkoro", "Api url is not found")
       return statusCode == HttpStatusCode.NotFound
     }
 

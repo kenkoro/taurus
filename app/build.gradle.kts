@@ -65,6 +65,13 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("debug")
     }
+    create("beta") {
+      isDebuggable = false
+      isMinifyEnabled = true
+      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+      signingConfig = signingConfigs.getByName("debug")
+      applicationIdSuffix = ".beta"
+    }
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_1_8
