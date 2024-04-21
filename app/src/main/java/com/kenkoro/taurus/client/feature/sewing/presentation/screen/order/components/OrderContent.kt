@@ -7,49 +7,49 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
+import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showSnackbar
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun OrderContent(
   orders: LazyPagingItems<Order>,
-  snackbarHostState: SnackbarHostState,
   user: User?,
-  networkStatus: NetworkStatus,
   isLoginFailed: Boolean,
-  scope: CoroutineScope,
+  networkStatus: NetworkStatus,
+  snackbarHostState: SnackbarHostState,
+  errorSnackbarHostState: SnackbarHostState,
   onDeleteOrderRemotely: suspend (Int, String, String) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
   onUpsertOrderLocally: suspend (Order) -> Unit,
 ) {
   val contentHeight = LocalContentHeight.current
+  val strokeWidth = LocalStrokeWidth.current
+  val scope = rememberCoroutineScope()
 
-  if (orders.loadState.append is LoadState.Error) {
-    showSnackbar(
-      snackbarHostState = snackbarHostState,
-      key = orders.loadState,
-      message = stringResource(id = R.string.request_error),
-    )
-  }
+  val errorRequestMessage = stringResource(id = R.string.request_error)
+  val okActionLabel = stringResource(id = R.string.ok)
 
-  if (isLoginFailed) {
-    showSnackbar(
-      snackbarHostState = snackbarHostState,
-      key = Unit,
-      message = stringResource(id = R.string.request_error),
-      delayInMillis = 1500L,
-    )
+  if (orders.loadState.append is LoadState.Error || isLoginFailed) {
+    LaunchedEffect(orders.loadState, isLoginFailed) {
+      launch {
+        errorSnackbarHostState.showSnackbar(
+          message = errorRequestMessage,
+          actionLabel = okActionLabel,
+        )
+      }
+    }
   }
 
   LazyColumn(
@@ -65,19 +65,19 @@ fun OrderContent(
         OrderItem(
           order = order,
           user = user,
-          scope = scope,
-          snackbarHostState = snackbarHostState,
-          networkStatus = networkStatus,
           isLoginFailed = isLoginFailed,
           onDeleteOrderRemotely = onDeleteOrderRemotely,
           onDeleteOrderLocally = onDeleteOrderLocally,
           onUpsertOrderLocally = onUpsertOrderLocally,
+          networkStatus = networkStatus,
+          snackbarHostState = snackbarHostState,
+          scope = scope,
         )
       }
     }
     item {
       if (orders.loadState.append is LoadState.Loading) {
-        CircularProgressIndicator(strokeWidth = 4.dp)
+        CircularProgressIndicator(strokeWidth = strokeWidth.standard)
       }
     }
     item {

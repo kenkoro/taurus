@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,21 +45,19 @@ import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.sewing.data.util.OrderStatus
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.remotelyDeleteOrderWithLocallyScopedCredentials
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun OrderItem(
   order: Order,
   user: User?,
-  networkStatus: NetworkStatus,
-  isLoginFailed: Boolean,
   scope: CoroutineScope,
+  isLoginFailed: Boolean,
+  networkStatus: NetworkStatus,
   snackbarHostState: SnackbarHostState,
   onDeleteOrderRemotely: suspend (Int, String, String) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
@@ -69,51 +68,33 @@ fun OrderItem(
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
 
-  var isOrderItemClicked by rememberSaveable {
+  val orderWasDeletedMessage = stringResource(id = R.string.order_was_deleted)
+  val okActionLabel = stringResource(id = R.string.ok)
+
+  var clicked by rememberSaveable {
     mutableStateOf(false)
   }
-  var isOrderItemVisible by rememberSaveable {
+  var visible by rememberSaveable {
     mutableStateOf(true)
   }
-  val orderItemHeightAnimation by animateDpAsState(
+  val heightAnimated by animateDpAsState(
     targetValue =
-      if (isOrderItemClicked) {
-        contentHeight.standard * 4
-      } else {
-        contentHeight.standard + 10.dp
-      },
+      if (clicked) contentHeight.orderItemExpanded else contentHeight.orderItemNotExpanded,
     label = "AnimatedHeightOfOrderItem",
-    animationSpec =
-      tween(500),
-  )
-  showSnackbar(
-    snackbarHostState = snackbarHostState,
-    key = isOrderItemVisible,
-    message = stringResource(id = R.string.order_was_deleted),
-    actionLabel = stringResource(id = R.string.cancel),
-    extraCondition = !isOrderItemVisible,
-    duration = SnackbarDuration.Short,
-    onActionPerformed = {
-      scope.launch(Dispatchers.IO) {
-        onUpsertOrderLocally(order)
-      }
-      isOrderItemVisible = !isOrderItemVisible
-    },
+    animationSpec = tween(300),
   )
 
-  AnimatedVisibility(visible = isOrderItemVisible) {
+  AnimatedVisibility(visible = visible) {
     Column {
       Spacer(modifier = Modifier.height(contentHeight.medium))
       Column(
         modifier =
           Modifier
             .width(contentWidth.standard + 30.dp)
-            .height(orderItemHeightAnimation)
+            .height(heightAnimated)
             .clip(RoundedCornerShape(shape.medium))
             .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable {
-              isOrderItemClicked = !isOrderItemClicked
-            },
+            .clickable { clicked = !clicked },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(contentHeight.large),
       ) {
@@ -153,7 +134,7 @@ fun OrderItem(
               )
             }
 
-            OrderStatus.Cutted -> {
+            OrderStatus.Cut -> {
               Text(
                 text = stringResource(id = R.string.order_status_cutted),
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -171,7 +152,7 @@ fun OrderItem(
           }
         }
 
-        if (isOrderItemClicked) {
+        if (clicked) {
           val orderInfo =
             listOf(
               Pair(stringResource(id = R.string.order_id), order.orderId.toString()),
@@ -209,10 +190,8 @@ fun OrderItem(
             shape = RoundedCornerShape(shape.small),
             onClick = {
               scope.launch(Dispatchers.IO) {
-                isOrderItemVisible = !isOrderItemVisible
-
-                delay(5000L)
-                if (!isOrderItemVisible) {
+                launch {
+                  visible = false
                   onDeleteOrderLocally(order)
                   try {
                     remotelyDeleteOrderWithLocallyScopedCredentials(
@@ -225,6 +204,17 @@ fun OrderItem(
                   } catch (e: Exception) {
                     Log.d("kenkoro", e.message!!)
                   }
+
+                  visible = true
+                  clicked = false
+                }
+
+                launch {
+                  snackbarHostState.showSnackbar(
+                    message = orderWasDeletedMessage,
+                    actionLabel = okActionLabel,
+                    duration = SnackbarDuration.Short,
+                  )
                 }
               }
             },
@@ -243,8 +233,11 @@ fun OrderItem(
 @Composable
 private fun OrderItemPrev() {
   val snackbarHostState = remember { SnackbarHostState() }
+  val scope = rememberCoroutineScope()
+
   AppTheme {
     OrderItem(
+      scope = scope,
       order =
         Order(
           orderId = 0,
@@ -259,13 +252,12 @@ private fun OrderItemPrev() {
           status = OrderStatus.NotStarted,
         ),
       user = null,
-      networkStatus = NetworkStatus.Available,
       isLoginFailed = false,
       onDeleteOrderRemotely = { _, _, _ -> },
       onDeleteOrderLocally = { _ -> },
-      scope = CoroutineScope(Dispatchers.IO),
-      snackbarHostState = snackbarHostState,
       onUpsertOrderLocally = { _ -> },
+      networkStatus = NetworkStatus.Available,
+      snackbarHostState = snackbarHostState,
     )
   }
 }

@@ -5,8 +5,10 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -29,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -37,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
@@ -48,9 +52,9 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.O
 import com.kenkoro.taurus.client.feature.sewing.data.util.OrderStatus
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.FieldData
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showSnackbar
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.remotelyCreateANewOrderWithLocallyScopedCredentials
-import kotlinx.coroutines.CoroutineScope
+import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -59,8 +63,6 @@ import java.util.Date
 fun OrderBottomBar(
   networkStatus: NetworkStatus,
   isLoginFailed: Boolean,
-  scope: CoroutineScope,
-  snackbarHostState: SnackbarHostState,
   onUpsertOrderLocally: suspend (Order) -> Unit,
   onUpsertOrderRemotely: suspend (OrderRequestDto, String) -> Unit,
 ) {
@@ -68,10 +70,9 @@ fun OrderBottomBar(
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
-
-  var expanded by rememberSaveable {
-    mutableStateOf(false)
-  }
+  val scope = rememberCoroutineScope()
+  val errorSnackbarHostState = remember { SnackbarHostState() }
+  var expanded by rememberSaveable { mutableStateOf(false) }
   val orderBottomBarHeightAnimation by animateDpAsState(
     targetValue =
       if (expanded) {
@@ -82,37 +83,19 @@ fun OrderBottomBar(
     animationSpec = tween(500),
     label = "OrderBottomBarHeightAnimation",
   )
-  var isError by remember {
-    mutableStateOf(false)
-  }
-  var wasRequestError by remember {
-    mutableStateOf(false)
-  }
+  var isError by remember { mutableStateOf(false) }
+  var requestError by remember { mutableStateOf(false) }
+  var orderId by remember { mutableStateOf("") }
+  var customer by remember { mutableStateOf("") }
+  var title by remember { mutableStateOf("") }
+  var model by remember { mutableStateOf("") }
+  var size by remember { mutableStateOf("") }
+  var color by remember { mutableStateOf("") }
+  var category by remember { mutableStateOf("") }
+  var quantity by remember { mutableStateOf("") }
 
-  var orderId by remember {
-    mutableStateOf("")
-  }
-  var customer by remember {
-    mutableStateOf("")
-  }
-  var title by remember {
-    mutableStateOf("")
-  }
-  var model by remember {
-    mutableStateOf("")
-  }
-  var size by remember {
-    mutableStateOf("")
-  }
-  var color by remember {
-    mutableStateOf("")
-  }
-  var category by remember {
-    mutableStateOf("")
-  }
-  var quantity by remember {
-    mutableStateOf("")
-  }
+  val requestErrorMessage = stringResource(id = R.string.request_error)
+  val okActionLabel = stringResource(id = R.string.ok)
 
   LaunchedEffect(isLoginFailed, networkStatus) {
     if (networkStatus != NetworkStatus.Available || isLoginFailed) {
@@ -120,12 +103,14 @@ fun OrderBottomBar(
     }
   }
 
-  showSnackbar(
-    snackbarHostState = snackbarHostState,
-    key = wasRequestError,
-    message = stringResource(id = R.string.request_error),
-    extraCondition = wasRequestError,
-  )
+  LaunchedEffect(requestError) {
+    if (requestError) {
+      errorSnackbarHostState.showSnackbar(
+        message = requestErrorMessage,
+        actionLabel = okActionLabel,
+      )
+    }
+  }
 
   Column(
     modifier =
@@ -145,7 +130,7 @@ fun OrderBottomBar(
       shape = RoundedCornerShape(shape.small),
       onClick = {
         expanded = !expanded
-        wasRequestError = false
+        requestError = false
       },
     ) {
       if (expanded) {
@@ -284,7 +269,7 @@ fun OrderBottomBar(
                 try {
                   onUpsertOrderRemotely(request, token)
                 } catch (e: Exception) {
-                  wasRequestError = true
+                  requestError = true
                 }
               }
 
@@ -307,6 +292,15 @@ fun OrderBottomBar(
         Text(text = stringResource(id = R.string.new_order_button))
       }
     }
+    Box(modifier = Modifier.fillMaxSize()) {
+      TaurusSnackbar(
+        snackbarHostState = errorSnackbarHostState,
+        onDismiss = { errorSnackbarHostState.currentSnackbarData?.dismiss() },
+        modifier = Modifier.align(Alignment.BottomCenter),
+        containerColor = MaterialTheme.colorScheme.errorContainer,
+        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+      )
+    }
   }
 }
 
@@ -320,4 +314,17 @@ private fun now(): String {
   val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm")
   val date = Date()
   return formatter.format(date)
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun OrderBottomBarPrev() {
+  AppTheme {
+    OrderBottomBar(
+      networkStatus = NetworkStatus.Available,
+      isLoginFailed = false,
+      onUpsertOrderLocally = { _ -> },
+      onUpsertOrderRemotely = { _, _ -> },
+    )
+  }
 }

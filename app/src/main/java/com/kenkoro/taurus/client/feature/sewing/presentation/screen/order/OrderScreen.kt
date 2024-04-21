@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -33,25 +32,23 @@ import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderBottomBar
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderTopBar
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.ErrorSnackbar
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showSnackbar
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.loginWithLocallyScopedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.remotelyGetUserWithLocallyScopedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
 import com.kenkoro.taurus.client.ui.theme.AppTheme
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun OrderScreen(
   orders: LazyPagingItems<Order>,
   user: User?,
-  networkStatus: NetworkStatus,
   isLoginFailed: Boolean,
   loginResponse: LoginResponse,
-  scope: CoroutineScope,
+  networkStatus: NetworkStatus,
   onLogin: suspend (LoginRequestDto, Context, encryptSubjectAndPassword: Boolean) -> LoginResponse,
   onGetUser: suspend (String, String) -> GetUserResponseDto,
   onDeleteOrderRemotely: suspend (Int, String, String) -> Unit,
@@ -63,20 +60,30 @@ fun OrderScreen(
 ) {
   val context = LocalContext.current
   val snackbarHostState = remember { SnackbarHostState() }
+  val errorSnackbarHostState = remember { SnackbarHostState() }
+
+  val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
+  val okActionLabel = stringResource(id = R.string.ok)
 
   AppTheme {
     Scaffold(
+      snackbarHost = {
+        TaurusSnackbar(
+          snackbarHostState = snackbarHostState,
+          onDismiss = { snackbarHostState.currentSnackbarData?.dismiss() },
+        )
+
+        TaurusSnackbar(
+          snackbarHostState = errorSnackbarHostState,
+          onDismiss = { errorSnackbarHostState.currentSnackbarData?.dismiss() },
+          containerColor = MaterialTheme.colorScheme.errorContainer,
+          contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        )
+      },
       modifier =
         Modifier
           .statusBarsPadding()
           .navigationBarsPadding(),
-      snackbarHost = {
-        SnackbarHost(hostState = snackbarHostState) {
-          ErrorSnackbar(
-            snackbarData = it,
-          )
-        }
-      },
       topBar = {
         OrderTopBar(networkStatus = networkStatus)
       },
@@ -84,80 +91,83 @@ fun OrderScreen(
         OrderBottomBar(
           networkStatus = networkStatus,
           isLoginFailed = isLoginFailed,
-          scope = scope,
           onUpsertOrderLocally = onUpsertOrderLocally,
           onUpsertOrderRemotely = onUpsertOrderRemotely,
-          snackbarHostState = snackbarHostState,
         )
       },
-    ) {
-      Surface(
-        modifier =
-          Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(it),
-      ) {
-        if (networkStatus != NetworkStatus.Available) {
-          onLoginResponseChange(LoginResponse.RequestFailure)
-          showSnackbar(
-            snackbarHostState = snackbarHostState,
-            key = networkStatus,
-            message = stringResource(id = R.string.check_internet_connection),
-            actionLabel = null,
-          )
-        } else {
-          LaunchedEffect(Unit) {
-            scope.launch {
-              if (loginResponse != LoginResponse.Success) {
-                loginWithLocallyScopedCredentials(
-                  login = { subject, password, encryptThese ->
-                    val request =
-                      LoginRequestDto(
-                        subject = subject,
-                        password = password,
-                      )
-                    onLogin(request, context, encryptThese)
-                  },
-                  context = context,
-                ).run {
-                  onLoginResponseChange(this)
-                }
+      content = {
+        Surface(
+          modifier =
+            Modifier
+              .fillMaxSize()
+              .background(MaterialTheme.colorScheme.background)
+              .padding(it),
+        ) {
+          if (networkStatus != NetworkStatus.Available) {
+            onLoginResponseChange(LoginResponse.RequestFailure)
+            LaunchedEffect(networkStatus) {
+              launch {
+                errorSnackbarHostState.showSnackbar(
+                  message = internetConnectionErrorMessage,
+                  actionLabel = okActionLabel,
+                )
               }
-
-              remotelyGetUserWithLocallyScopedCredentials(context = context) { subject, token ->
-                try {
-                  onGetUser(subject, token).run {
-                    onGetUserResponseChange(this)
+            }
+          } else {
+            LaunchedEffect(Unit) {
+              withContext(Dispatchers.IO) {
+                launch {
+                  if (loginResponse != LoginResponse.Success) {
+                    loginWithLocallyScopedCredentials(
+                      login = { subject, password, encryptThese ->
+                        val request =
+                          LoginRequestDto(
+                            subject = subject,
+                            password = password,
+                          )
+                        onLogin(request, context, encryptThese)
+                      },
+                      context = context,
+                    ).run {
+                      onLoginResponseChange(this)
+                    }
                   }
-                } catch (e: Exception) {
-                  Log.d("kenkoro", e.message!!)
+
+                  remotelyGetUserWithLocallyScopedCredentials(context = context) { subject, token ->
+                    try {
+                      onGetUser(subject, token).run {
+                        onGetUserResponseChange(this)
+                      }
+                    } catch (e: Exception) {
+                      Log.d("kenkoro", e.message!!)
+                    }
+                  }
                 }
               }
             }
           }
-        }
 
-        OrderContent(
-          orders = orders,
-          snackbarHostState = snackbarHostState,
-          user = user,
-          networkStatus = networkStatus,
-          isLoginFailed = isLoginFailed,
-          onDeleteOrderRemotely = onDeleteOrderRemotely,
-          onDeleteOrderLocally = onDeleteOrderLocally,
-          onUpsertOrderLocally = onUpsertOrderLocally,
-          scope = scope,
-        )
-      }
-    }
+          OrderContent(
+            orders = orders,
+            user = user,
+            isLoginFailed = isLoginFailed,
+            onDeleteOrderRemotely = onDeleteOrderRemotely,
+            onDeleteOrderLocally = onDeleteOrderLocally,
+            onUpsertOrderLocally = onUpsertOrderLocally,
+            networkStatus = networkStatus,
+            errorSnackbarHostState = errorSnackbarHostState,
+            snackbarHostState = snackbarHostState,
+          )
+        }
+      },
+    )
   }
 }
 
 @Preview
 @Composable
 private fun OrderScreenPrev() {
-  val orders = flow<PagingData<Order>> { }.collectAsLazyPagingItems()
+  val orders = flow<PagingData<Order>> {}.collectAsLazyPagingItems()
   AppTheme {
     OrderScreen(
       orders = orders,
@@ -184,7 +194,6 @@ private fun OrderScreenPrev() {
       onDeleteOrderRemotely = { _, _, _ -> },
       onDeleteOrderLocally = { _ -> },
       onUpsertOrderLocally = { _ -> },
-      scope = CoroutineScope(Dispatchers.IO),
       onUpsertOrderRemotely = { _, _ -> },
     )
   }

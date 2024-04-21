@@ -26,7 +26,4 @@ interface OrderDao {
 
   @Query("select * from orderentity")
   fun pagingSource(): PagingSource<Int, OrderEntity>
-
-  @Query("select count(*) from orderentity")
-  suspend fun count(): Int
 }

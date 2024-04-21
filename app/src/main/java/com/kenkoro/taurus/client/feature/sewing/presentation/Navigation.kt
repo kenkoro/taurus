@@ -5,7 +5,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -44,7 +43,7 @@ fun AppNavHost(
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
   val networkStatus by networkConnectivityObserver
     .observer()
-    .collectAsState(initial = NetworkStatus.Unavailable)
+    .collectAsState(initial = NetworkStatus.Available)
 
   val userViewModel: UserViewModel = hiltViewModel()
   val orderViewModel: OrderViewModel = hiltViewModel()
@@ -55,7 +54,6 @@ fun AppNavHost(
     composable(route = Screen.LoginScreen.route) {
       LoginScreen(
         networkStatus = networkStatus,
-        scope = userViewModel.viewModelScope,
         onLoginNavigate = {
           navController.navigate(Screen.OrderScreen.route)
         },
@@ -75,12 +73,11 @@ fun AppNavHost(
     }
     composable(route = Screen.OrderScreen.route) {
       OrderScreen(
+        networkStatus = networkStatus,
         orders = orderViewModel.orderPagingFlow.collectAsLazyPagingItems(),
         user = userViewModel.user,
-        networkStatus = networkStatus,
         loginResponse = userViewModel.loginResponse,
         isLoginFailed = userViewModel.isLoginFailed,
-        scope = orderViewModel.viewModelScope,
         onLogin = { loginRequestDto, context, encryptSubjectAndPassword ->
           userViewModel.login(
             loginRequestDto,

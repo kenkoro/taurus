@@ -19,12 +19,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,19 +41,16 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.showSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 fun LoginFieldsContent(
-  snackbarHostState: SnackbarHostState,
   subject: String,
   password: String,
-  networkStatus: NetworkStatus,
   modifier: Modifier,
-  scope: CoroutineScope,
+  networkStatus: NetworkStatus,
+  errorSnackbarHostState: SnackbarHostState,
   onSubjectChange: (String) -> Unit,
   onLoginNavigate: () -> Unit,
   onPasswordChange: (String) -> Unit,
@@ -63,15 +61,14 @@ fun LoginFieldsContent(
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
+  var isError by rememberSaveable { mutableStateOf(false) }
+  val scope = rememberCoroutineScope()
 
+  val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
   val requestErrorMessage = stringResource(id = R.string.request_error)
   val subjectAndPasswordCannotBeBlankMessage =
     stringResource(id = R.string.subject_and_password_cannot_be_blank)
-  val actionLabelMessage = stringResource(id = R.string.ok)
-
-  var isError by rememberSaveable {
-    mutableStateOf(false)
-  }
+  val okActionLabel = stringResource(id = R.string.ok)
 
   val loginFields =
     listOf(
@@ -101,12 +98,14 @@ fun LoginFieldsContent(
     verticalArrangement = Arrangement.Center,
   ) {
     if (networkStatus != NetworkStatus.Available) {
-      showSnackbar(
-        snackbarHostState = snackbarHostState,
-        key = networkStatus,
-        message = stringResource(id = R.string.check_internet_connection),
-        actionLabel = null,
-      )
+      LaunchedEffect(networkStatus) {
+        launch {
+          errorSnackbarHostState.showSnackbar(
+            message = internetConnectionErrorMessage,
+            actionLabel = okActionLabel,
+          )
+        }
+      }
     }
 
     Text(
@@ -172,11 +171,9 @@ fun LoginFieldsContent(
                   requestErrorMessage
                 }
 
-              snackbarHostState.showSnackbar(
+              errorSnackbarHostState.showSnackbar(
                 message = message,
-                actionLabel = actionLabelMessage,
-                withDismissAction = false,
-                duration = SnackbarDuration.Indefinite,
+                actionLabel = okActionLabel,
               )
             } else {
               isError = false

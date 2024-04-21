@@ -12,5 +12,5 @@ data class Order(
   val color: String = "Цвет",
   val category: String = "Категория",
   val quantity: Int = 0,
-  val status: OrderStatus = OrderStatus.Cutted,
+  val status: OrderStatus = OrderStatus.Cut,
 )

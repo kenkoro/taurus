@@ -20,7 +20,7 @@ class UserKtorApi(
   override suspend fun login(request: LoginRequestDto): HttpResponse =
     client.post {
       url {
-        protocol = URLProtocol.HTTPS
+        protocol = URLProtocol.HTTP
         host = Urls.HOST
         port = Urls.PORT
         path(Urls.User.LOGIN)
@@ -32,7 +32,7 @@ class UserKtorApi(
   override suspend fun getUser(user: String): HttpResponse =
     client.get {
       url {
-        protocol = URLProtocol.HTTPS
+        protocol = URLProtocol.HTTP
         host = Urls.HOST
         port = Urls.PORT
         path("${Urls.User.GET_USER}/$user")
