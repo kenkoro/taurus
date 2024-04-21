@@ -21,6 +21,7 @@ import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 private fun getOrderKey(order: Order): Int = order.orderId
 
@@ -63,7 +64,7 @@ fun OrderContent(
     }
     items(
       count = orders.itemCount,
-      key = { index -> orders[index]?.orderId ?: 0 },
+      key = { index -> orders[index]?.orderId ?: UUID.randomUUID().toString() },
     ) { index ->
       val order = orders[index]
       if (order != null) {

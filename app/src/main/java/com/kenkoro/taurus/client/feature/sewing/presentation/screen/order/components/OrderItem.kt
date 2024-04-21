@@ -49,6 +49,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.rem
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -192,6 +193,8 @@ fun OrderItem(
               scope.launch(Dispatchers.IO) {
                 launch {
                   visible = false
+
+                  delay(500L)
                   onDeleteOrderLocally(order)
                   try {
                     remotelyDeleteOrderWithLocallyScopedCredentials(
