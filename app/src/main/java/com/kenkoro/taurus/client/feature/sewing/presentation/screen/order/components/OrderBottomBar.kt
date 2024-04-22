@@ -53,7 +53,7 @@ import com.kenkoro.taurus.client.feature.sewing.data.util.OrderStatus
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.FieldData
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.remotelyCreateANewOrderWithLocallyScopedCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentialService
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -96,6 +96,7 @@ fun OrderBottomBar(
 
   val requestErrorMessage = stringResource(id = R.string.request_error)
   val okActionLabel = stringResource(id = R.string.ok)
+  val credentialService = DecryptedCredentialService(context)
 
   LaunchedEffect(isLoginFailed, networkStatus) {
     if (networkStatus != NetworkStatus.Available || isLoginFailed) {
@@ -262,15 +263,14 @@ fun OrderBottomBar(
               onUpsertOrderLocally(order)
               expanded = !expanded
               val orderDto = order.toOrderDto()
-              remotelyCreateANewOrderWithLocallyScopedCredentials(
-                context,
-                orderDto,
-              ) { request, token ->
-                try {
-                  onUpsertOrderRemotely(request, token)
-                } catch (e: Exception) {
-                  requestError = true
-                }
+
+              try {
+                onUpsertOrderRemotely(
+                  orderDto,
+                  credentialService.storedToken().value,
+                )
+              } catch (e: Exception) {
+                requestError = true
               }
 
               /*

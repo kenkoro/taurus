@@ -45,7 +45,7 @@ import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.sewing.data.util.OrderStatus
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.remotelyDeleteOrderWithLocallyScopedCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentialService
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -84,6 +84,7 @@ fun OrderItem(
     label = "AnimatedHeightOfOrderItem",
     animationSpec = tween(300),
   )
+  val credentialService = DecryptedCredentialService(context)
 
   AnimatedVisibility(visible = visible) {
     Column {
@@ -197,13 +198,11 @@ fun OrderItem(
                   delay(500L)
                   onDeleteOrderLocally(order)
                   try {
-                    remotelyDeleteOrderWithLocallyScopedCredentials(
-                      context,
+                    onDeleteOrderRemotely(
                       order.orderId,
+                      credentialService.storedToken().value,
                       user?.subject ?: "",
-                    ) { orderId, token, deleterSubject ->
-                      onDeleteOrderRemotely(orderId, token, deleterSubject)
-                    }
+                    )
                   } catch (e: Exception) {
                     Log.d("kenkoro", e.message!!)
                   }

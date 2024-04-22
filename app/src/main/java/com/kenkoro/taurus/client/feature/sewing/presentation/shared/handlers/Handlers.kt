@@ -2,7 +2,7 @@ package com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers
 
 import android.content.Context
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.OrderRequestDto
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredential
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
 
@@ -11,12 +11,12 @@ suspend fun remotelyGetUserWithLocallyScopedCredentials(
   getUser: suspend (String, String) -> Unit,
 ) {
   val firstName =
-    DecryptedCredentials.getDecryptedCredential(
+    DecryptedCredential.get(
       filename = LocalCredentials.SUBJECT_FILENAME,
       context = context,
     ).value
   val token =
-    DecryptedCredentials.getDecryptedCredential(
+    DecryptedCredential.get(
       filename = LocalCredentials.TOKEN_FILENAME,
       context = context,
     ).value
@@ -31,7 +31,7 @@ suspend fun remotelyDeleteOrderWithLocallyScopedCredentials(
   deleteOrder: suspend (Int, String, String) -> Unit,
 ) {
   val token =
-    DecryptedCredentials.getDecryptedCredential(
+    DecryptedCredential.get(
       filename = LocalCredentials.TOKEN_FILENAME,
       context = context,
     ).value
@@ -45,7 +45,7 @@ suspend fun remotelyCreateANewOrderWithLocallyScopedCredentials(
   newOrder: suspend (OrderRequestDto, String) -> Unit,
 ) {
   val token =
-    DecryptedCredentials.getDecryptedCredential(
+    DecryptedCredential.get(
       filename = LocalCredentials.TOKEN_FILENAME,
       context = context,
     ).value
@@ -58,12 +58,12 @@ suspend fun loginWithLocallyScopedCredentials(
   context: Context,
 ): LoginResponse {
   val locallyStoredSubject =
-    DecryptedCredentials.getDecryptedCredential(
+    DecryptedCredential.get(
       filename = LocalCredentials.SUBJECT_FILENAME,
       context = context,
     ).value
   val locallyStoredPassword =
-    DecryptedCredentials.getDecryptedCredential(
+    DecryptedCredential.get(
       filename = LocalCredentials.PASSWORD_FILENAME,
       context = context,
     ).value

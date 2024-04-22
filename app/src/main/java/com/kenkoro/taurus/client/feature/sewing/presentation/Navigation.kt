@@ -18,7 +18,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginS
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.UserViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderViewModel
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredential
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.Screen
 import io.ktor.client.call.body
@@ -30,12 +30,12 @@ fun AppNavHost(
 ) {
   val context = LocalContext.current
   val locallyStoredSubject =
-    DecryptedCredentials.getDecryptedCredential(
+    DecryptedCredential.get(
       filename = LocalCredentials.SUBJECT_FILENAME,
       context = context,
     ).value
   val locallyStoredPassword =
-    DecryptedCredentials.getDecryptedCredential(
+    DecryptedCredential.get(
       filename = LocalCredentials.PASSWORD_FILENAME,
       context = context,
     ).value
@@ -43,7 +43,7 @@ fun AppNavHost(
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
   val networkStatus by networkConnectivityObserver
     .observer()
-    .collectAsState(initial = NetworkStatus.Available)
+    .collectAsState(initial = NetworkStatus.Unavailable)
 
   val userViewModel: UserViewModel = hiltViewModel()
   val orderViewModel: OrderViewModel = hiltViewModel()

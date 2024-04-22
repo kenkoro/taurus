@@ -33,8 +33,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.compon
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderTopBar
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.loginWithLocallyScopedCredentials
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.handlers.remotelyGetUserWithLocallyScopedCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentialService
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
@@ -64,6 +63,7 @@ fun OrderScreen(
 
   val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
   val okActionLabel = stringResource(id = R.string.ok)
+  val credentialService = DecryptedCredentialService(context)
 
   AppTheme {
     Scaffold(
@@ -118,24 +118,24 @@ fun OrderScreen(
               withContext(Dispatchers.IO) {
                 launch {
                   if (loginResponse != LoginResponse.Success) {
-                    loginWithLocallyScopedCredentials(
-                      login = { subject, password, encryptThese ->
-                        val request =
-                          LoginRequestDto(
-                            subject = subject,
-                            password = password,
-                          )
-                        onLogin(request, context, encryptThese)
-                      },
-                      context = context,
+                    val loginDto =
+                      LoginRequestDto(
+                        subject = credentialService.storedSubject(),
+                        password = credentialService.storedPassword(),
+                      )
+                    onLogin(
+                      loginDto,
+                      context,
+                      false,
                     ).run {
                       onLoginResponseChange(this)
                     }
-                  }
 
-                  remotelyGetUserWithLocallyScopedCredentials(context = context) { subject, token ->
                     try {
-                      onGetUser(subject, token).run {
+                      onGetUser(
+                        credentialService.storedSubject(),
+                        credentialService.storedToken().value,
+                      ).run {
                         onGetUserResponseChange(this)
                       }
                     } catch (e: Exception) {
@@ -145,19 +145,19 @@ fun OrderScreen(
                 }
               }
             }
-          }
 
-          OrderContent(
-            orders = orders,
-            user = user,
-            isLoginFailed = isLoginFailed,
-            onDeleteOrderRemotely = onDeleteOrderRemotely,
-            onDeleteOrderLocally = onDeleteOrderLocally,
-            onUpsertOrderLocally = onUpsertOrderLocally,
-            networkStatus = networkStatus,
-            errorSnackbarHostState = errorSnackbarHostState,
-            snackbarHostState = snackbarHostState,
-          )
+            OrderContent(
+              orders = orders,
+              user = user,
+              isLoginFailed = isLoginFailed,
+              onDeleteOrderRemotely = onDeleteOrderRemotely,
+              onDeleteOrderLocally = onDeleteOrderLocally,
+              onUpsertOrderLocally = onUpsertOrderLocally,
+              networkStatus = networkStatus,
+              errorSnackbarHostState = errorSnackbarHostState,
+              snackbarHostState = snackbarHostState,
+            )
+          }
         }
       },
     )

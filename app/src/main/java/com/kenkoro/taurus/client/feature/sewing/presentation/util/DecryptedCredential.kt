@@ -6,19 +6,19 @@ import java.io.File
 import java.io.FileInputStream
 
 @JvmInline
-value class DecryptedCredentials(val value: String) {
+value class DecryptedCredential(val value: String) {
   companion object {
-    fun getDecryptedCredential(
+    fun get(
       filename: String,
       context: Context,
-    ): DecryptedCredentials {
+    ): DecryptedCredential {
       val cryptoManager = CryptoManager()
       val file = File(context.filesDir, "$filename.txt")
       if (!file.exists()) {
-        return DecryptedCredentials("")
+        return DecryptedCredential("")
       }
       val fis = FileInputStream(file)
-      return DecryptedCredentials(cryptoManager.decrypt(fis).decodeToString())
+      return DecryptedCredential(cryptoManager.decrypt(fis).decodeToString())
     }
   }
 }

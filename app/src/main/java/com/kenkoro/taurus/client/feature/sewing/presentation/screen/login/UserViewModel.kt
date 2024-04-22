@@ -12,8 +12,8 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.LoginResponseDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.JwtToken
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.LoginCredentials
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.inline.JwtToken
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.EncryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse

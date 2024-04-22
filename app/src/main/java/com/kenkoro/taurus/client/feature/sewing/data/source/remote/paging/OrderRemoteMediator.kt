@@ -12,7 +12,7 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.local.OrderEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toOrderEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetOrdersResponseDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepositoryImpl
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredential
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
 import io.ktor.client.call.body
 
@@ -39,7 +39,7 @@ class OrderRemoteMediator(
         }
 
       val token =
-        DecryptedCredentials.getDecryptedCredential(
+        DecryptedCredential.get(
           filename = LocalCredentials.TOKEN_FILENAME,
           context = context,
         ).value
