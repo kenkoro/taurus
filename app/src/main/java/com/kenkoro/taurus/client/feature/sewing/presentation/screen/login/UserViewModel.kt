@@ -41,7 +41,7 @@ class UserViewModel
     var user by mutableStateOf<User?>(null)
       private set
 
-    var isLoginFailed by mutableStateOf(false)
+    var loginFailed by mutableStateOf(false)
       private set
 
     fun subject(subject: String) {
@@ -54,7 +54,7 @@ class UserViewModel
 
     fun loginResponse(loginResponse: LoginResponse) {
       this.loginResponse = loginResponse
-      isLoginFailed = isLoginFailed(this.loginResponse)
+      loginFailed = isLoginFailed(this.loginResponse)
     }
 
     fun onGetUserResponseDto(userDto: GetUserResponseDto) {

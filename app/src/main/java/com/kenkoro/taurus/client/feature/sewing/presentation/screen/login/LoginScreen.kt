@@ -10,13 +10,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
@@ -26,6 +30,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.compon
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
 import com.kenkoro.taurus.client.ui.theme.AppTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -42,6 +47,9 @@ fun LoginScreen(
   val contentHeight = LocalContentHeight.current
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
+  val internetSnackbarHostState = remember { SnackbarHostState() }
+
+  val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
 
   AppTheme {
     Scaffold(
@@ -57,6 +65,14 @@ fun LoginScreen(
           containerColor = MaterialTheme.colorScheme.errorContainer,
           contentColor = MaterialTheme.colorScheme.onErrorContainer,
         )
+
+        TaurusSnackbar(
+          snackbarHostState = internetSnackbarHostState,
+          onDismiss = { internetSnackbarHostState.currentSnackbarData?.dismiss() },
+          containerColor = MaterialTheme.colorScheme.errorContainer,
+          contentColor = MaterialTheme.colorScheme.onErrorContainer,
+          centeredContent = true,
+        )
       },
     ) {
       Surface(
@@ -70,6 +86,17 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceAround,
           ) {
+            if (networkStatus != NetworkStatus.Available) {
+              LaunchedEffect(networkStatus) {
+                launch {
+                  internetSnackbarHostState.showSnackbar(
+                    message = internetConnectionErrorMessage,
+                    duration = SnackbarDuration.Indefinite,
+                  )
+                }
+              }
+            }
+
             LoginFieldsContent(
               modifier =
                 Modifier

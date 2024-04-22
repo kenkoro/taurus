@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -45,7 +46,7 @@ import kotlinx.coroutines.withContext
 fun OrderScreen(
   orders: LazyPagingItems<Order>,
   user: User?,
-  isLoginFailed: Boolean,
+  loginFailed: Boolean,
   loginResponse: LoginResponse,
   networkStatus: NetworkStatus,
   onLogin: suspend (LoginRequestDto, Context, encryptSubjectAndPassword: Boolean) -> LoginResponse,
@@ -60,9 +61,9 @@ fun OrderScreen(
   val context = LocalContext.current
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
+  val internetSnackbarHostState = remember { SnackbarHostState() }
 
   val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
-  val okActionLabel = stringResource(id = R.string.ok)
   val credentialService = DecryptedCredentialService(context)
 
   AppTheme {
@@ -79,6 +80,14 @@ fun OrderScreen(
           containerColor = MaterialTheme.colorScheme.errorContainer,
           contentColor = MaterialTheme.colorScheme.onErrorContainer,
         )
+
+        TaurusSnackbar(
+          snackbarHostState = internetSnackbarHostState,
+          onDismiss = { internetSnackbarHostState.currentSnackbarData?.dismiss() },
+          containerColor = MaterialTheme.colorScheme.errorContainer,
+          contentColor = MaterialTheme.colorScheme.onErrorContainer,
+          centeredContent = true,
+        )
       },
       modifier =
         Modifier
@@ -90,7 +99,7 @@ fun OrderScreen(
       bottomBar = {
         OrderBottomBar(
           networkStatus = networkStatus,
-          isLoginFailed = isLoginFailed,
+          isLoginFailed = loginFailed,
           onUpsertOrderLocally = onUpsertOrderLocally,
           onUpsertOrderRemotely = onUpsertOrderRemotely,
         )
@@ -107,9 +116,9 @@ fun OrderScreen(
             onLoginResponseChange(LoginResponse.RequestFailure)
             LaunchedEffect(networkStatus) {
               launch {
-                errorSnackbarHostState.showSnackbar(
+                internetSnackbarHostState.showSnackbar(
                   message = internetConnectionErrorMessage,
-                  actionLabel = okActionLabel,
+                  duration = SnackbarDuration.Indefinite,
                 )
               }
             }
@@ -149,7 +158,7 @@ fun OrderScreen(
             OrderContent(
               orders = orders,
               user = user,
-              isLoginFailed = isLoginFailed,
+              loginFailed = loginFailed,
               onDeleteOrderRemotely = onDeleteOrderRemotely,
               onDeleteOrderLocally = onDeleteOrderLocally,
               onUpsertOrderLocally = onUpsertOrderLocally,
@@ -190,7 +199,7 @@ private fun OrderScreenPrev() {
       },
       onGetUserResponseChange = {},
       onLoginResponseChange = {},
-      isLoginFailed = false,
+      loginFailed = false,
       onDeleteOrderRemotely = { _, _, _ -> },
       onDeleteOrderLocally = { _ -> },
       onUpsertOrderLocally = { _ -> },

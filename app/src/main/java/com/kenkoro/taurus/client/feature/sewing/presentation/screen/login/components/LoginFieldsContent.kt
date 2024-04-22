@@ -22,7 +22,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -64,7 +63,6 @@ fun LoginFieldsContent(
   var isError by rememberSaveable { mutableStateOf(false) }
   val scope = rememberCoroutineScope()
 
-  val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
   val requestErrorMessage = stringResource(id = R.string.request_error)
   val subjectAndPasswordCannotBeBlankMessage =
     stringResource(id = R.string.subject_and_password_cannot_be_blank)
@@ -97,17 +95,6 @@ fun LoginFieldsContent(
     modifier = modifier,
     verticalArrangement = Arrangement.Center,
   ) {
-    if (networkStatus != NetworkStatus.Available) {
-      LaunchedEffect(networkStatus) {
-        launch {
-          errorSnackbarHostState.showSnackbar(
-            message = internetConnectionErrorMessage,
-            actionLabel = okActionLabel,
-          )
-        }
-      }
-    }
-
     Text(
       text = stringResource(id = R.string.login_credentials_label),
       style = MaterialTheme.typography.headlineLarge,

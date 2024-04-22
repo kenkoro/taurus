@@ -12,8 +12,7 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.local.OrderEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toOrderEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetOrdersResponseDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepositoryImpl
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredential
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentialService
 import io.ktor.client.call.body
 
 @OptIn(ExperimentalPagingApi::class)
@@ -38,15 +37,11 @@ class OrderRemoteMediator(
           LoadType.APPEND -> this.page
         }
 
-      val token =
-        DecryptedCredential.decrypt(
-          filename = LocalCredentials.TOKEN_FILENAME,
-          context = context,
-        ).value
+      val credentialService = DecryptedCredentialService(context)
       val (orders, hasNextPage) =
         try {
           orderRepository
-            .token(token)
+            .token(credentialService.storedToken())
             .getOrders(page, state.config.pageSize).body<GetOrdersResponseDto>().run {
               Pair(this.paginatedOrders, this.hasNextPage)
             }

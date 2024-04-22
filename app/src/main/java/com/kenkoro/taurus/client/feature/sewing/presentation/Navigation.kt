@@ -18,8 +18,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginS
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.UserViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderViewModel
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredential
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
+import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentialService
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.Screen
 import io.ktor.client.call.body
 
@@ -29,17 +28,7 @@ fun AppNavHost(
   startDestination: (String, String) -> Screen,
 ) {
   val context = LocalContext.current
-  val locallyStoredSubject =
-    DecryptedCredential.decrypt(
-      filename = LocalCredentials.SUBJECT_FILENAME,
-      context = context,
-    ).value
-  val locallyStoredPassword =
-    DecryptedCredential.decrypt(
-      filename = LocalCredentials.PASSWORD_FILENAME,
-      context = context,
-    ).value
-
+  val credentialService = DecryptedCredentialService(context)
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
   val networkStatus by networkConnectivityObserver
     .observer()
@@ -49,7 +38,11 @@ fun AppNavHost(
   val orderViewModel: OrderViewModel = hiltViewModel()
   NavHost(
     navController = navController,
-    startDestination = startDestination(locallyStoredSubject, locallyStoredPassword).route,
+    startDestination =
+      startDestination(
+        credentialService.storedSubject(),
+        credentialService.storedPassword(),
+      ).route,
   ) {
     composable(route = Screen.LoginScreen.route) {
       LoginScreen(
@@ -77,7 +70,7 @@ fun AppNavHost(
         orders = orderViewModel.orderPagingFlow.collectAsLazyPagingItems(),
         user = userViewModel.user,
         loginResponse = userViewModel.loginResponse,
-        isLoginFailed = userViewModel.isLoginFailed,
+        loginFailed = userViewModel.loginFailed,
         onLogin = { loginRequestDto, context, encryptSubjectAndPassword ->
           userViewModel.login(
             loginRequestDto,

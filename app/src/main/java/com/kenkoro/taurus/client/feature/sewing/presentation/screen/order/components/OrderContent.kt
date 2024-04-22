@@ -23,13 +23,11 @@ import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-private fun getOrderKey(order: Order): Int = order.orderId
-
 @Composable
 fun OrderContent(
   orders: LazyPagingItems<Order>,
   user: User?,
-  isLoginFailed: Boolean,
+  loginFailed: Boolean,
   networkStatus: NetworkStatus,
   snackbarHostState: SnackbarHostState,
   errorSnackbarHostState: SnackbarHostState,
@@ -44,8 +42,8 @@ fun OrderContent(
   val errorRequestMessage = stringResource(id = R.string.request_error)
   val okActionLabel = stringResource(id = R.string.ok)
 
-  if (orders.loadState.append is LoadState.Error || isLoginFailed) {
-    LaunchedEffect(orders.loadState, isLoginFailed) {
+  if (orders.loadState.append is LoadState.Error || loginFailed) {
+    LaunchedEffect(Unit) {
       launch {
         errorSnackbarHostState.showSnackbar(
           message = errorRequestMessage,
@@ -71,7 +69,7 @@ fun OrderContent(
         OrderItem(
           order = order,
           user = user,
-          isLoginFailed = isLoginFailed,
+          isLoginFailed = loginFailed,
           onDeleteOrderRemotely = onDeleteOrderRemotely,
           onDeleteOrderLocally = onDeleteOrderLocally,
           onUpsertOrderLocally = onUpsertOrderLocally,
