@@ -5,10 +5,8 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -29,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -52,7 +51,6 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.O
 import com.kenkoro.taurus.client.feature.sewing.data.util.OrderStatus
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.FieldData
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentialService
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.launch
@@ -62,7 +60,7 @@ import java.util.Date
 @Composable
 fun OrderBottomBar(
   networkStatus: NetworkStatus,
-  isLoginFailed: Boolean,
+  loginFailed: Boolean,
   onUpsertOrderLocally: suspend (Order) -> Unit,
   onUpsertOrderRemotely: suspend (OrderRequestDto, String) -> Unit,
 ) {
@@ -76,30 +74,42 @@ fun OrderBottomBar(
   val orderBottomBarHeightAnimation by animateDpAsState(
     targetValue =
       if (expanded) {
-        contentHeight.standard * 9
+        contentHeight.orderBottomBarExpanded
       } else {
-        contentHeight.standard
+        contentHeight.orderBottomBarNotExpanded
       },
     animationSpec = tween(500),
     label = "OrderBottomBarHeightAnimation",
   )
   var isError by remember { mutableStateOf(false) }
   var requestError by remember { mutableStateOf(false) }
-  var orderId by remember { mutableStateOf("") }
+
+  var orderId by remember { mutableIntStateOf(0) }
   var customer by remember { mutableStateOf("") }
   var title by remember { mutableStateOf("") }
   var model by remember { mutableStateOf("") }
   var size by remember { mutableStateOf("") }
   var color by remember { mutableStateOf("") }
   var category by remember { mutableStateOf("") }
-  var quantity by remember { mutableStateOf("") }
+  var quantity by remember { mutableIntStateOf(0) }
+
+  fun onClearAllFields() {
+    orderId = 0
+    customer = ""
+    title = ""
+    model = ""
+    size = ""
+    color = ""
+    category = ""
+    quantity = 0
+  }
 
   val requestErrorMessage = stringResource(id = R.string.request_error)
   val okActionLabel = stringResource(id = R.string.ok)
   val credentialService = DecryptedCredentialService(context)
 
-  LaunchedEffect(isLoginFailed, networkStatus) {
-    if (networkStatus != NetworkStatus.Available || isLoginFailed) {
+  LaunchedEffect(loginFailed, networkStatus) {
+    if (networkStatus != NetworkStatus.Available || loginFailed) {
       expanded = false
     }
   }
@@ -124,10 +134,10 @@ fun OrderBottomBar(
   ) {
     Spacer(modifier = Modifier.height(contentHeight.medium))
     Button(
-      enabled = networkStatus == NetworkStatus.Available && !isLoginFailed,
+      enabled = networkStatus == NetworkStatus.Available && !loginFailed,
       modifier =
         Modifier
-          .size(contentWidth.standard + 30.dp, contentHeight.halfStandard),
+          .size(contentWidth.orderBottomBarButton, contentHeight.halfStandard),
       shape = RoundedCornerShape(shape.small),
       onClick = {
         expanded = !expanded
@@ -148,9 +158,9 @@ fun OrderBottomBar(
       val orderFields =
         listOf(
           FieldData(
-            value = orderId,
+            value = orderId.toString(),
             hint = stringResource(id = R.string.order_id_field),
-            onValueChange = { orderId = it },
+            onValueChange = { orderId = it.toInt() },
             keyboardOptions =
               KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Next,
@@ -188,9 +198,9 @@ fun OrderBottomBar(
             onValueChange = { category = it },
           ),
           FieldData(
-            value = quantity,
+            value = quantity.toString(),
             hint = stringResource(id = R.string.order_quantity),
-            onValueChange = { quantity = it },
+            onValueChange = { quantity = it.toInt() },
             keyboardOptions =
               KeyboardOptions.Default.copy(
                 imeAction = ImeAction.Done,
@@ -223,7 +233,7 @@ fun OrderBottomBar(
       }
       Spacer(modifier = Modifier.height(contentHeight.medium))
       Button(
-        enabled = networkStatus == NetworkStatus.Available && !isLoginFailed,
+        enabled = networkStatus == NetworkStatus.Available && !loginFailed,
         modifier =
           Modifier
             .size(contentWidth.standard + 30.dp, contentHeight.halfStandard),
@@ -231,14 +241,14 @@ fun OrderBottomBar(
         onClick = {
           if (!areOrderFieldsValid(
               listOf(
-                orderId,
+                orderId.toString(),
                 customer,
                 title,
                 model,
                 size,
                 color,
                 category,
-                quantity,
+                quantity.toString(),
               ),
             )
           ) {
@@ -249,7 +259,7 @@ fun OrderBottomBar(
             scope.launch {
               val order =
                 Order(
-                  orderId = orderId.toInt(),
+                  orderId = orderId,
                   customer = customer,
                   date = now(),
                   title = title,
@@ -257,7 +267,7 @@ fun OrderBottomBar(
                   size = size,
                   color = color,
                   category = category,
-                  quantity = quantity.toInt(),
+                  quantity = quantity,
                   status = OrderStatus.NotStarted,
                 )
               onUpsertOrderLocally(order)
@@ -273,33 +283,13 @@ fun OrderBottomBar(
                 requestError = true
               }
 
-              /*
-               * TODO: Refactor this and also get rid of the lazy column.
-               * Instead, use a new composable.
-               */
-              orderId = ""
-              customer = ""
-              title = ""
-              model = ""
-              size = ""
-              color = ""
-              category = ""
-              quantity = ""
+              onClearAllFields()
             }
           }
         },
       ) {
         Text(text = stringResource(id = R.string.new_order_button))
       }
-    }
-    Box(modifier = Modifier.fillMaxSize()) {
-      TaurusSnackbar(
-        snackbarHostState = errorSnackbarHostState,
-        onDismiss = { errorSnackbarHostState.currentSnackbarData?.dismiss() },
-        modifier = Modifier.align(Alignment.BottomCenter),
-        containerColor = MaterialTheme.colorScheme.errorContainer,
-        contentColor = MaterialTheme.colorScheme.onErrorContainer,
-      )
     }
   }
 }
@@ -322,7 +312,7 @@ private fun OrderBottomBarPrev() {
   AppTheme {
     OrderBottomBar(
       networkStatus = NetworkStatus.Available,
-      isLoginFailed = false,
+      loginFailed = false,
       onUpsertOrderLocally = { _ -> },
       onUpsertOrderRemotely = { _, _ -> },
     )

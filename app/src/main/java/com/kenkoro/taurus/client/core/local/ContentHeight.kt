@@ -12,6 +12,8 @@ data class ContentHeight(
   val large: Dp = 15.dp,
   val orderItemExpanded: Dp = 320.dp,
   val orderItemNotExpanded: Dp = 90.dp,
+  val orderBottomBarExpanded: Dp = 720.dp,
+  val orderBottomBarNotExpanded: Dp = standard,
 )
 
 val LocalContentHeight = compositionLocalOf { ContentHeight() }

@@ -18,16 +18,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.OrderRequestDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponseDto
-import com.kenkoro.taurus.client.feature.sewing.data.util.UserProfile
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderBottomBar
@@ -38,7 +34,6 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCrede
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -99,7 +94,7 @@ fun OrderScreen(
       bottomBar = {
         OrderBottomBar(
           networkStatus = networkStatus,
-          isLoginFailed = loginFailed,
+          loginFailed = loginFailed,
           onUpsertOrderLocally = onUpsertOrderLocally,
           onUpsertOrderRemotely = onUpsertOrderRemotely,
         )
@@ -169,41 +164,6 @@ fun OrderScreen(
           }
         }
       },
-    )
-  }
-}
-
-@Preview
-@Composable
-private fun OrderScreenPrev() {
-  val orders = flow<PagingData<Order>> {}.collectAsLazyPagingItems()
-  AppTheme {
-    OrderScreen(
-      orders = orders,
-      user = null,
-      networkStatus = NetworkStatus.Available,
-      loginResponse = LoginResponse.Success,
-      onLogin = { _, _, _ -> LoginResponse.Success },
-      onGetUser = { _, _ ->
-        GetUserResponseDto(
-          id = -1,
-          subject = "",
-          password = "",
-          image = "",
-          firstName = "",
-          lastName = "",
-          email = "",
-          profile = UserProfile.Admin,
-          salt = "",
-        )
-      },
-      onGetUserResponseChange = {},
-      onLoginResponseChange = {},
-      loginFailed = false,
-      onDeleteOrderRemotely = { _, _, _ -> },
-      onDeleteOrderLocally = { _ -> },
-      onUpsertOrderLocally = { _ -> },
-      onUpsertOrderRemotely = { _, _ -> },
     )
   }
 }
