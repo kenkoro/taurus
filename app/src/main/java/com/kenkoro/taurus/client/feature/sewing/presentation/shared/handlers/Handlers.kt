@@ -11,12 +11,12 @@ suspend fun remotelyGetUserWithLocallyScopedCredentials(
   getUser: suspend (String, String) -> Unit,
 ) {
   val firstName =
-    DecryptedCredential.get(
+    DecryptedCredential.decrypt(
       filename = LocalCredentials.SUBJECT_FILENAME,
       context = context,
     ).value
   val token =
-    DecryptedCredential.get(
+    DecryptedCredential.decrypt(
       filename = LocalCredentials.TOKEN_FILENAME,
       context = context,
     ).value
@@ -31,7 +31,7 @@ suspend fun remotelyDeleteOrderWithLocallyScopedCredentials(
   deleteOrder: suspend (Int, String, String) -> Unit,
 ) {
   val token =
-    DecryptedCredential.get(
+    DecryptedCredential.decrypt(
       filename = LocalCredentials.TOKEN_FILENAME,
       context = context,
     ).value
@@ -45,7 +45,7 @@ suspend fun remotelyCreateANewOrderWithLocallyScopedCredentials(
   newOrder: suspend (OrderRequestDto, String) -> Unit,
 ) {
   val token =
-    DecryptedCredential.get(
+    DecryptedCredential.decrypt(
       filename = LocalCredentials.TOKEN_FILENAME,
       context = context,
     ).value
@@ -58,12 +58,12 @@ suspend fun loginWithLocallyScopedCredentials(
   context: Context,
 ): LoginResponse {
   val locallyStoredSubject =
-    DecryptedCredential.get(
+    DecryptedCredential.decrypt(
       filename = LocalCredentials.SUBJECT_FILENAME,
       context = context,
     ).value
   val locallyStoredPassword =
-    DecryptedCredential.get(
+    DecryptedCredential.decrypt(
       filename = LocalCredentials.PASSWORD_FILENAME,
       context = context,
     ).value

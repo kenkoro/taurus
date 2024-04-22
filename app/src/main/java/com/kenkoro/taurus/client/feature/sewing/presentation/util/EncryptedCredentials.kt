@@ -40,7 +40,7 @@ object EncryptedCredentials {
       context = context,
     )
     encryptCredential(
-      credential = credentials.token.value,
+      credential = credentials.token,
       filename = LocalCredentials.TOKEN_FILENAME,
       context = context,
     )

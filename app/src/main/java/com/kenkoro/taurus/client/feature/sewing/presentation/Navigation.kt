@@ -30,12 +30,12 @@ fun AppNavHost(
 ) {
   val context = LocalContext.current
   val locallyStoredSubject =
-    DecryptedCredential.get(
+    DecryptedCredential.decrypt(
       filename = LocalCredentials.SUBJECT_FILENAME,
       context = context,
     ).value
   val locallyStoredPassword =
-    DecryptedCredential.get(
+    DecryptedCredential.decrypt(
       filename = LocalCredentials.PASSWORD_FILENAME,
       context = context,
     ).value

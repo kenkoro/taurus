@@ -200,7 +200,7 @@ fun OrderItem(
                   try {
                     onDeleteOrderRemotely(
                       order.orderId,
-                      credentialService.storedToken().value,
+                      credentialService.storedToken(),
                       user?.subject ?: "",
                     )
                   } catch (e: Exception) {

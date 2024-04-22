@@ -134,7 +134,7 @@ fun OrderScreen(
                     try {
                       onGetUser(
                         credentialService.storedSubject(),
-                        credentialService.storedToken().value,
+                        credentialService.storedToken(),
                       ).run {
                         onGetUserResponseChange(this)
                       }

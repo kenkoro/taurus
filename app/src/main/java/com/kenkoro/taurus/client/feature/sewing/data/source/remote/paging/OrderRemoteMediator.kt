@@ -39,7 +39,7 @@ class OrderRemoteMediator(
         }
 
       val token =
-        DecryptedCredential.get(
+        DecryptedCredential.decrypt(
           filename = LocalCredentials.TOKEN_FILENAME,
           context = context,
         ).value

@@ -12,7 +12,6 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.LoginResponseDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.JwtToken
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.LoginCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.EncryptedCredentials
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.LocalCredentials
@@ -77,13 +76,23 @@ class UserViewModel
                   LoginCredentials(
                     subject = request.subject,
                     password = request.password,
-                    token = takeToken(this),
+                    token =
+                      try {
+                        this.body<LoginResponseDto>().token
+                      } catch (_: Exception) {
+                        ""
+                      },
                   ),
                 context = context,
               )
             } else {
               EncryptedCredentials.encryptCredential(
-                credential = takeToken(this).value,
+                credential =
+                  try {
+                    this.body<LoginResponseDto>().token
+                  } catch (_: Exception) {
+                    ""
+                  },
                 filename = LocalCredentials.TOKEN_FILENAME,
                 context = context,
               )
@@ -115,17 +124,6 @@ class UserViewModel
     private fun apiUrlNotFound(statusCode: HttpStatusCode): Boolean {
       Log.d("kenkoro", "Api url is not found")
       return statusCode == HttpStatusCode.NotFound
-    }
-
-    private suspend fun takeToken(response: HttpResponse): JwtToken {
-      return JwtToken(
-        value =
-          try {
-            response.body<LoginResponseDto>().token
-          } catch (_: Exception) {
-            ""
-          },
-      )
     }
 
     private suspend fun loginWithRequest(request: LoginRequestDto): HttpResponse {

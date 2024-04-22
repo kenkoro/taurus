@@ -267,7 +267,7 @@ fun OrderBottomBar(
               try {
                 onUpsertOrderRemotely(
                   orderDto,
-                  credentialService.storedToken().value,
+                  credentialService.storedToken(),
                 )
               } catch (e: Exception) {
                 requestError = true
