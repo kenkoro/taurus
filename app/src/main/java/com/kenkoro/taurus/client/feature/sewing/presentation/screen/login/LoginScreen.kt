@@ -1,55 +1,38 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login
 
-import android.content.Context
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.core.local.LocalContentHeight
-import com.kenkoro.taurus.client.core.local.LocalContentWidth
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.LoginRequestDto
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginFieldsContent
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginHelpContent
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
+import com.kenkoro.taurus.client.feature.sewing.presentation.LoginResult
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.LoginResponse
 import com.kenkoro.taurus.client.ui.theme.AppTheme
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
   subject: String,
   password: String,
+  onSubject: (String) -> Unit,
+  onPassword: (String) -> Unit,
+  onLogin: suspend () -> Result<TokenDto>,
+  onLoginResult: (LoginResult) -> Unit,
+  onEncryptAll: (String) -> Unit,
+  onNavigateToOrderScreen: () -> Unit,
   networkStatus: NetworkStatus,
-  onLoginNavigate: () -> Unit,
-  onSubjectChange: (String) -> Unit,
-  onPasswordChange: (String) -> Unit,
-  onLogin: suspend (LoginRequestDto, Context, encryptSubjectAndPassword: Boolean) -> LoginResponse,
-  onLoginResponseChange: (LoginResponse) -> Unit,
 ) {
-  val contentWidth = LocalContentWidth.current
-  val contentHeight = LocalContentHeight.current
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
   val internetSnackbarHostState = remember { SnackbarHostState() }
 
-  val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
 
   AppTheme {
     Scaffold(
@@ -74,56 +57,30 @@ fun LoginScreen(
           centeredContent = true,
         )
       },
-    ) {
-      Surface(
-        modifier =
+      content = {
+        Surface(
+          modifier =
           Modifier
             .fillMaxSize()
             .padding(it),
-        content = {
-          Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround,
-          ) {
-            if (networkStatus != NetworkStatus.Available) {
-              LaunchedEffect(networkStatus) {
-                launch {
-                  internetSnackbarHostState.showSnackbar(
-                    message = internetConnectionErrorMessage,
-                    duration = SnackbarDuration.Indefinite,
-                  )
-                }
-              }
-            }
-
-            LoginFieldsContent(
-              modifier =
-                Modifier
-                  .width(contentWidth.standard)
-                  .weight(9F),
-              onLoginNavigate = onLoginNavigate,
-              subject = subject,
-              onSubjectChange = onSubjectChange,
-              password = password,
-              onPasswordChange = onPasswordChange,
-              onLogin = onLogin,
-              onLoginResponseChange = onLoginResponseChange,
-              networkStatus = networkStatus,
-              errorSnackbarHostState = errorSnackbarHostState,
-            )
-            LoginHelpContent(
-              modifier =
-                Modifier
-                  .weight(1F)
-                  .height(contentHeight.standard),
-              snackbarHostState = snackbarHostState,
-            )
-            Spacer(modifier = Modifier.height(contentHeight.medium))
-          }
-        },
-      )
-    }
+        ) {
+          LoginContent(
+            subject = subject,
+            password = password,
+            onSubject = onSubject,
+            onPassword = onPassword,
+            onLogin = onLogin,
+            onLoginResult = onLoginResult,
+            onEncryptAll = onEncryptAll,
+            onNavigateToOrderScreen = onNavigateToOrderScreen,
+            networkStatus = networkStatus,
+            snackbarHostState = snackbarHostState,
+            errorSnackbarHostState = errorSnackbarHostState,
+            internetSnackbarHostState = internetSnackbarHostState,
+          )
+        }
+      }
+    )
   }
 }
 
@@ -134,12 +91,13 @@ private fun LoginScreenPrev() {
     LoginScreen(
       subject = "",
       password = "",
+      onSubject = {},
+      onPassword = {},
+      onLogin = { Result.success(TokenDto("")) },
+      onLoginResult = {},
+      onEncryptAll = {},
+      onNavigateToOrderScreen = { /*TODO*/ },
       networkStatus = NetworkStatus.Available,
-      onLoginNavigate = { /*TODO*/ },
-      onSubjectChange = { _ -> },
-      onPasswordChange = { _ -> },
-      onLogin = { _, _, _ -> LoginResponse.Success },
-      onLoginResponseChange = { _ -> },
     )
   }
 }

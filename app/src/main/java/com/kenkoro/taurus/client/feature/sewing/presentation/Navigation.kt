@@ -9,18 +9,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetUserResponseDto
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginScreen
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.UserViewModel
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderScreen
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderViewModel
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentialService
+import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 import com.kenkoro.taurus.client.feature.sewing.presentation.util.Screen
-import io.ktor.client.call.body
+import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.LoginViewModel
 
 @Composable
 fun AppNavHost(
@@ -34,65 +29,26 @@ fun AppNavHost(
     .observer()
     .collectAsState(initial = NetworkStatus.Unavailable)
 
-  val userViewModel: UserViewModel = hiltViewModel()
-  val orderViewModel: OrderViewModel = hiltViewModel()
+  val loginViewModel: LoginViewModel = hiltViewModel()
   NavHost(
     navController = navController,
     startDestination =
-      startDestination(
-        credentialService.storedSubject(),
-        credentialService.storedPassword(),
-      ).route,
+    startDestination(
+      credentialService.storedSubject(),
+      credentialService.storedPassword(),
+    ).route,
   ) {
     composable(route = Screen.LoginScreen.route) {
       LoginScreen(
+        subject = loginViewModel.subject,
+        password = loginViewModel.password,
+        onSubject = loginViewModel::subject,
+        onPassword = loginViewModel::password,
+        onLogin = loginViewModel::login,
+        onLoginResult = loginViewModel::loginResult,
+        onEncryptAll = loginViewModel::encryptAll,
+        onNavigateToOrderScreen = { navController.navigate(Screen.OrderScreen.route) },
         networkStatus = networkStatus,
-        onLoginNavigate = {
-          navController.navigate(Screen.OrderScreen.route)
-        },
-        subject = userViewModel.subject,
-        onSubjectChange = userViewModel::subject,
-        password = userViewModel.password,
-        onPasswordChange = userViewModel::password,
-        onLogin = { loginRequestDto, context, encryptSubjectAndPassword ->
-          userViewModel.login(
-            loginRequestDto,
-            context,
-            encryptSubjectAndPassword,
-          )
-        },
-        onLoginResponseChange = userViewModel::loginResponse,
-      )
-    }
-    composable(route = Screen.OrderScreen.route) {
-      OrderScreen(
-        networkStatus = networkStatus,
-        orders = orderViewModel.orderPagingFlow.collectAsLazyPagingItems(),
-        user = userViewModel.user,
-        loginResponse = userViewModel.loginResponse,
-        loginFailed = userViewModel.loginFailed,
-        onLogin = { loginRequestDto, context, encryptSubjectAndPassword ->
-          userViewModel.login(
-            loginRequestDto,
-            context,
-            encryptSubjectAndPassword,
-          )
-        },
-        onGetUser = { subject, token ->
-          userViewModel
-            .getUser(subject, token)
-            .body<GetUserResponseDto>()
-        },
-        onGetUserResponseChange = userViewModel::onGetUserResponseDto,
-        onLoginResponseChange = userViewModel::loginResponse,
-        onDeleteOrderRemotely = { orderId, token, deleterSubject ->
-          orderViewModel.deleteOrderRemotely(orderId, token, deleterSubject)
-        },
-        onDeleteOrderLocally = orderViewModel::deleteOrderLocally,
-        onUpsertOrderLocally = orderViewModel::upsertOrderLocally,
-        onUpsertOrderRemotely = { request, token ->
-          orderViewModel.upsertOrderRemotely(request, token)
-        },
       )
     }
   }

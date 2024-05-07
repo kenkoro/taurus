@@ -28,9 +28,12 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 
 @Composable
-fun OrderTopBar(networkStatus: NetworkStatus) {
-  val contentHeight = LocalContentHeight.current
+fun OrderTopBar(
+  networkStatus: NetworkStatus,
+  modifier: Modifier = Modifier,
+) {
   val contentWidth = LocalContentWidth.current
+  val contentHeight = LocalContentHeight.current
 
   val selectCustomerText = stringResource(id = R.string.all_orders)
   var expanded by rememberSaveable {
@@ -41,25 +44,22 @@ fun OrderTopBar(networkStatus: NetworkStatus) {
   }
 
   Column(
-    modifier =
-      Modifier
-        .fillMaxWidth()
-        .background(MaterialTheme.colorScheme.background),
+    modifier = modifier.fillMaxWidth(),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {
     Column(
       modifier =
-        Modifier
-          .clickable(enabled = networkStatus == NetworkStatus.Available) {
-            expanded = !expanded
-          },
+      Modifier
+        .clickable(enabled = networkStatus == NetworkStatus.Available) {
+          expanded = !expanded
+        },
     ) {
       Spacer(modifier = Modifier.height(contentHeight.medium))
       Row(
         modifier =
-          Modifier
-            .fillMaxWidth(),
+        Modifier
+          .fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
       ) {

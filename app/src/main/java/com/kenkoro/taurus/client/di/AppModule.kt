@@ -5,15 +5,20 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.room.Room
+import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
+import com.kenkoro.taurus.client.core.crypto.EncryptedCredentialService
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.LocalDatabase
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.OrderEntity
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.OrderKtorApi
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.UserKtorApi
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.LoginRemoteApiImpl
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.OrderRemoteApiImpl
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.api.UserRemoteApiImpl
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.paging.OrderRemoteMediator
-import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepository
-import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepositoryImpl
-import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepository
-import com.kenkoro.taurus.client.feature.sewing.data.source.repository.UserRepositoryImpl
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.repository.LoginRepository
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.repository.LoginRepositoryImpl
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.repository.OrderRepository
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.repository.OrderRepositoryImpl
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.repository.UserRepository
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.repository.UserRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -52,18 +57,31 @@ object AppModule {
 
   @Provides
   @Singleton
+  fun provideLoginRepository(): LoginRepositoryImpl {
+    return LoginRepository.create(LoginRemoteApiImpl(client))
+  }
+
+  @Provides
+  @Singleton
   fun provideUserRepository(): UserRepositoryImpl {
-    return UserRepository.create(
-      userApi = UserKtorApi(client),
-    )
+    return UserRepository.create(UserRemoteApiImpl(client))
   }
 
   @Provides
   @Singleton
   fun provideOrderRepository(): OrderRepositoryImpl {
-    return OrderRepository.create(
-      orderApi = OrderKtorApi(client),
-    )
+    return OrderRepository.create(OrderRemoteApiImpl(client))
+  }
+
+  @Provides
+  @Singleton
+  fun provideDecryptedCredentialService(app: Application): DecryptedCredentialService {
+    return DecryptedCredentialService(app)
+  }
+
+  @Provides
+  fun provideEncryptedCredentialService(app: Application): EncryptedCredentialService {
+    return EncryptedCredentialService(app)
   }
 
   @Provides
@@ -77,11 +95,11 @@ object AppModule {
     return Pager(
       config = PagingConfig(pageSize = pageSize),
       remoteMediator =
-        OrderRemoteMediator(
-          localDb = localDb,
-          orderRepository = orderRepository,
-          context = app,
-        ),
+      OrderRemoteMediator(
+        localDb = localDb,
+        orderRepository = orderRepository,
+        context = app,
+      ),
       pagingSourceFactory = {
         localDb.orderDao.pagingSource()
       },

@@ -1,320 +1,61 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
 
-import android.annotation.SuppressLint
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
-import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toOrderDto
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.OrderRequestDto
-import com.kenkoro.taurus.client.feature.sewing.data.util.OrderStatus
-import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.FieldData
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentialService
-import com.kenkoro.taurus.client.ui.theme.AppTheme
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
 
 @Composable
 fun OrderBottomBar(
   networkStatus: NetworkStatus,
-  loginFailed: Boolean,
-  onUpsertOrderLocally: suspend (Order) -> Unit,
-  onUpsertOrderRemotely: suspend (OrderRequestDto, String) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
-  val context = LocalContext.current
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
-  val scope = rememberCoroutineScope()
-  val errorSnackbarHostState = remember { SnackbarHostState() }
-  var expanded by rememberSaveable { mutableStateOf(false) }
-  val orderBottomBarHeightAnimation by animateDpAsState(
-    targetValue =
-      if (expanded) {
-        contentHeight.orderBottomBarExpanded
-      } else {
-        contentHeight.orderBottomBarNotExpanded
-      },
-    animationSpec = tween(500),
-    label = "OrderBottomBarHeightAnimation",
-  )
-  var isError by remember { mutableStateOf(false) }
-  var requestError by remember { mutableStateOf(false) }
-
-  var orderId by remember { mutableIntStateOf(0) }
-  var customer by remember { mutableStateOf("") }
-  var title by remember { mutableStateOf("") }
-  var model by remember { mutableStateOf("") }
-  var size by remember { mutableStateOf("") }
-  var color by remember { mutableStateOf("") }
-  var category by remember { mutableStateOf("") }
-  var quantity by remember { mutableIntStateOf(0) }
-
-  fun onClearAllFields() {
-    orderId = 0
-    customer = ""
-    title = ""
-    model = ""
-    size = ""
-    color = ""
-    category = ""
-    quantity = 0
-  }
-
-  val requestErrorMessage = stringResource(id = R.string.request_error)
-  val okActionLabel = stringResource(id = R.string.ok)
-  val credentialService = DecryptedCredentialService(context)
-
-  LaunchedEffect(loginFailed, networkStatus) {
-    if (networkStatus != NetworkStatus.Available || loginFailed) {
-      expanded = false
-    }
-  }
-
-  LaunchedEffect(requestError) {
-    if (requestError) {
-      errorSnackbarHostState.showSnackbar(
-        message = requestErrorMessage,
-        actionLabel = okActionLabel,
-      )
-    }
-  }
 
   Column(
-    modifier =
-      Modifier
-        .fillMaxWidth()
-        .height(orderBottomBarHeightAnimation)
-        .background(MaterialTheme.colorScheme.background),
+    modifier = modifier
+      .fillMaxWidth()
+      .height(contentHeight.standard),
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(contentHeight.small),
+    verticalArrangement = Arrangement.Center,
   ) {
-    Spacer(modifier = Modifier.height(contentHeight.medium))
     Button(
-      enabled = networkStatus == NetworkStatus.Available && !loginFailed,
-      modifier =
-        Modifier
-          .size(contentWidth.orderBottomBarButton, contentHeight.halfStandard),
-      shape = RoundedCornerShape(shape.small),
-      onClick = {
-        expanded = !expanded
-        requestError = false
-      },
+      modifier = Modifier
+        .width(contentWidth.orderItem)
+        .height(contentHeight.halfStandard),
+      onClick = { /*TODO*/ },
+      shape = RoundedCornerShape(shape.medium)
     ) {
-      if (expanded) {
-        Icon(
-          imageVector = Icons.Default.KeyboardArrowUp,
-          contentDescription = "CancelTheCreationOfANewOrder",
-        )
-      } else {
-        Icon(imageVector = Icons.Default.Add, contentDescription = "AddANewOrder")
-      }
-    }
-    Spacer(modifier = Modifier.height(contentHeight.medium))
-    if (expanded) {
-      val orderFields =
-        listOf(
-          FieldData(
-            value = orderId.toString(),
-            hint = stringResource(id = R.string.order_id_field),
-            onValueChange = { orderId = it.toInt() },
-            keyboardOptions =
-              KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Decimal,
-              ),
-          ),
-          FieldData(
-            value = customer,
-            hint = stringResource(id = R.string.order_customer),
-            onValueChange = { customer = it },
-          ),
-          FieldData(
-            value = title,
-            hint = stringResource(id = R.string.order_title),
-            onValueChange = { title = it },
-          ),
-          FieldData(
-            value = model,
-            hint = stringResource(id = R.string.order_model),
-            onValueChange = { model = it },
-          ),
-          FieldData(
-            value = size,
-            hint = stringResource(id = R.string.order_size),
-            onValueChange = { size = it },
-          ),
-          FieldData(
-            value = color,
-            hint = stringResource(id = R.string.order_color),
-            onValueChange = { color = it },
-          ),
-          FieldData(
-            value = category,
-            hint = stringResource(id = R.string.order_category),
-            onValueChange = { category = it },
-          ),
-          FieldData(
-            value = quantity.toString(),
-            hint = stringResource(id = R.string.order_quantity),
-            onValueChange = { quantity = it.toInt() },
-            keyboardOptions =
-              KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Decimal,
-              ),
-          ),
-        )
-
-      LazyColumn {
-        items(orderFields) { fieldData: FieldData ->
-          OutlinedTextField(
-            isError = isError,
-            value = fieldData.value,
-            onValueChange = {
-              if (isError) {
-                isError = false
-              }
-              fieldData.onValueChange(it)
-            },
-            shape = RoundedCornerShape(shape.large),
-            label = {
-              Text(text = fieldData.hint)
-            },
-            keyboardOptions = fieldData.keyboardOptions,
-            keyboardActions = fieldData.keyboardActions,
-            modifier = Modifier.width(contentWidth.standard + 30.dp),
-            singleLine = true,
-          )
-        }
-      }
-      Spacer(modifier = Modifier.height(contentHeight.medium))
-      Button(
-        enabled = networkStatus == NetworkStatus.Available && !loginFailed,
-        modifier =
-          Modifier
-            .size(contentWidth.standard + 30.dp, contentHeight.halfStandard),
-        shape = RoundedCornerShape(shape.small),
-        onClick = {
-          if (!areOrderFieldsValid(
-              listOf(
-                orderId.toString(),
-                customer,
-                title,
-                model,
-                size,
-                color,
-                category,
-                quantity.toString(),
-              ),
-            )
-          ) {
-            isError = true
-          }
-
-          if (!isError) {
-            scope.launch {
-              val order =
-                Order(
-                  orderId = orderId,
-                  customer = customer,
-                  date = now(),
-                  title = title,
-                  model = model,
-                  size = size,
-                  color = color,
-                  category = category,
-                  quantity = quantity,
-                  status = OrderStatus.NotStarted,
-                )
-              onUpsertOrderLocally(order)
-              expanded = !expanded
-              val orderDto = order.toOrderDto()
-
-              try {
-                onUpsertOrderRemotely(
-                  orderDto,
-                  credentialService.storedToken(),
-                )
-              } catch (e: Exception) {
-                requestError = true
-              }
-
-              onClearAllFields()
-            }
-          }
-        },
+      Row(
+        modifier = Modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
       ) {
+        Icon(imageVector = Icons.Default.AddCircle, contentDescription = "AddANewOrder")
+        Spacer(modifier = Modifier.width(contentWidth.medium))
         Text(text = stringResource(id = R.string.new_order_button))
       }
     }
-  }
-}
-
-private fun areOrderFieldsValid(fields: List<String>): Boolean {
-  fields.forEach { if (it.isBlank()) return false }
-  return true
-}
-
-@SuppressLint("SimpleDateFormat")
-private fun now(): String {
-  val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm")
-  val date = Date()
-  return formatter.format(date)
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun OrderBottomBarPrev() {
-  AppTheme {
-    OrderBottomBar(
-      networkStatus = NetworkStatus.Available,
-      loginFailed = false,
-      onUpsertOrderLocally = { _ -> },
-      onUpsertOrderRemotely = { _, _ -> },
-    )
   }
 }

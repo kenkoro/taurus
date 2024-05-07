@@ -1,21 +1,21 @@
 package com.kenkoro.taurus.client.feature.sewing.data.util
 
 object Urls {
-  private const val KTOR_LOCALHOST = "ktor-backend.loca.lt"
-  private const val LOCALHOST = "10.10.65.179"
-  private const val LOCALHOST_PHONE = "192.168.224.149"
-  const val HOST = LOCALHOST
-  const val PORT = 8080
+  private const val HOST = "10.10.209.226"
+  private const val PROTOCOL = "http"
+  private const val PORT = 8080
+  private const val URL = "$PROTOCOL://$HOST:$PORT"
 
-  object User {
-    const val LOGIN = "login"
-    const val GET_USER = "user"
-  }
+  const val LOGIN = "$URL/login"
 
-  object Order {
-    const val GET_ORDER = "order"
-    const val GET_ORDERS = "orders"
-    const val NEW_ORDER = "new/order"
-    const val DELETE_ORDER = "delete/order"
-  }
+  const val ADD_NEW_ORDER = "$URL/add-new/order"
+  const val GET_ORDER = "$URL/order"
+  const val GET_PAGINATED_ORDERS = "$URL/orders"
+  const val EDIT_ORDER = "$URL/edit/order"
+  const val DELETE_ORDER = "$URL/delete/order"
+
+  const val ADD_NEW_USER = "$URL/add-new/user"
+  const val GET_USER = "$URL/user"
+  const val EDIT_USER = "$URL/edit/user"
+  const val DELETE_USER = "$URL/delete/user"
 }

@@ -7,7 +7,7 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.local.dao.UserDao
 
 @Database(
   entities = [UserEntity::class, OrderEntity::class],
-  version = 3,
+  version = 4,
 )
 abstract class LocalDatabase : RoomDatabase() {
   abstract val userDao: UserDao

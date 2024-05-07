@@ -1,11 +1,8 @@
 package com.kenkoro.taurus.client.feature.sewing.domain.model
 
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile
-import kotlinx.serialization.Serializable
 
-@Serializable
-data class User(
-  val userId: Int,
+data class NewUser(
   val subject: String,
   val password: String,
   val image: String,

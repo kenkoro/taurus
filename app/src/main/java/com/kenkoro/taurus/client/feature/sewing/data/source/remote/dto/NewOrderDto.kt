@@ -1,14 +1,13 @@
-package com.kenkoro.taurus.client.feature.sewing.domain.model
+package com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto
 
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.OrderStatus
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Order(
-  val recordId: Int,
-  val orderId: Int,
+data class NewOrderDto(
+  @SerialName("order_id") val orderId: Int,
   val customer: String,
-  val date: Long,
   val title: String,
   val model: String,
   val size: String,
@@ -16,5 +15,5 @@ data class Order(
   val category: String,
   val quantity: Int,
   val status: OrderStatus,
-  val creatorId: Int,
+  @SerialName("creator_id") val creatorId: Int,
 )

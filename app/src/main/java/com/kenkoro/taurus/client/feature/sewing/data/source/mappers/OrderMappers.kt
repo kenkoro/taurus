@@ -1,26 +1,29 @@
 package com.kenkoro.taurus.client.feature.sewing.data.source.mappers
 
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.OrderEntity
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.request.OrderRequestDto
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.NewOrderDto
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.OrderDto
+import com.kenkoro.taurus.client.feature.sewing.domain.model.NewOrder
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 
-fun OrderRequestDto.toOrderEntity(): OrderEntity {
-  return OrderEntity(
-    orderId = orderId,
-    customer = customer,
-    date = date,
-    title = title,
-    model = model,
-    size = size,
-    color = color,
-    category = category,
-    quantity = quantity,
-    status = status,
+fun OrderDto.toOrderEntity(): OrderEntity =
+  OrderEntity(
+    orderId = order.orderId,
+    customer = order.customer,
+    date = order.date,
+    title = order.title,
+    model = order.model,
+    size = order.size,
+    color = order.color,
+    category = order.category,
+    quantity = order.quantity,
+    status = order.status,
+    creatorId = order.creatorId,
   )
-}
 
-fun OrderEntity.toOrder(): Order {
-  return Order(
+fun OrderEntity.toOrder(): Order =
+  Order(
+    recordId = recordId,
     orderId = orderId,
     customer = customer,
     date = date,
@@ -31,11 +34,12 @@ fun OrderEntity.toOrder(): Order {
     category = category,
     quantity = quantity,
     status = status,
+    creatorId = creatorId,
   )
-}
 
-fun Order.toOrderEntity(): OrderEntity {
-  return OrderEntity(
+fun Order.toOrderEntity(): OrderEntity =
+  OrderEntity(
+    recordId = recordId,
     orderId = orderId,
     customer = customer,
     date = date,
@@ -46,11 +50,11 @@ fun Order.toOrderEntity(): OrderEntity {
     category = category,
     quantity = quantity,
     status = status,
+    creatorId = creatorId,
   )
-}
 
-fun Order.toOrderDto(): OrderRequestDto {
-  return OrderRequestDto(
+fun NewOrder.toOrderEntity(): OrderEntity =
+  OrderEntity(
     orderId = orderId,
     customer = customer,
     date = date,
@@ -61,5 +65,19 @@ fun Order.toOrderDto(): OrderRequestDto {
     category = category,
     quantity = quantity,
     status = status,
+    creatorId = creatorId,
   )
-}
+
+fun NewOrder.toNewOrderDto(): NewOrderDto =
+  NewOrderDto(
+    orderId = orderId,
+    customer = customer,
+    title = title,
+    model = model,
+    size = size,
+    color = color,
+    category = category,
+    quantity = quantity,
+    status = status,
+    creatorId = creatorId,
+  )

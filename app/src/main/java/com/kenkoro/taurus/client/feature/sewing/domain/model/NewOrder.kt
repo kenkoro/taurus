@@ -1,11 +1,8 @@
 package com.kenkoro.taurus.client.feature.sewing.domain.model
 
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.OrderStatus
-import kotlinx.serialization.Serializable
 
-@Serializable
-data class Order(
-  val recordId: Int,
+data class NewOrder(
   val orderId: Int,
   val customer: String,
   val date: Long,

@@ -1,7 +1,6 @@
 package com.kenkoro.taurus.client.feature.sewing.data.source.remote.paging
 
 import android.content.Context
-import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
@@ -10,10 +9,8 @@ import androidx.room.withTransaction
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.LocalDatabase
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.OrderEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toOrderEntity
-import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.response.GetOrdersResponseDto
-import com.kenkoro.taurus.client.feature.sewing.data.source.repository.OrderRepositoryImpl
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.DecryptedCredentialService
-import io.ktor.client.call.body
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.repository.OrderRepositoryImpl
+import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 
 @OptIn(ExperimentalPagingApi::class)
 class OrderRemoteMediator(
@@ -38,17 +35,11 @@ class OrderRemoteMediator(
         }
 
       val credentialService = DecryptedCredentialService(context)
-      val (orders, hasNextPage) =
-        try {
-          orderRepository
-            .token(credentialService.storedToken())
-            .getOrders(page, state.config.pageSize).body<GetOrdersResponseDto>().run {
-              Pair(this.paginatedOrders, this.hasNextPage)
-            }
-        } catch (e: Exception) {
-          Log.d("kenkoro", e.message!!)
-          Pair(emptyList(), false)
-        }
+      val (orders, hasNextPage) = orderRepository.getPaginatedOrders(
+        page = page,
+        perPage = state.config.pageSize,
+        token = credentialService.storedToken(),
+      ).getOrThrow()
 
       if (hasNextPage) {
         this.page++
@@ -65,7 +56,6 @@ class OrderRemoteMediator(
           }
         localDb.orderDao.upsertAll(orderEntities)
       }
-
       MediatorResult.Success(endOfPaginationReached = !hasNextPage)
     } catch (e: Exception) {
       MediatorResult.Error(e)
