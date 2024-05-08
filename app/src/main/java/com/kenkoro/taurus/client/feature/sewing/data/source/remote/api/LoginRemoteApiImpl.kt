@@ -8,15 +8,16 @@ import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 
 class LoginRemoteApiImpl(
   private val client: HttpClient,
 ) : LoginRemoteApi {
   override suspend fun login(dto: LoginDto): TokenDto =
-    TokenDto(
-      client.post {
-        url(Urls.LOGIN)
-        setBody(dto)
-      }.body<TokenDto>().token
-    )
+    client.post {
+      url(Urls.LOGIN)
+      contentType(ContentType.Application.Json)
+      setBody(dto)
+    }.body<TokenDto>()
 }

@@ -9,7 +9,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 data class FieldData(
   val value: String,
   val hint: String = "",
-  val onValueChange: (String) -> Unit,
   val placeholderText: String = "",
   val keyboardOptions: KeyboardOptions =
     KeyboardOptions.Default.copy(

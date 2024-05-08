@@ -4,17 +4,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
-import com.kenkoro.taurus.client.feature.sewing.presentation.LoginResult
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
+import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.LoginResult
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
@@ -33,6 +36,13 @@ fun LoginScreen(
   val errorSnackbarHostState = remember { SnackbarHostState() }
   val internetSnackbarHostState = remember { SnackbarHostState() }
 
+  val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
+  val requestErrorMessage = stringResource(id = R.string.request_error)
+  val subjectAndPasswordCannotBeBlankMessage =
+    stringResource(id = R.string.subject_and_password_cannot_be_blank)
+  val notImplementedYetMessage = stringResource(id = R.string.login_forgot_password_not_implemented)
+
+  val okActionLabel = stringResource(id = R.string.ok)
 
   AppTheme {
     Scaffold(
@@ -60,9 +70,9 @@ fun LoginScreen(
       content = {
         Surface(
           modifier =
-          Modifier
-            .fillMaxSize()
-            .padding(it),
+            Modifier
+              .fillMaxSize()
+              .padding(it),
         ) {
           LoginContent(
             subject = subject,
@@ -73,13 +83,34 @@ fun LoginScreen(
             onLoginResult = onLoginResult,
             onEncryptAll = onEncryptAll,
             onNavigateToOrderScreen = onNavigateToOrderScreen,
+            onInternetConnectionErrorShowSnackbar = {
+              internetSnackbarHostState.showSnackbar(
+                message = internetConnectionErrorMessage,
+                duration = SnackbarDuration.Indefinite,
+              )
+            },
+            onLoginErrorShowSnackbar = {
+              errorSnackbarHostState.showSnackbar(
+                message = requestErrorMessage,
+                actionLabel = okActionLabel,
+              )
+            },
+            onInvalidLoginCredentialsShowSnackbar = {
+              errorSnackbarHostState.showSnackbar(
+                message = subjectAndPasswordCannotBeBlankMessage,
+                actionLabel = okActionLabel,
+              )
+            },
+            onHelpTextClickShowSnackbar = {
+              snackbarHostState.showSnackbar(
+                message = notImplementedYetMessage,
+                actionLabel = okActionLabel,
+              )
+            },
             networkStatus = networkStatus,
-            snackbarHostState = snackbarHostState,
-            errorSnackbarHostState = errorSnackbarHostState,
-            internetSnackbarHostState = internetSnackbarHostState,
           )
         }
-      }
+      },
     )
   }
 }

@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation
+package com.kenkoro.taurus.client.feature.sewing.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -9,13 +9,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginScreen
-import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.Screen
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.LoginViewModel
+import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.OrderViewModel
 
 @Composable
 fun AppNavHost(
@@ -23,20 +24,19 @@ fun AppNavHost(
   startDestination: (String, String) -> Screen,
 ) {
   val context = LocalContext.current
-  val credentialService = DecryptedCredentialService(context)
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
   val networkStatus by networkConnectivityObserver
     .observer()
     .collectAsState(initial = NetworkStatus.Unavailable)
 
   val loginViewModel: LoginViewModel = hiltViewModel()
+  val orderViewModel: OrderViewModel = hiltViewModel()
+  val orders = orderViewModel.orderPagingFlow.collectAsLazyPagingItems()
+
+  val (subject, password) = loginViewModel.decryptSubjectAndPassword()
   NavHost(
     navController = navController,
-    startDestination =
-    startDestination(
-      credentialService.storedSubject(),
-      credentialService.storedPassword(),
-    ).route,
+    startDestination = startDestination(subject, password).route,
   ) {
     composable(route = Screen.LoginScreen.route) {
       LoginScreen(
@@ -48,6 +48,24 @@ fun AppNavHost(
         onLoginResult = loginViewModel::loginResult,
         onEncryptAll = loginViewModel::encryptAll,
         onNavigateToOrderScreen = { navController.navigate(Screen.OrderScreen.route) },
+        networkStatus = networkStatus,
+      )
+    }
+
+    composable(route = Screen.OrderScreen.route) {
+      OrderScreen(
+        orders = orders,
+        loginResult = loginViewModel.loginResult,
+        onLogin = { subject, password ->
+          loginViewModel.login(subject, password)
+        },
+        onLoginResult = loginViewModel::loginResult,
+        onEncryptToken = orderViewModel::encryptToken,
+        onAddNewOrderLocally = orderViewModel::addNewOrderLocally,
+        onAddNewOrderRemotely = orderViewModel::addNewOrderRemotely,
+        onDeleteOrderLocally = orderViewModel::deleteOrderLocally,
+        onDeleteOrderRemotely = orderViewModel::deleteOrderRemotely,
+        onDecryptSubjectAndPassword = loginViewModel::decryptSubjectAndPassword,
         networkStatus = networkStatus,
       )
     }

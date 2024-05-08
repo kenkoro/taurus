@@ -4,7 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -17,26 +17,18 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun HelpContent(
-  snackbarHostState: SnackbarHostState,
+  onHelpTextClickShowSnackbar: suspend () -> SnackbarResult,
   modifier: Modifier = Modifier,
 ) {
   val scope = rememberCoroutineScope()
 
-  val notImplementedYetMessage = stringResource(id = R.string.login_forgot_password_not_implemented)
-  val okActionLabel = stringResource(id = R.string.ok)
-
   Column(
     modifier =
-    modifier
-      .wrapContentSize()
-      .clickable {
-        scope.launch {
-          snackbarHostState.showSnackbar(
-            message = notImplementedYetMessage,
-            actionLabel = okActionLabel,
-          )
-        }
-      },
+      modifier
+        .wrapContentSize()
+        .clickable {
+          scope.launch { onHelpTextClickShowSnackbar() }
+        },
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     Text(

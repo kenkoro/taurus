@@ -14,7 +14,10 @@ class UserRepositoryImpl(
       api.addNewUser(dto)
     }
 
-  override suspend fun getUser(subject: String, token: String): Result<UserDto> =
+  override suspend fun getUser(
+    subject: String,
+    token: String,
+  ): Result<UserDto> =
     runCatching {
       api.getUser(subject, token)
     }
@@ -23,7 +26,7 @@ class UserRepositoryImpl(
     dto: NewUserDto,
     subject: String,
     editorSubject: String,
-    token: String
+    token: String,
   ): Result<HttpStatusCode> =
     runCatching {
       api.editUser(dto, subject, editorSubject, token)
@@ -32,7 +35,7 @@ class UserRepositoryImpl(
   override suspend fun deleteUser(
     dto: DeleteDto,
     subject: String,
-    token: String
+    token: String,
   ): Result<HttpStatusCode> =
     runCatching {
       api.deleteUser(dto, subject, token)

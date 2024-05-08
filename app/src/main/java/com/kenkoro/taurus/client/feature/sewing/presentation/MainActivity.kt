@@ -13,7 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.kenkoro.taurus.client.feature.sewing.presentation.util.Screen
+import com.kenkoro.taurus.client.feature.sewing.presentation.navigation.AppNavHost
+import com.kenkoro.taurus.client.feature.sewing.presentation.navigation.Screen
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 

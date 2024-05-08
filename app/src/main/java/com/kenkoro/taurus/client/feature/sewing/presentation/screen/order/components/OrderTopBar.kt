@@ -1,6 +1,5 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,16 +48,16 @@ fun OrderTopBar(
   ) {
     Column(
       modifier =
-      Modifier
-        .clickable(enabled = networkStatus == NetworkStatus.Available) {
-          expanded = !expanded
-        },
+        Modifier
+          .clickable(enabled = networkStatus == NetworkStatus.Available) {
+            expanded = !expanded
+          },
     ) {
       Spacer(modifier = Modifier.height(contentHeight.medium))
       Row(
         modifier =
-        Modifier
-          .fillMaxWidth(),
+          Modifier
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
       ) {

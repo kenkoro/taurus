@@ -72,6 +72,11 @@ android {
       signingConfig = signingConfigs.getByName("debug")
       applicationIdSuffix = ".beta"
     }
+    create("betaDebug") {
+      isDebuggable = true
+      isMinifyEnabled = false
+      applicationIdSuffix = ".beta"
+    }
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_1_8

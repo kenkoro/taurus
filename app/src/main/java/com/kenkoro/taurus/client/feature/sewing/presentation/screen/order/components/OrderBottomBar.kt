@@ -34,18 +34,20 @@ fun OrderBottomBar(
   val contentHeight = LocalContentHeight.current
 
   Column(
-    modifier = modifier
-      .fillMaxWidth()
-      .height(contentHeight.standard),
+    modifier =
+      modifier
+        .fillMaxWidth()
+        .height(contentHeight.standard),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {
     Button(
-      modifier = Modifier
-        .width(contentWidth.orderItem)
-        .height(contentHeight.halfStandard),
+      modifier =
+        Modifier
+          .width(contentWidth.orderItem)
+          .height(contentHeight.halfStandard),
       onClick = { /*TODO*/ },
-      shape = RoundedCornerShape(shape.medium)
+      shape = RoundedCornerShape(shape.medium),
     ) {
       Row(
         modifier = Modifier.fillMaxSize(),

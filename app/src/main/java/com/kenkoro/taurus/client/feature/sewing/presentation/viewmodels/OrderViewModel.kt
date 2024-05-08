@@ -26,52 +26,56 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OrderViewModel
-@Inject
-constructor(
-  pager: Pager<Int, OrderEntity>,
-  private val localDb: LocalDatabase,
-  private val orderRepository: OrderRepositoryImpl,
-  private val decryptedCredentialService: DecryptedCredentialService,
-  private val encryptedCredentialService: EncryptedCredentialService,
-) : ViewModel() {
-  val orderPagingFlow =
-    pager
-      .flow
-      .map { pagingData ->
-        pagingData.map { it.toOrder() }
+  @Inject
+  constructor(
+    pager: Pager<Int, OrderEntity>,
+    private val localDb: LocalDatabase,
+    private val orderRepository: OrderRepositoryImpl,
+    private val decryptedCredentialService: DecryptedCredentialService,
+    private val encryptedCredentialService: EncryptedCredentialService,
+  ) : ViewModel() {
+    val orderPagingFlow =
+      pager
+        .flow
+        .map { pagingData ->
+          pagingData.map { it.toOrder() }
+        }
+        .flowOn(Dispatchers.IO)
+        .cachedIn(viewModelScope)
+
+    suspend fun deleteOrderLocally(order: Order) {
+      localDb.withTransaction {
+        localDb.orderDao.delete(order.toOrderEntity())
       }
-      .flowOn(Dispatchers.IO)
-      .cachedIn(viewModelScope)
+    }
 
-  suspend fun deleteOrderLocally(order: Order) {
-    localDb.withTransaction {
-      localDb.orderDao.delete(order.toOrderEntity())
+    suspend fun addNewOrderLocally(newOrder: NewOrder) {
+      localDb.withTransaction {
+        localDb.orderDao.upsert(newOrder.toOrderEntity())
+      }
+    }
+
+    suspend fun deleteOrderRemotely(
+      orderId: Int,
+      deleterSubject: String,
+    ): Boolean {
+      val result =
+        orderRepository.deleteOrder(
+          dto = DeleteDto(deleterSubject = deleterSubject),
+          orderId = orderId,
+          token = decryptedCredentialService.storedToken(),
+        )
+
+      return result.isSuccess
+    }
+
+    suspend fun addNewOrderRemotely(newOrder: NewOrder): Result<OrderDto> =
+      orderRepository.addNewOrder(
+        dto = newOrder.toNewOrderDto(),
+        token = decryptedCredentialService.storedToken(),
+      )
+
+    fun encryptToken(token: String) {
+      encryptedCredentialService.putToken(token)
     }
   }
-
-  suspend fun addNewOrderLocally(newOrder: NewOrder) {
-    localDb.withTransaction {
-      localDb.orderDao.upsert(newOrder.toOrderEntity())
-    }
-  }
-
-  suspend fun deleteOrderRemotely(orderId: Int, deleterSubject: String): Boolean {
-    val result = orderRepository.deleteOrder(
-      dto = DeleteDto(deleterSubject = deleterSubject),
-      orderId = orderId,
-      token = decryptedCredentialService.storedToken(),
-    )
-
-    return result.isSuccess
-  }
-
-  suspend fun addNewOrderRemotely(newOrder: NewOrder): Result<OrderDto> =
-    orderRepository.addNewOrder(
-      dto = newOrder.toNewOrderDto(),
-      token = decryptedCredentialService.storedToken(),
-    )
-
-  fun encryptToken(token: String) {
-    encryptedCredentialService.putToken(token)
-  }
-}

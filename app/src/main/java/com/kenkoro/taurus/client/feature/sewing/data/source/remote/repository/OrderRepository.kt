@@ -26,7 +26,7 @@ interface OrderRepository {
     page: Int,
     perPage: Int,
     token: String,
-  ): Result<PaginatedOrdersDto>
+  ): PaginatedOrdersDto
 
   suspend fun editOrder(
     dto: NewOrderDto,

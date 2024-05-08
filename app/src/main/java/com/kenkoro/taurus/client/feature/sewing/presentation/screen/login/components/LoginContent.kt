@@ -8,20 +8,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
-import com.kenkoro.taurus.client.feature.sewing.presentation.LoginResult
-import kotlinx.coroutines.launch
+import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.LoginResult
 
 @Composable
 fun LoginContent(
@@ -33,16 +29,15 @@ fun LoginContent(
   onLoginResult: (LoginResult) -> Unit,
   onEncryptAll: (String) -> Unit,
   onNavigateToOrderScreen: () -> Unit,
+  onInternetConnectionErrorShowSnackbar: suspend () -> SnackbarResult,
+  onLoginErrorShowSnackbar: suspend () -> SnackbarResult,
+  onInvalidLoginCredentialsShowSnackbar: suspend () -> SnackbarResult,
+  onHelpTextClickShowSnackbar: suspend () -> SnackbarResult,
   networkStatus: NetworkStatus,
-  snackbarHostState: SnackbarHostState,
-  errorSnackbarHostState: SnackbarHostState,
-  internetSnackbarHostState: SnackbarHostState,
   modifier: Modifier = Modifier,
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
-
-  val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
 
   Column(
     modifier = modifier.fillMaxSize(),
@@ -50,20 +45,14 @@ fun LoginContent(
     verticalArrangement = Arrangement.Center,
   ) {
     if (networkStatus != NetworkStatus.Available) {
-      LaunchedEffect(networkStatus) {
-        launch {
-          internetSnackbarHostState.showSnackbar(
-            message = internetConnectionErrorMessage,
-            duration = SnackbarDuration.Indefinite,
-          )
-        }
-      }
+      LaunchedEffect(networkStatus) { onInternetConnectionErrorShowSnackbar() }
     }
 
     Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .fillMaxHeight(.6F),
+      modifier =
+        Modifier
+          .fillMaxWidth()
+          .fillMaxHeight(.6F),
       verticalArrangement = Arrangement.Bottom,
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -76,9 +65,10 @@ fun LoginContent(
         onLoginResult = onLoginResult,
         onNavigateToOrderScreen = onNavigateToOrderScreen,
         onEncryptAll = onEncryptAll,
-        errorSnackbarHostState = errorSnackbarHostState,
+        onLoginErrorShowSnackbar = onLoginErrorShowSnackbar,
+        onInvalidLoginCredentialsShowSnackbar = onInvalidLoginCredentialsShowSnackbar,
         networkStatus = networkStatus,
-        modifier = Modifier.width(contentWidth.orderItem),
+        modifier = Modifier.width(contentWidth.standard),
       )
     }
     Column(
@@ -86,7 +76,7 @@ fun LoginContent(
       verticalArrangement = Arrangement.Bottom,
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-      HelpContent(snackbarHostState = snackbarHostState)
+      HelpContent(onHelpTextClickShowSnackbar = onHelpTextClickShowSnackbar)
       Spacer(modifier = Modifier.height(contentHeight.halfStandard))
     }
   }

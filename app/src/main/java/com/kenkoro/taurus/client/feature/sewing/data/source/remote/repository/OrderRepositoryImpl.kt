@@ -10,12 +10,18 @@ import io.ktor.http.HttpStatusCode
 class OrderRepositoryImpl(
   private val api: OrderRemoteApi,
 ) : OrderRepository {
-  override suspend fun addNewOrder(dto: NewOrderDto, token: String): Result<OrderDto> =
+  override suspend fun addNewOrder(
+    dto: NewOrderDto,
+    token: String,
+  ): Result<OrderDto> =
     runCatching {
       api.addNewOrder(dto, token)
     }
 
-  override suspend fun getOrder(orderId: Int, token: String): Result<OrderDto> =
+  override suspend fun getOrder(
+    orderId: Int,
+    token: String,
+  ): Result<OrderDto> =
     runCatching {
       api.getOrder(orderId, token)
     }
@@ -23,17 +29,14 @@ class OrderRepositoryImpl(
   override suspend fun getPaginatedOrders(
     page: Int,
     perPage: Int,
-    token: String
-  ): Result<PaginatedOrdersDto> =
-    runCatching {
-      api.getPaginatedOrders(page, perPage, token)
-    }
+    token: String,
+  ): PaginatedOrdersDto = api.getPaginatedOrders(page, perPage, token)
 
   override suspend fun editOrder(
     dto: NewOrderDto,
     orderId: Int,
     editorSubject: String,
-    token: String
+    token: String,
   ): Result<HttpStatusCode> =
     runCatching {
       api.editOrder(dto, orderId, editorSubject, token)
@@ -42,7 +45,7 @@ class OrderRepositoryImpl(
   override suspend fun deleteOrder(
     dto: DeleteDto,
     orderId: Int,
-    token: String
+    token: String,
   ): Result<HttpStatusCode> =
     runCatching {
       api.deleteOrder(dto, orderId, token)

@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -18,7 +16,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,9 +36,10 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
-import com.kenkoro.taurus.client.feature.sewing.presentation.LoginResult
+import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.LoginResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun FieldsContent(
@@ -52,7 +51,8 @@ fun FieldsContent(
   onLoginResult: (LoginResult) -> Unit,
   onNavigateToOrderScreen: () -> Unit,
   onEncryptAll: (String) -> Unit,
-  errorSnackbarHostState: SnackbarHostState,
+  onLoginErrorShowSnackbar: suspend () -> SnackbarResult,
+  onInvalidLoginCredentialsShowSnackbar: suspend () -> SnackbarResult,
   networkStatus: NetworkStatus,
   modifier: Modifier = Modifier,
 ) {
@@ -62,34 +62,6 @@ fun FieldsContent(
   var showError by rememberSaveable { mutableStateOf(false) }
   val scope = rememberCoroutineScope()
 
-  val okActionLabel = stringResource(id = R.string.ok)
-  val requestErrorMessage = stringResource(id = R.string.request_error)
-  val subjectAndPasswordCannotBeBlankMessage =
-    stringResource(id = R.string.subject_and_password_cannot_be_blank)
-
-  val loginFields =
-    listOf(
-      FieldData(
-        value = subject,
-        onValueChange = {
-          onSubject(it)
-        },
-        placeholderText = stringResource(id = R.string.login_subject),
-      ),
-      FieldData(
-        value = password,
-        onValueChange = {
-          onPassword(it)
-        },
-        placeholderText = stringResource(id = R.string.login_password),
-        keyboardOptions =
-        KeyboardOptions.Default.copy(
-          imeAction = ImeAction.Done,
-          keyboardType = KeyboardType.Password,
-        ),
-        transformation = PasswordVisualTransformation(),
-      ),
-    )
   Column(
     modifier = modifier,
     verticalArrangement = Arrangement.Center,
@@ -99,32 +71,44 @@ fun FieldsContent(
       style = MaterialTheme.typography.headlineLarge,
     )
     Spacer(modifier = Modifier.height(contentHeight.large * 2))
-    LazyColumn(
-      horizontalAlignment = Alignment.End,
-    ) {
-      items(loginFields) { fieldData: FieldData ->
-        OutlinedTextField(
-          isError = showError,
-          value = fieldData.value,
-          onValueChange = {
-            if (showError) {
-              showError = false
-            }
-            fieldData.onValueChange(it)
-          },
-          shape = RoundedCornerShape(shape.large),
-          placeholder = {
-            Text(text = fieldData.placeholderText)
-          },
-          keyboardOptions = fieldData.keyboardOptions,
-          keyboardActions = fieldData.keyboardActions,
-          visualTransformation = fieldData.transformation,
-          modifier = Modifier.fillMaxWidth(),
-          singleLine = true,
-        )
-        Spacer(modifier = Modifier.height(contentHeight.large))
-      }
+    Column(horizontalAlignment = Alignment.End) {
+      OutlinedTextField(
+        isError = showError,
+        value = subject,
+        onValueChange = { onSubject(it) },
+        shape = RoundedCornerShape(shape.large),
+        placeholder = {
+          Text(text = stringResource(id = R.string.login_subject))
+        },
+        keyboardOptions =
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+          ),
+        modifier = Modifier.fillMaxWidth(),
+        singleLine = true,
+      )
+      Spacer(modifier = Modifier.height(contentHeight.large))
+      OutlinedTextField(
+        isError = showError,
+        value = password,
+        onValueChange = { onPassword(it) },
+        shape = RoundedCornerShape(shape.large),
+        placeholder = {
+          Text(text = stringResource(id = R.string.login_password))
+        },
+        keyboardOptions =
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password,
+          ),
+        visualTransformation = PasswordVisualTransformation(),
+        modifier = Modifier.fillMaxWidth(),
+        singleLine = true,
+      )
+      Spacer(modifier = Modifier.height(contentHeight.large))
     }
+
     Column(
       horizontalAlignment = Alignment.End,
       modifier = Modifier.fillMaxWidth(),
@@ -132,8 +116,8 @@ fun FieldsContent(
       Button(
         enabled = networkStatus == NetworkStatus.Available,
         modifier =
-        Modifier
-          .size(width = contentWidth.halfStandard, height = contentHeight.standard),
+          Modifier
+            .size(width = contentWidth.halfStandard, height = contentHeight.standard),
         shape = RoundedCornerShape(shape.medium),
         onClick = {
           scope.launch(Dispatchers.IO) {
@@ -142,22 +126,19 @@ fun FieldsContent(
               result.onSuccess {
                 onLoginResult(LoginResult.Success)
                 onEncryptAll(it.token)
-                onNavigateToOrderScreen()
+
+                withContext(Dispatchers.Main) {
+                  onNavigateToOrderScreen()
+                }
               }
 
               result.onFailure {
                 showError = true
-                errorSnackbarHostState.showSnackbar(
-                  message = requestErrorMessage,
-                  actionLabel = okActionLabel,
-                )
+                onLoginErrorShowSnackbar()
               }
             } else {
               showError = true
-              errorSnackbarHostState.showSnackbar(
-                message = subjectAndPasswordCannotBeBlankMessage,
-                actionLabel = okActionLabel,
-              )
+              onInvalidLoginCredentialsShowSnackbar()
             }
           }
         },

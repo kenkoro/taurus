@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,11 +24,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
@@ -42,9 +40,8 @@ fun OrderItem(
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
   onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
-  onShowSnackbar: suspend () -> Unit,
+  onDeleteOrderShowSnackbar: suspend () -> SnackbarResult,
   networkStatus: NetworkStatus,
-  decryptedCredentialService: DecryptedCredentialService,
   modifier: Modifier = Modifier,
 ) {
   val shape = LocalShape.current
@@ -59,7 +56,7 @@ fun OrderItem(
   }
   val heightAnimated by animateDpAsState(
     targetValue =
-    if (clicked) contentHeight.orderItemExpanded else contentHeight.orderItemNotExpanded,
+      if (clicked) contentHeight.orderItemExpanded else contentHeight.orderItemNotExpanded,
     label = "AnimatedHeightOfOrderItem",
     animationSpec = tween(300),
   )
@@ -69,26 +66,26 @@ fun OrderItem(
       Spacer(modifier = Modifier.height(contentHeight.medium))
       Column(
         modifier =
-        Modifier
-          .width(contentWidth.orderItem)
-          .height(heightAnimated)
-          .clip(RoundedCornerShape(shape.medium))
-          .background(MaterialTheme.colorScheme.primaryContainer)
-          .clickable { clicked = !clicked },
+          Modifier
+            .width(contentWidth.orderItem)
+            .height(heightAnimated)
+            .clip(RoundedCornerShape(shape.medium))
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clickable { clicked = !clicked },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(contentHeight.large),
       ) {
         Column(
-          modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(.7F),
+          modifier =
+            Modifier
+              .fillMaxWidth()
+              .fillMaxHeight(.7F),
           verticalArrangement = Arrangement.Top,
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           OrderItemContent(
             order = order,
             clicked = clicked,
-            modifier = Modifier.background(Color.Red),
           )
         }
         Column(
@@ -101,6 +98,7 @@ fun OrderItem(
             onAddNewOrderLocally = onAddNewOrderLocally,
             onDeleteOrderLocally = onDeleteOrderLocally,
             onDeleteOrderRemotely = onDeleteOrderRemotely,
+            onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
             onVisible = { visible = it },
             networkStatus = networkStatus,
           )
@@ -114,9 +112,6 @@ fun OrderItem(
 @Preview
 @Composable
 private fun OrderItemPrev() {
-  val context = LocalContext.current
-  val decryptedCredentialService = DecryptedCredentialService(context)
-
   val order =
     Order(
       recordId = 0,
@@ -136,12 +131,11 @@ private fun OrderItemPrev() {
   AppTheme {
     OrderItem(
       order = order,
-      onShowSnackbar = {},
       onAddNewOrderLocally = { _ -> },
       onDeleteOrderLocally = { _ -> },
       onDeleteOrderRemotely = { _, _ -> false },
+      onDeleteOrderShowSnackbar = { SnackbarResult.Dismissed },
       networkStatus = NetworkStatus.Available,
-      decryptedCredentialService = decryptedCredentialService,
     )
   }
 }

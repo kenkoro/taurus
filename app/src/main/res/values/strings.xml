@@ -34,4 +34,6 @@
     <string name="all_orders">Все заказы</string>
     <string name="order_id_field">Номер заказа</string>
     <string name="order_title">Наименование</string>
+    <string name="paginated_orders_error">Не удалось загрузить заказы</string>
+    <string name="login_fail">Не удалось войти</string>
 </resources>

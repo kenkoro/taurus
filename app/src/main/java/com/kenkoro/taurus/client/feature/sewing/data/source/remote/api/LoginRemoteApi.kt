@@ -4,7 +4,5 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.LoginDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
 
 interface LoginRemoteApi {
-  suspend fun login(
-    dto: LoginDto
-  ): TokenDto
+  suspend fun login(dto: LoginDto): TokenDto
 }

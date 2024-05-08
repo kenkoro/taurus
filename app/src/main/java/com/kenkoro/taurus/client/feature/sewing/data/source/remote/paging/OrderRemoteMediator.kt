@@ -1,22 +1,22 @@
 package com.kenkoro.taurus.client.feature.sewing.data.source.remote.paging
 
-import android.content.Context
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
+import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.LocalDatabase
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.OrderEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toOrderEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.repository.OrderRepositoryImpl
-import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 
 @OptIn(ExperimentalPagingApi::class)
 class OrderRemoteMediator(
   private val localDb: LocalDatabase,
   private val orderRepository: OrderRepositoryImpl,
-  private val context: Context,
+  private val decryptedCredentialService: DecryptedCredentialService,
   private var page: Int = 1,
 ) : RemoteMediator<Int, OrderEntity>() {
   override suspend fun load(
@@ -34,12 +34,12 @@ class OrderRemoteMediator(
           LoadType.APPEND -> this.page
         }
 
-      val credentialService = DecryptedCredentialService(context)
-      val (orders, hasNextPage) = orderRepository.getPaginatedOrders(
-        page = page,
-        perPage = state.config.pageSize,
-        token = credentialService.storedToken(),
-      ).getOrThrow()
+      val (orders, hasNextPage) =
+        orderRepository.getPaginatedOrders(
+          page = page,
+          perPage = state.config.pageSize,
+          token = decryptedCredentialService.storedToken(),
+        )
 
       if (hasNextPage) {
         this.page++
@@ -58,6 +58,7 @@ class OrderRemoteMediator(
       }
       MediatorResult.Success(endOfPaginationReached = !hasNextPage)
     } catch (e: Exception) {
+      Log.d("kenkoro", e.message!!)
       MediatorResult.Error(e)
     }
   }

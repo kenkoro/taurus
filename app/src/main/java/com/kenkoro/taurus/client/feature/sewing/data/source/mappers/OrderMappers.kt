@@ -8,17 +8,34 @@ import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 
 fun OrderDto.toOrderEntity(): OrderEntity =
   OrderEntity(
-    orderId = order.orderId,
-    customer = order.customer,
-    date = order.date,
-    title = order.title,
-    model = order.model,
-    size = order.size,
-    color = order.color,
-    category = order.category,
-    quantity = order.quantity,
-    status = order.status,
-    creatorId = order.creatorId,
+    recordId = recordId,
+    orderId = orderId,
+    customer = customer,
+    date = date,
+    title = title,
+    model = model,
+    size = size,
+    color = color,
+    category = category,
+    quantity = quantity,
+    status = status,
+    creatorId = creatorId,
+  )
+
+fun Order.toOrderDto(): OrderDto =
+  OrderDto(
+    recordId = recordId,
+    orderId = orderId,
+    customer = customer,
+    date = date,
+    title = title,
+    model = model,
+    size = size,
+    color = color,
+    category = category,
+    quantity = quantity,
+    status = status,
+    creatorId = creatorId,
   )
 
 fun OrderEntity.toOrder(): Order =
@@ -72,6 +89,21 @@ fun NewOrder.toNewOrderDto(): NewOrderDto =
   NewOrderDto(
     orderId = orderId,
     customer = customer,
+    title = title,
+    model = model,
+    size = size,
+    color = color,
+    category = category,
+    quantity = quantity,
+    status = status,
+    creatorId = creatorId,
+  )
+
+fun Order.toNewOrder(): NewOrder =
+  NewOrder(
+    orderId = orderId,
+    customer = customer,
+    date = date,
     title = title,
     model = model,
     size = size,

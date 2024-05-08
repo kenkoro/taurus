@@ -87,19 +87,19 @@ object AppModule {
   @Provides
   @Singleton
   fun provideOrderPager(
-    app: Application,
     localDb: LocalDatabase,
     orderRepository: OrderRepositoryImpl,
+    decryptedCredentialService: DecryptedCredentialService,
   ): Pager<Int, OrderEntity> {
     val pageSize = 25
     return Pager(
       config = PagingConfig(pageSize = pageSize),
       remoteMediator =
-      OrderRemoteMediator(
-        localDb = localDb,
-        orderRepository = orderRepository,
-        context = app,
-      ),
+        OrderRemoteMediator(
+          localDb = localDb,
+          orderRepository = orderRepository,
+          decryptedCredentialService = decryptedCredentialService,
+        ),
       pagingSourceFactory = {
         localDb.orderDao.pagingSource()
       },

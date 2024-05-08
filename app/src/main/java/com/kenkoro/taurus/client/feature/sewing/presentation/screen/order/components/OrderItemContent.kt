@@ -58,11 +58,12 @@ fun OrderItemContent(
       )
     }
 
-    val orderStatus = when (order.status) {
-      OrderStatus.Idle -> stringResource(id = R.string.order_status_idle)
-      OrderStatus.Cut -> stringResource(id = R.string.order_status_cut)
-      OrderStatus.Checked -> stringResource(id = R.string.order_status_checked)
-    }
+    val orderStatus =
+      when (order.status) {
+        OrderStatus.Idle -> stringResource(id = R.string.order_status_idle)
+        OrderStatus.Cut -> stringResource(id = R.string.order_status_cut)
+        OrderStatus.Checked -> stringResource(id = R.string.order_status_checked)
+      }
     Text(text = orderStatus)
   }
 

@@ -9,7 +9,5 @@ interface LoginRepository {
     fun create(api: LoginRemoteApi): LoginRepositoryImpl = LoginRepositoryImpl(api)
   }
 
-  suspend fun login(
-    dto: LoginDto
-  ): Result<TokenDto>
+  suspend fun login(dto: LoginDto): Result<TokenDto>
 }

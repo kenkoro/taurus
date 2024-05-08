@@ -14,7 +14,9 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import io.ktor.http.parameters
 
 class OrderRemoteApiException(message: String) : Exception(message)
@@ -22,34 +24,39 @@ class OrderRemoteApiException(message: String) : Exception(message)
 class OrderRemoteApiImpl(
   private val client: HttpClient,
 ) : OrderRemoteApi {
-  override suspend fun addNewOrder(dto: NewOrderDto, token: String): OrderDto =
-    OrderDto(
-      client.post {
-        url(Urls.ADD_NEW_ORDER)
-        setBody(dto)
-        headers {
-          append("Authorization", "Bearer $token")
-        }
-      }.body<OrderDto>().order
-    )
+  override suspend fun addNewOrder(
+    dto: NewOrderDto,
+    token: String,
+  ): OrderDto =
+    client.post {
+      url(Urls.ADD_NEW_ORDER)
+      setBody(dto)
+      contentType(ContentType.Application.Json)
+      headers {
+        append("Authorization", "Bearer $token")
+      }
+    }.body<OrderDto>()
 
-  override suspend fun getOrder(orderId: Int, token: String): OrderDto =
-    OrderDto(
-      client.get {
-        url("${Urls.GET_ORDER}/$orderId")
-        headers {
-          append("Authorization", "Bearer $token")
-        }
-      }.body<OrderDto>().order
-    )
+  override suspend fun getOrder(
+    orderId: Int,
+    token: String,
+  ): OrderDto =
+    client.get {
+      url("${Urls.GET_ORDER}/$orderId")
+      contentType(ContentType.Application.Json)
+      headers {
+        append("Authorization", "Bearer $token")
+      }
+    }.body<OrderDto>()
 
   override suspend fun getPaginatedOrders(
     page: Int,
     perPage: Int,
-    token: String
+    token: String,
   ): PaginatedOrdersDto =
     client.get {
       url(Urls.GET_PAGINATED_ORDERS)
+      contentType(ContentType.Application.Json)
       parameters {
         append("page", page.toString())
         append("per_page", perPage.toString())
@@ -63,19 +70,21 @@ class OrderRemoteApiImpl(
     dto: NewOrderDto,
     orderId: Int,
     editorSubject: String,
-    token: String
+    token: String,
   ): HttpStatusCode {
-    val status = client.put {
-      url(Urls.EDIT_ORDER)
-      setBody(dto)
-      parameters {
-        append("order_id", orderId.toString())
-        append("editor_subject", editorSubject)
-      }
-      headers {
-        append("Authorization", "Bearer $token")
-      }
-    }.status
+    val status =
+      client.put {
+        url(Urls.EDIT_ORDER)
+        contentType(ContentType.Application.Json)
+        setBody(dto)
+        parameters {
+          append("order_id", orderId.toString())
+          append("editor_subject", editorSubject)
+        }
+        headers {
+          append("Authorization", "Bearer $token")
+        }
+      }.status
 
     if (status != HttpStatusCode.OK) {
       throw OrderRemoteApiException("The editing of order ${dto.orderId} was unsuccessful")
@@ -83,14 +92,20 @@ class OrderRemoteApiImpl(
     return status
   }
 
-  override suspend fun deleteOrder(dto: DeleteDto, orderId: Int, token: String): HttpStatusCode {
-    val status = client.delete {
-      url("${Urls.DELETE_ORDER}/$orderId")
-      setBody(dto)
-      headers {
-        append("Authorization", "Bearer $token")
-      }
-    }.status
+  override suspend fun deleteOrder(
+    dto: DeleteDto,
+    orderId: Int,
+    token: String,
+  ): HttpStatusCode {
+    val status =
+      client.delete {
+        url("${Urls.DELETE_ORDER}/$orderId")
+        contentType(ContentType.Application.Json)
+        setBody(dto)
+        headers {
+          append("Authorization", "Bearer $token")
+        }
+      }.status
 
     if (status != HttpStatusCode.OK) {
       throw OrderRemoteApiException("The deleting of order $orderId was unsuccessful")
