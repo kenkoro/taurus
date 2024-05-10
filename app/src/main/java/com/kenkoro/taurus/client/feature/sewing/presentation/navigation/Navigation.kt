@@ -17,6 +17,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginS
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.OrderViewModel
+import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.UserViewModel
 
 @Composable
 fun AppNavHost(
@@ -31,6 +32,7 @@ fun AppNavHost(
 
   val loginViewModel: LoginViewModel = hiltViewModel()
   val orderViewModel: OrderViewModel = hiltViewModel()
+  val userViewModel: UserViewModel = hiltViewModel()
   val orders = orderViewModel.orderPagingFlow.collectAsLazyPagingItems()
 
   val (subject, password) = loginViewModel.decryptSubjectAndPassword()
@@ -54,17 +56,21 @@ fun AppNavHost(
 
     composable(route = Screen.OrderScreen.route) {
       OrderScreen(
+        user = userViewModel.user,
+        onUser = userViewModel::user,
         orders = orders,
         loginResult = loginViewModel.loginResult,
+        onLoginResult = loginViewModel::loginResult,
         onLogin = { subject, password ->
           loginViewModel.login(subject, password)
         },
-        onLoginResult = loginViewModel::loginResult,
-        onEncryptToken = orderViewModel::encryptToken,
+        onGetUserRemotely = userViewModel::getUser,
+        onAddNewUserLocally = userViewModel::addNewUserLocally,
         onAddNewOrderLocally = orderViewModel::addNewOrderLocally,
         onAddNewOrderRemotely = orderViewModel::addNewOrderRemotely,
         onDeleteOrderLocally = orderViewModel::deleteOrderLocally,
         onDeleteOrderRemotely = orderViewModel::deleteOrderRemotely,
+        onEncryptToken = orderViewModel::encryptToken,
         onDecryptSubjectAndPassword = loginViewModel::decryptSubjectAndPassword,
         networkStatus = networkStatus,
       )

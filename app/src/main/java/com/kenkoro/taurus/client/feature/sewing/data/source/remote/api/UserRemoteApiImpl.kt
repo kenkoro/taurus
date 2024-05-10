@@ -36,7 +36,7 @@ class UserRemoteApiImpl(
        */
     }.body<UserDto>()
 
-  override suspend fun getUserBySubject(
+  override suspend fun getUser(
     subject: String,
     token: String,
   ): UserDto =

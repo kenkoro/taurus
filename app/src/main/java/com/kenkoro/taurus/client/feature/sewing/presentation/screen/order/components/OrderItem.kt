@@ -32,10 +32,12 @@ import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.sewing.domain.model.NewOrder
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.OrderStatus
+import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderItem(
+  profile: UserProfile,
   order: Order,
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
@@ -89,25 +91,36 @@ fun OrderItem(
             clicked = clicked,
           )
         }
-        Column(
-          modifier = Modifier.fillMaxSize(),
-          verticalArrangement = Arrangement.Bottom,
-          horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-          OrderItemButton(
-            order = order,
-            onAddNewOrderLocally = onAddNewOrderLocally,
-            onDeleteOrderLocally = onDeleteOrderLocally,
-            onDeleteOrderRemotely = onDeleteOrderRemotely,
-            onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
-            onVisible = { visible = it },
-            networkStatus = networkStatus,
-          )
-          Spacer(modifier = Modifier.height(contentHeight.large))
+
+        if (allowedToUpdateOrderStatus(profile)) {
+          Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.CenterHorizontally,
+          ) {
+            // TODO: Depending on a certain profile, change this button
+            OrderItemButton(
+              order = order,
+              onAddNewOrderLocally = onAddNewOrderLocally,
+              onDeleteOrderLocally = onDeleteOrderLocally,
+              onDeleteOrderRemotely = onDeleteOrderRemotely,
+              onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
+              onVisible = { visible = it },
+              networkStatus = networkStatus,
+            )
+            Spacer(modifier = Modifier.height(contentHeight.large))
+          }
         }
       }
     }
   }
+}
+
+private fun allowedToUpdateOrderStatus(profile: UserProfile): Boolean {
+  return allowedToSeeOrders(profile) &&
+    profile != UserProfile.Admin &&
+    profile != UserProfile.Ceo &&
+    profile != UserProfile.Manager
 }
 
 @Preview
@@ -131,6 +144,7 @@ private fun OrderItemPrev() {
 
   AppTheme {
     OrderItem(
+      profile = UserProfile.Inspector,
       order = order,
       onAddNewOrderLocally = { _ -> },
       onDeleteOrderLocally = { _ -> },

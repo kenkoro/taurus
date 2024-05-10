@@ -9,6 +9,7 @@ import com.kenkoro.taurus.client.core.crypto.EncryptedCredentialService
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.LoginDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.repository.LoginRepositoryImpl
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.util.LoginResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

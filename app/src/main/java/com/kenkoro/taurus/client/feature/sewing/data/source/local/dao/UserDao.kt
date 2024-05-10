@@ -15,7 +15,7 @@ interface UserDao {
   suspend fun delete(userEntity: UserEntity)
 
   @Query("select * from user_entities where subject = :subject")
-  suspend fun getUserBySubject(subject: String): UserEntity?
+  suspend fun getUser(subject: String): UserEntity?
 
   @Query("select * from user_entities")
   suspend fun getUsers(): List<UserEntity>

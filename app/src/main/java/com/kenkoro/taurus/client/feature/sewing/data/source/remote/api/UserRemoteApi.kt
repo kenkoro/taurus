@@ -11,7 +11,7 @@ interface UserRemoteApi {
     // Later add here a token
   ): UserDto
 
-  suspend fun getUserBySubject(
+  suspend fun getUser(
     subject: String,
     token: String,
   ): UserDto

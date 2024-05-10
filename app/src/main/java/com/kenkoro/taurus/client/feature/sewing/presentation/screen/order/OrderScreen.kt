@@ -20,26 +20,35 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
+import com.kenkoro.taurus.client.feature.sewing.data.source.local.UserEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toOrderDto
+import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toUserDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.OrderDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.UserDto
 import com.kenkoro.taurus.client.feature.sewing.domain.model.NewOrder
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
+import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.OrderStatus
+import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderBottomBar
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderTopBar
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.util.LoginResult
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
-import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.LoginResult
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.flow.flow
 
 @Composable
 fun OrderScreen(
+  user: User?,
+  onUser: (User) -> Unit,
   orders: LazyPagingItems<Order>,
   loginResult: LoginResult,
-  onLogin: suspend (storedSubject: String, storedPassword: String) -> Result<TokenDto>,
   onLoginResult: (LoginResult) -> Unit,
+  onLogin: suspend (storedSubject: String, storedPassword: String) -> Result<TokenDto>,
+  onGetUserRemotely: suspend (subject: String, token: String) -> Result<UserDto>,
+  onAddNewUserLocally: suspend (UserEntity) -> Unit,
   onEncryptToken: (String) -> Unit,
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onAddNewOrderRemotely: suspend (NewOrder) -> Result<OrderDto>,
@@ -107,11 +116,14 @@ fun OrderScreen(
               .padding(it),
         ) {
           OrderContent(
+            user = user,
+            onUser = onUser,
             orders = orders,
             loginResult = loginResult,
-            onLogin = onLogin,
             onLoginResult = onLoginResult,
-            onEncryptToken = onEncryptToken,
+            onLogin = onLogin,
+            onGetUserRemotely = onGetUserRemotely,
+            onAddNewUserLocally = onAddNewUserLocally,
             onAddNewOrderLocally = onAddNewOrderLocally,
             onDeleteOrderLocally = onDeleteOrderLocally,
             onDeleteOrderRemotely = onDeleteOrderRemotely,
@@ -140,6 +152,7 @@ fun OrderScreen(
                 actionLabel = okActionLabel,
               )
             },
+            onEncryptToken = onEncryptToken,
             onDecryptSubjectAndPassword = onDecryptSubjectAndPassword,
             networkStatus = networkStatus,
           )
@@ -181,11 +194,28 @@ private fun OrderScreenPrev() {
     }.collectAsLazyPagingItems()
   val orderDto = order.toOrderDto()
 
+  val user =
+    User(
+      userId = 0,
+      subject = "Subject",
+      password = "Password",
+      image = "Image",
+      firstName = "FirstName",
+      lastName = "LastName",
+      email = "Email",
+      profile = UserProfile.Other,
+      salt = "Salt",
+    )
+
   AppTheme {
     OrderScreen(
+      user = null,
+      onUser = {},
       orders = orders,
       loginResult = LoginResult.Success,
       onLogin = { _, _ -> Result.success(TokenDto("")) },
+      onGetUserRemotely = { _, _ -> Result.success(user.toUserDto()) },
+      onAddNewUserLocally = { _ -> },
       onLoginResult = {},
       onEncryptToken = {},
       onAddNewOrderLocally = { _ -> },

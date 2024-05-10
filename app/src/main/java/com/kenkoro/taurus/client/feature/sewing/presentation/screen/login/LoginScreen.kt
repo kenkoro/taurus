@@ -16,8 +16,8 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginContent
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.util.LoginResult
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
-import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.LoginResult
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
