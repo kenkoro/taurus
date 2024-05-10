@@ -49,7 +49,7 @@ fun OrderItem(
   val contentHeight = LocalContentHeight.current
 
   var clicked by rememberSaveable {
-    mutableStateOf(true)
+    mutableStateOf(false)
   }
   var visible by rememberSaveable {
     mutableStateOf(true)
@@ -83,6 +83,7 @@ fun OrderItem(
           verticalArrangement = Arrangement.Top,
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+          Spacer(modifier = Modifier.height(contentHeight.medium))
           OrderItemContent(
             order = order,
             clicked = clicked,

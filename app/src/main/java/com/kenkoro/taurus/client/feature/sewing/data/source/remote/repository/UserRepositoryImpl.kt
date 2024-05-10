@@ -19,7 +19,7 @@ class UserRepositoryImpl(
     token: String,
   ): Result<UserDto> =
     runCatching {
-      api.getUser(subject, token)
+      api.getUserBySubject(subject, token)
     }
 
   override suspend fun editUser(
