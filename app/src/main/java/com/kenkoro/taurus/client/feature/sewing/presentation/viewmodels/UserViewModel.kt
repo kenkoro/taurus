@@ -41,4 +41,6 @@ class UserViewModel
     }
 
     fun decryptSubject(): String = decryptedCredentialService.storedSubject()
+
+    fun decryptToken(): String = decryptedCredentialService.storedToken()
   }

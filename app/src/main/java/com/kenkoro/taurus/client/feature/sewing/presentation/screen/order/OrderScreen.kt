@@ -23,6 +23,7 @@ import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.UserEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toOrderDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toUserDto
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.OrderDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.UserDto
@@ -46,15 +47,18 @@ fun OrderScreen(
   orders: LazyPagingItems<Order>,
   loginResult: LoginResult,
   onLoginResult: (LoginResult) -> Unit,
+  onAddNewUserLocally: suspend (UserEntity) -> Unit,
+  onAddNewOrderLocally: suspend (NewOrder) -> Unit,
+  onDeleteOrderLocally: suspend (Order) -> Unit,
+  onEditOrderLocally: suspend (NewOrder) -> Unit,
   onLogin: suspend (storedSubject: String, storedPassword: String) -> Result<TokenDto>,
   onGetUserRemotely: suspend (subject: String, token: String) -> Result<UserDto>,
-  onAddNewUserLocally: suspend (UserEntity) -> Unit,
-  onEncryptToken: (String) -> Unit,
-  onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onAddNewOrderRemotely: suspend (NewOrder) -> Result<OrderDto>,
-  onDeleteOrderLocally: suspend (Order) -> Unit,
   onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
+  onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
+  onEncryptToken: (String) -> Unit,
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
+  onDecryptToken: () -> String,
   networkStatus: NetworkStatus,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
@@ -121,12 +125,14 @@ fun OrderScreen(
             orders = orders,
             loginResult = loginResult,
             onLoginResult = onLoginResult,
-            onLogin = onLogin,
-            onGetUserRemotely = onGetUserRemotely,
             onAddNewUserLocally = onAddNewUserLocally,
             onAddNewOrderLocally = onAddNewOrderLocally,
             onDeleteOrderLocally = onDeleteOrderLocally,
+            onEditOrderLocally = onEditOrderLocally,
+            onLogin = onLogin,
+            onGetUserRemotely = onGetUserRemotely,
             onDeleteOrderRemotely = onDeleteOrderRemotely,
+            onEditOrderRemotely = onEditOrderRemotely,
             onInternetConnectionErrorShowSnackbar = {
               internetSnackbarHostState.showSnackbar(
                 message = internetConnectionErrorMessage,
@@ -154,6 +160,7 @@ fun OrderScreen(
             },
             onEncryptToken = onEncryptToken,
             onDecryptSubjectAndPassword = onDecryptSubjectAndPassword,
+            onDecryptToken = onDecryptToken,
             networkStatus = networkStatus,
           )
         }
@@ -213,16 +220,19 @@ private fun OrderScreenPrev() {
       onUser = {},
       orders = orders,
       loginResult = LoginResult.Success,
+      onLoginResult = {},
+      onAddNewUserLocally = { _ -> },
+      onDeleteOrderLocally = { _ -> },
+      onAddNewOrderLocally = { _ -> },
+      onEditOrderLocally = { _ -> },
       onLogin = { _, _ -> Result.success(TokenDto("")) },
       onGetUserRemotely = { _, _ -> Result.success(user.toUserDto()) },
-      onAddNewUserLocally = { _ -> },
-      onLoginResult = {},
-      onEncryptToken = {},
-      onAddNewOrderLocally = { _ -> },
       onAddNewOrderRemotely = { _ -> Result.success(orderDto) },
-      onDeleteOrderLocally = { _ -> },
       onDeleteOrderRemotely = { _, _ -> false },
+      onEditOrderRemotely = { _, _, _, _ -> false },
+      onEncryptToken = {},
       onDecryptSubjectAndPassword = { Pair("", "") },
+      onDecryptToken = { "" },
       networkStatus = NetworkStatus.Available,
     )
   }

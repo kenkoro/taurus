@@ -61,17 +61,20 @@ fun AppNavHost(
         orders = orders,
         loginResult = loginViewModel.loginResult,
         onLoginResult = loginViewModel::loginResult,
+        onAddNewUserLocally = userViewModel::addNewUserLocally,
+        onAddNewOrderLocally = orderViewModel::addNewOrderLocally,
+        onDeleteOrderLocally = orderViewModel::deleteOrderLocally,
+        onEditOrderLocally = orderViewModel::editOrderLocally,
         onLogin = { subject, password ->
           loginViewModel.login(subject, password)
         },
         onGetUserRemotely = userViewModel::getUser,
-        onAddNewUserLocally = userViewModel::addNewUserLocally,
-        onAddNewOrderLocally = orderViewModel::addNewOrderLocally,
         onAddNewOrderRemotely = orderViewModel::addNewOrderRemotely,
-        onDeleteOrderLocally = orderViewModel::deleteOrderLocally,
         onDeleteOrderRemotely = orderViewModel::deleteOrderRemotely,
+        onEditOrderRemotely = orderViewModel::editOrderRemotely,
         onEncryptToken = orderViewModel::encryptToken,
         onDecryptSubjectAndPassword = loginViewModel::decryptSubjectAndPassword,
+        onDecryptToken = userViewModel::decryptToken,
         networkStatus = networkStatus,
       )
     }

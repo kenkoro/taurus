@@ -29,19 +29,25 @@ import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.sewing.domain.model.NewOrder
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.OrderStatus
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile
+import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Admin
+import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Ceo
+import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Manager
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderItem(
-  profile: UserProfile,
   order: Order,
+  profile: UserProfile,
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
+  onEditOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
+  onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
   onDeleteOrderShowSnackbar: suspend () -> SnackbarResult,
   networkStatus: NetworkStatus,
   modifier: Modifier = Modifier,
@@ -51,14 +57,18 @@ fun OrderItem(
   val contentHeight = LocalContentHeight.current
 
   var clicked by rememberSaveable {
-    mutableStateOf(false)
+    mutableStateOf(true)
   }
   var visible by rememberSaveable {
     mutableStateOf(true)
   }
   val heightAnimated by animateDpAsState(
     targetValue =
-      if (clicked) contentHeight.orderItemExpanded else contentHeight.orderItemNotExpanded,
+      if (clicked) {
+        contentHeight.orderItemExpanded
+      } else {
+        contentHeight.orderItemNotExpanded
+      },
     label = "AnimatedHeightOfOrderItem",
     animationSpec = tween(300),
   )
@@ -81,11 +91,13 @@ fun OrderItem(
           modifier =
             Modifier
               .fillMaxWidth()
+              // TODO: Change the height for the profiles
               .fillMaxHeight(.7F),
           verticalArrangement = Arrangement.Top,
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           Spacer(modifier = Modifier.height(contentHeight.medium))
+          // TODO: Change order.status at the top of an order item as well
           OrderItemContent(
             order = order,
             clicked = clicked,
@@ -98,12 +110,14 @@ fun OrderItem(
             verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
           ) {
-            // TODO: Depending on a certain profile, change this button
-            OrderItemButton(
+            OrderItemButtonHandler(
               order = order,
+              profile = profile,
               onAddNewOrderLocally = onAddNewOrderLocally,
               onDeleteOrderLocally = onDeleteOrderLocally,
+              onEditOrderLocally = onEditOrderLocally,
               onDeleteOrderRemotely = onDeleteOrderRemotely,
+              onEditOrderRemotely = onEditOrderRemotely,
               onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
               onVisible = { visible = it },
               networkStatus = networkStatus,
@@ -118,9 +132,9 @@ fun OrderItem(
 
 private fun allowedToUpdateOrderStatus(profile: UserProfile): Boolean {
   return allowedToSeeOrders(profile) &&
-    profile != UserProfile.Admin &&
-    profile != UserProfile.Ceo &&
-    profile != UserProfile.Manager
+    profile != Admin &&
+    profile != Ceo &&
+    profile != Manager
 }
 
 @Preview
@@ -138,17 +152,19 @@ private fun OrderItemPrev() {
       color = "Color",
       category = "Category",
       quantity = 0,
-      status = OrderStatus.Idle,
+      status = OrderStatus.Checked,
       creatorId = 0,
     )
 
   AppTheme {
     OrderItem(
-      profile = UserProfile.Inspector,
+      profile = UserProfile.Admin,
       order = order,
       onAddNewOrderLocally = { _ -> },
       onDeleteOrderLocally = { _ -> },
+      onEditOrderLocally = { _ -> },
       onDeleteOrderRemotely = { _, _ -> false },
+      onEditOrderRemotely = { _, _, _, _ -> false },
       onDeleteOrderShowSnackbar = { SnackbarResult.Dismissed },
       networkStatus = NetworkStatus.Available,
     )

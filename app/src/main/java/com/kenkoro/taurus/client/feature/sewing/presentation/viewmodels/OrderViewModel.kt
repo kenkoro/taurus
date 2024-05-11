@@ -14,6 +14,7 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toNewOrderDt
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toOrder
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toOrderEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.DeleteDto
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.OrderDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.repository.OrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.sewing.domain.model.NewOrder
@@ -55,6 +56,12 @@ class OrderViewModel
       }
     }
 
+    suspend fun editOrderLocally(newOrder: NewOrder) {
+      localDb.withTransaction {
+        localDb.orderDao.upsert(newOrder.toOrderEntity())
+      }
+    }
+
     suspend fun deleteOrderRemotely(
       orderId: Int,
       deleterSubject: String,
@@ -74,6 +81,23 @@ class OrderViewModel
         dto = newOrder.toNewOrderDto(),
         token = decryptedCredentialService.storedToken(),
       )
+
+    suspend fun editOrderRemotely(
+      dto: NewOrderDto,
+      orderId: Int,
+      editorSubject: String,
+      token: String,
+    ): Boolean {
+      val result =
+        orderRepository.editOrder(
+          dto = dto,
+          orderId = orderId,
+          editorSubject = editorSubject,
+          token = token,
+        )
+
+      return result.isSuccess
+    }
 
     fun encryptToken(token: String) {
       encryptedCredentialService.putToken(token)

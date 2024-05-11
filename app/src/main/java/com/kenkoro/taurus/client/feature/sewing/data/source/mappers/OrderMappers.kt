@@ -5,6 +5,7 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.NewOrderD
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.OrderDto
 import com.kenkoro.taurus.client.feature.sewing.domain.model.NewOrder
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
+import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.OrderStatus
 
 fun OrderDto.toOrderEntity(): OrderEntity =
   OrderEntity(
@@ -111,5 +112,35 @@ fun Order.toNewOrder(): NewOrder =
     category = category,
     quantity = quantity,
     status = status,
+    creatorId = creatorId,
+  )
+
+fun Order.toCutOrder(): NewOrder =
+  NewOrder(
+    orderId = orderId,
+    customer = customer,
+    date = date,
+    title = title,
+    model = model,
+    size = size,
+    color = color,
+    category = category,
+    quantity = quantity,
+    status = OrderStatus.Cut,
+    creatorId = creatorId,
+  )
+
+fun Order.toCheckedOrder(): NewOrder =
+  NewOrder(
+    orderId = orderId,
+    customer = customer,
+    date = date,
+    title = title,
+    model = model,
+    size = size,
+    color = color,
+    category = category,
+    quantity = quantity,
+    status = OrderStatus.Checked,
     creatorId = creatorId,
   )

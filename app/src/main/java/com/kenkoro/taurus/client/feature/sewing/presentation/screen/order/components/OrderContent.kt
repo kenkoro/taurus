@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
 
+import android.util.Log
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -9,6 +10,7 @@ import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.UserEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toUser
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toUserEntity
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.UserDto
 import com.kenkoro.taurus.client.feature.sewing.domain.model.NewOrder
@@ -26,18 +28,21 @@ fun OrderContent(
   orders: LazyPagingItems<Order>,
   loginResult: LoginResult,
   onLoginResult: (LoginResult) -> Unit,
-  onLogin: suspend (storedSubject: String, storedPassword: String) -> Result<TokenDto>,
-  onGetUserRemotely: suspend (subject: String, token: String) -> Result<UserDto>,
   onAddNewUserLocally: suspend (UserEntity) -> Unit,
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
+  onEditOrderLocally: suspend (NewOrder) -> Unit,
+  onLogin: suspend (storedSubject: String, storedPassword: String) -> Result<TokenDto>,
+  onGetUserRemotely: suspend (subject: String, token: String) -> Result<UserDto>,
   onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
+  onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
   onInternetConnectionErrorShowSnackbar: suspend () -> SnackbarResult,
   onLoginErrorShowSnackbar: suspend () -> SnackbarResult,
   onDeleteOrderShowSnackbar: suspend () -> SnackbarResult,
   onAppendNewOrdersErrorShowSnackbar: suspend () -> SnackbarResult,
   onEncryptToken: (String) -> Unit,
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
+  onDecryptToken: () -> String,
   networkStatus: NetworkStatus,
   modifier: Modifier = Modifier,
 ) {
@@ -51,16 +56,19 @@ fun OrderContent(
         val (subject, password) = onDecryptSubjectAndPassword()
         val result = onLogin(subject, password)
         result.onSuccess { dto ->
-          val token = dto.token
-          onLoginResult(LoginResult.Success)
-          onEncryptToken(token)
+          onEncryptToken(dto.token)
+        }
 
+        if (result.isSuccess) {
+          val token = onDecryptToken()
           val getUserResult = onGetUserRemotely(subject, token)
           getUserResult.onSuccess { userDto ->
             onAddNewUserLocally(userDto.toUserEntity())
             onUser(userDto.toUser())
+            onLoginResult(LoginResult.Success)
           }
           getUserResult.onFailure {
+            Log.d("kenkoro", it.message!!)
             withContext(Dispatchers.Main) { onLoginErrorShowSnackbar() }
           }
         }
@@ -78,6 +86,8 @@ fun OrderContent(
       orders = orders,
       onAddNewOrderLocally = onAddNewOrderLocally,
       onDeleteOrderLocally = onDeleteOrderLocally,
+      onEditOrderLocally = onEditOrderLocally,
+      onEditOrderRemotely = onEditOrderRemotely,
       onDeleteOrderRemotely = onDeleteOrderRemotely,
       onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
       onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,

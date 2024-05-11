@@ -34,28 +34,33 @@ fun OrderItemContent(
   Spacer(modifier = Modifier.height(contentHeight.large))
   Row(
     modifier = Modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.SpaceEvenly,
     verticalAlignment = Alignment.CenterVertically,
   ) {
-    Column(
-      modifier = Modifier.width(contentWidth.halfStandard),
-      horizontalAlignment = Alignment.Start,
+    Row(
+      modifier = Modifier.fillMaxWidth(.5F),
+      horizontalArrangement = Arrangement.Start,
     ) {
-      Text(
-        text = order.date.toString(),
-        color = MaterialTheme.colorScheme.onPrimaryContainer,
-        style = MaterialTheme.typography.bodySmall,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-      )
-      Spacer(modifier = Modifier.height(contentHeight.small))
-      Text(
-        text = order.title,
-        color = MaterialTheme.colorScheme.onBackground,
-        style = MaterialTheme.typography.bodyMedium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-      )
+      Spacer(modifier = Modifier.width(contentWidth.large))
+      Column(
+        modifier = Modifier.width(contentWidth.halfStandard),
+        horizontalAlignment = Alignment.Start,
+      ) {
+        Text(
+          text = order.date.toString(),
+          color = MaterialTheme.colorScheme.onPrimaryContainer,
+          style = MaterialTheme.typography.bodySmall,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+        )
+        Spacer(modifier = Modifier.height(contentHeight.small))
+        Text(
+          text = order.title,
+          color = MaterialTheme.colorScheme.onBackground,
+          style = MaterialTheme.typography.bodyMedium,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+        )
+      }
     }
 
     val orderStatus =
@@ -64,7 +69,13 @@ fun OrderItemContent(
         OrderStatus.Cut -> stringResource(id = R.string.order_status_cut)
         OrderStatus.Checked -> stringResource(id = R.string.order_status_checked)
       }
-    Text(text = orderStatus)
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalArrangement = Arrangement.End,
+    ) {
+      Text(text = orderStatus)
+      Spacer(modifier = Modifier.width(contentWidth.large))
+    }
   }
 
   if (clicked) {

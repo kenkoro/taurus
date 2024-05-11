@@ -18,6 +18,7 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
+import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.sewing.domain.model.NewOrder
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile
@@ -29,7 +30,9 @@ fun LazyOrdersColumn(
   orders: LazyPagingItems<Order>,
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
+  onEditOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
+  onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
   onDeleteOrderShowSnackbar: suspend () -> SnackbarResult,
   networkStatus: NetworkStatus,
   modifier: Modifier = Modifier,
@@ -56,6 +59,8 @@ fun LazyOrdersColumn(
           order = order,
           onAddNewOrderLocally = onAddNewOrderLocally,
           onDeleteOrderLocally = onDeleteOrderLocally,
+          onEditOrderLocally = onEditOrderLocally,
+          onEditOrderRemotely = onEditOrderRemotely,
           onDeleteOrderRemotely = onDeleteOrderRemotely,
           onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
           networkStatus = networkStatus,
