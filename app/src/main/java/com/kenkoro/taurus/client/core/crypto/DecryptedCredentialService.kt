@@ -23,4 +23,8 @@ class DecryptedCredentialService(private val context: Context) {
       context = context,
     )
   }
+
+  fun deleteAll(): Boolean {
+    return DecryptedCredential.deleteAll(context)
+  }
 }

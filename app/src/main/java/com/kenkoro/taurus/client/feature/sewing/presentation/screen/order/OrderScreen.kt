@@ -59,6 +59,7 @@ fun OrderScreen(
   onEncryptToken: (String) -> Unit,
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
   onDecryptToken: () -> String,
+  onNavigateToProfileScreen: () -> Unit,
   networkStatus: NetworkStatus,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
@@ -69,6 +70,7 @@ fun OrderScreen(
   val orderWasDeletedMessage = stringResource(id = R.string.order_was_deleted)
   val paginatedOrdersErrorMessage = stringResource(id = R.string.paginated_orders_error)
   val loginErrorMessage = stringResource(id = R.string.login_fail)
+  val notImplementedYetMessage = stringResource(id = R.string.not_implemented_yet)
 
   val cancelOrderDeletionLabel = stringResource(id = R.string.cancel)
   val okActionLabel = stringResource(id = R.string.ok)
@@ -102,12 +104,31 @@ fun OrderScreen(
           .navigationBarsPadding(),
       topBar = {
         OrderTopBar(
+          onSortOrdersShowSnackbar = {
+            snackbarHostState.showSnackbar(
+              message = notImplementedYetMessage,
+              actionLabel = okActionLabel,
+            )
+          },
+          onFilterOrdersShowSnackbar = {
+            snackbarHostState.showSnackbar(
+              message = notImplementedYetMessage,
+              actionLabel = okActionLabel,
+            )
+          },
+          onNavigateToProfileScreen = onNavigateToProfileScreen,
           networkStatus = networkStatus,
         )
       },
       bottomBar = {
         // TODO: onAddNewOrderRemotely callback
         OrderBottomBar(
+          onAddNewOrderShowSnackbar = {
+            snackbarHostState.showSnackbar(
+              message = notImplementedYetMessage,
+              actionLabel = okActionLabel,
+            )
+          },
           networkStatus = networkStatus,
         )
       },
@@ -233,6 +254,7 @@ private fun OrderScreenPrev() {
       onEncryptToken = {},
       onDecryptSubjectAndPassword = { Pair("", "") },
       onDecryptToken = { "" },
+      onNavigateToProfileScreen = {},
       networkStatus = NetworkStatus.Available,
     )
   }

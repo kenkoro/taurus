@@ -1,15 +1,14 @@
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
-val retrofitVersion: String by project
-val okhttpVersion: String by project
-val daggerHiltVersion: String by project
-val roomVersion: String by project
-val pagingVersion: String by project
-val hiltNavigationComposeVersion: String by project
-val lifecycleVersion: String by project
-val truthVersion: String by project
-val ktorVersion: String by project
-val splashScreenVersion: String by project
+val daggerHilt: String by project
+val roomDb: String by project
+val paging3: String by project
+val hiltNavigationCompose: String by project
+val lifecycle: String by project
+val truth: String by project
+val ktor: String by project
+val splashScreen: String by project
+val materialIconsExtended: String by project
 
 plugins {
   id("com.android.application")
@@ -99,26 +98,26 @@ android {
 }
 
 dependencies {
-  implementation("com.google.dagger:dagger-android:$daggerHiltVersion")
-  implementation("com.google.dagger:hilt-android:$daggerHiltVersion")
-  implementation("io.ktor:ktor-client-cio:$ktorVersion")
-  implementation("io.ktor:ktor-client-logging:$ktorVersion")
-  ksp("com.google.dagger:hilt-android-compiler:$daggerHiltVersion")
-  kspAndroidTest("com.google.dagger:hilt-android-compiler:$daggerHiltVersion")
+  implementation("com.google.dagger:dagger-android:$daggerHilt")
+  implementation("com.google.dagger:hilt-android:$daggerHilt")
+  implementation("io.ktor:ktor-client-cio:$ktor")
+  implementation("io.ktor:ktor-client-logging:$ktor")
+  ksp("com.google.dagger:hilt-android-compiler:$daggerHilt")
+  kspAndroidTest("com.google.dagger:hilt-android-compiler:$daggerHilt")
 
-  implementation("androidx.room:room-paging:$roomVersion")
-  implementation("androidx.room:room-runtime:$roomVersion")
-  implementation("androidx.room:room-ktx:$roomVersion")
-  annotationProcessor("androidx.room:room-compiler:$roomVersion")
-  ksp("androidx.room:room-compiler:$roomVersion")
+  implementation("androidx.room:room-paging:$roomDb")
+  implementation("androidx.room:room-runtime:$roomDb")
+  implementation("androidx.room:room-ktx:$roomDb")
+  annotationProcessor("androidx.room:room-compiler:$roomDb")
+  ksp("androidx.room:room-compiler:$roomDb")
 
   implementation("androidx.core:core-ktx:1.12.0")
   implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
   implementation("androidx.activity:activity-compose:1.8.2")
-  implementation("androidx.hilt:hilt-navigation-compose:$hiltNavigationComposeVersion")
-  implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycleVersion")
-  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
-  implementation("androidx.core:core-splashscreen:$splashScreenVersion")
+  implementation("androidx.hilt:hilt-navigation-compose:$hiltNavigationCompose")
+  implementation("androidx.lifecycle:lifecycle-runtime-compose:$lifecycle")
+  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle")
+  implementation("androidx.core:core-splashscreen:$splashScreen")
 
   implementation(platform("androidx.compose:compose-bom:2023.10.01"))
   implementation("androidx.compose.ui:ui")
@@ -126,14 +125,15 @@ dependencies {
   implementation("androidx.compose.ui:ui-tooling-preview")
   implementation("androidx.compose.material3:material3")
 
-  implementation("io.ktor:ktor-client-core:$ktorVersion")
-  implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-  implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktorVersion")
-  implementation("androidx.paging:paging-runtime-ktx:$pagingVersion")
-  implementation("androidx.paging:paging-compose:$pagingVersion")
+  implementation("io.ktor:ktor-client-core:$ktor")
+  implementation("io.ktor:ktor-client-content-negotiation:$ktor")
+  implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:$ktor")
+  implementation("androidx.paging:paging-runtime-ktx:$paging3")
+  implementation("androidx.paging:paging-compose:$paging3")
+  implementation("androidx.compose.material:material-icons-extended:$materialIconsExtended")
 
   testImplementation("junit:junit:4.13.2")
-  testImplementation("com.google.truth:truth:$truthVersion")
+  testImplementation("com.google.truth:truth:$truth")
   androidTestImplementation("androidx.test.ext:junit:1.1.5")
   androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 

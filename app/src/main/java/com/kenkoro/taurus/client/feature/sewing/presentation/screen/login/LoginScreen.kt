@@ -40,7 +40,7 @@ fun LoginScreen(
   val requestErrorMessage = stringResource(id = R.string.request_error)
   val subjectAndPasswordCannotBeBlankMessage =
     stringResource(id = R.string.subject_and_password_cannot_be_blank)
-  val notImplementedYetMessage = stringResource(id = R.string.login_forgot_password_not_implemented)
+  val notImplementedYetMessage = stringResource(id = R.string.not_implemented_yet)
 
   val okActionLabel = stringResource(id = R.string.ok)
 

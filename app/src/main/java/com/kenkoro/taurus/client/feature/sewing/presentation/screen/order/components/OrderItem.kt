@@ -57,7 +57,7 @@ fun OrderItem(
   val contentHeight = LocalContentHeight.current
 
   var clicked by rememberSaveable {
-    mutableStateOf(true)
+    mutableStateOf(false)
   }
   var visible by rememberSaveable {
     mutableStateOf(true)
@@ -82,7 +82,7 @@ fun OrderItem(
             .width(contentWidth.orderItem)
             .height(heightAnimated)
             .clip(RoundedCornerShape(shape.medium))
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .background(MaterialTheme.colorScheme.onBackground)
             .clickable { clicked = !clicked },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(contentHeight.large),

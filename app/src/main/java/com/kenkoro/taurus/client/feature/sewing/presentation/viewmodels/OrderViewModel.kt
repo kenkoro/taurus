@@ -102,4 +102,6 @@ class OrderViewModel
     fun encryptToken(token: String) {
       encryptedCredentialService.putToken(token)
     }
+
+    fun deleteAllCredentials(): Boolean = decryptedCredentialService.deleteAll()
   }

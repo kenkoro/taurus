@@ -47,7 +47,7 @@ fun OrderItemContent(
       ) {
         Text(
           text = order.date.toString(),
-          color = MaterialTheme.colorScheme.onPrimaryContainer,
+          color = MaterialTheme.colorScheme.background,
           style = MaterialTheme.typography.bodySmall,
           maxLines = 1,
           overflow = TextOverflow.Ellipsis,
@@ -55,7 +55,7 @@ fun OrderItemContent(
         Spacer(modifier = Modifier.height(contentHeight.small))
         Text(
           text = order.title,
-          color = MaterialTheme.colorScheme.onBackground,
+          color = MaterialTheme.colorScheme.background,
           style = MaterialTheme.typography.bodyMedium,
           maxLines = 1,
           overflow = TextOverflow.Ellipsis,
@@ -73,7 +73,7 @@ fun OrderItemContent(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.End,
     ) {
-      Text(text = orderStatus)
+      Text(text = orderStatus, color = MaterialTheme.colorScheme.background)
       Spacer(modifier = Modifier.width(contentWidth.large))
     }
   }
@@ -99,7 +99,7 @@ fun OrderItemContent(
           Spacer(modifier = Modifier.width(contentWidth.large))
           Text(
             text = "${pair.first}: ${pair.second}",
-            color = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.background,
             style = MaterialTheme.typography.bodyMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

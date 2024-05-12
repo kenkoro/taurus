@@ -5,7 +5,7 @@
     <string name="login_credentials_label">Войти</string>
     <string name="login_subject">Логин</string>
     <string name="login_password">Пароль</string>
-    <string name="login_forgot_password_not_implemented">Ещё не имплементировано</string>
+    <string name="not_implemented_yet">Ещё не имплементировано</string>
     <string name="check_internet_connection">Интернет отсутствует</string>
     <string name="bottom_bar_host_orders">Заказы</string>
     <string name="get_user">Посмотреть пользователя</string>
@@ -38,4 +38,5 @@
     <string name="login_fail">Не удалось войти</string>
     <string name="order_was_cut">Раскроенно</string>
     <string name="order_was_checked">Оприходовано</string>
+    <string name="quit_from_account">Выйти из аккаунта</string>
 </resources>

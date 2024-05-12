@@ -15,6 +15,7 @@ import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.LoginScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.OrderScreen
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.profile.ProfileScreen
 import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.LoginViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.OrderViewModel
 import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.UserViewModel
@@ -23,6 +24,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.UserView
 fun AppNavHost(
   navController: NavHostController = rememberNavController(),
   startDestination: (String, String) -> Screen,
+  onRestartApp: () -> Unit,
 ) {
   val context = LocalContext.current
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
@@ -75,7 +77,15 @@ fun AppNavHost(
         onEncryptToken = orderViewModel::encryptToken,
         onDecryptSubjectAndPassword = loginViewModel::decryptSubjectAndPassword,
         onDecryptToken = userViewModel::decryptToken,
+        onNavigateToProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
         networkStatus = networkStatus,
+      )
+    }
+
+    composable(route = Screen.ProfileScreen.route) {
+      ProfileScreen(
+        onDeleteAllCredentials = orderViewModel::deleteAllCredentials,
+        onRestartApp = onRestartApp,
       )
     }
   }
