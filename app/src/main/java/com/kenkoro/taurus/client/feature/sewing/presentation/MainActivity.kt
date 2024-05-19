@@ -53,10 +53,6 @@ class MainActivity : ComponentActivity() {
                 Screen.LoginScreen
               }
             },
-            onRestartApp = {
-              finish()
-              startActivity(intent)
-            },
           )
         }
       }

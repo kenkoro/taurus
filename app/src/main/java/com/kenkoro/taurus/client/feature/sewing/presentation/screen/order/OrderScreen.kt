@@ -16,8 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.PagingData
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.UserEntity
@@ -38,13 +36,14 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.compon
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.util.LoginResult
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 @Composable
 fun OrderScreen(
   user: User?,
   onUser: (User) -> Unit,
-  orders: LazyPagingItems<Order>,
+  ordersFlow: Flow<PagingData<Order>>,
   loginResult: LoginResult,
   onLoginResult: (LoginResult) -> Unit,
   onAddNewUserLocally: suspend (UserEntity) -> Unit,
@@ -143,7 +142,7 @@ fun OrderScreen(
           OrderContent(
             user = user,
             onUser = onUser,
-            orders = orders,
+            ordersFlow = ordersFlow,
             loginResult = loginResult,
             onLoginResult = onLoginResult,
             onAddNewUserLocally = onAddNewUserLocally,
@@ -208,7 +207,7 @@ private fun OrderScreenPrev() {
       status = OrderStatus.Idle,
       creatorId = 0,
     )
-  val orders =
+  val ordersFlow =
     flow {
       emit(
         PagingData.from(
@@ -219,7 +218,7 @@ private fun OrderScreenPrev() {
           ),
         ),
       )
-    }.collectAsLazyPagingItems()
+    }
   val orderDto = order.toOrderDto()
 
   val user =
@@ -239,7 +238,7 @@ private fun OrderScreenPrev() {
     OrderScreen(
       user = null,
       onUser = {},
-      orders = orders,
+      ordersFlow = ordersFlow,
       loginResult = LoginResult.Success,
       onLoginResult = {},
       onAddNewUserLocally = { _ -> },

@@ -7,14 +7,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
@@ -43,7 +40,7 @@ fun LazyOrdersColumn(
   LazyColumn(
     modifier = modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.Center,
+    verticalArrangement = Arrangement.Top,
   ) {
     item {
       Spacer(modifier = Modifier.height(contentHeight.large))
@@ -70,11 +67,6 @@ fun LazyOrdersColumn(
     item {
       if (orders.loadState.append is LoadState.Loading) {
         CircularProgressIndicator(strokeWidth = strokeWidth.standard)
-      }
-    }
-    item {
-      if (orders.itemCount == 0) {
-        Text(text = stringResource(id = R.string.no_orders))
       }
     }
     item {

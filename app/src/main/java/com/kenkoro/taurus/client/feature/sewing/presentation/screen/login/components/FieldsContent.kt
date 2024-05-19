@@ -38,7 +38,6 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.util.LoginResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -50,7 +49,6 @@ fun FieldsContent(
   onSubject: (String) -> Unit,
   onPassword: (String) -> Unit,
   onLogin: suspend () -> Result<TokenDto>,
-  onLoginResult: (LoginResult) -> Unit,
   onNavigateToOrderScreen: () -> Unit,
   onEncryptAll: (String) -> Unit,
   onLoginErrorShowSnackbar: suspend () -> SnackbarResult,
@@ -139,7 +137,6 @@ fun FieldsContent(
             if (subject.isNotBlank() && password.isNotBlank()) {
               val result = onLogin()
               result.onSuccess {
-                onLoginResult(LoginResult.Success)
                 onEncryptAll(it.token)
 
                 withContext(Dispatchers.Main) {

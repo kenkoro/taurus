@@ -5,7 +5,8 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.paging.compose.LazyPagingItems
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.data.source.local.UserEntity
 import com.kenkoro.taurus.client.feature.sewing.data.source.mappers.toUser
@@ -19,13 +20,14 @@ import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.util.LoginResult
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 @Composable
 fun OrderContent(
   user: User?,
   onUser: (User) -> Unit,
-  orders: LazyPagingItems<Order>,
+  ordersFlow: Flow<PagingData<Order>>,
   loginResult: LoginResult,
   onLoginResult: (LoginResult) -> Unit,
   onAddNewUserLocally: suspend (UserEntity) -> Unit,
@@ -81,6 +83,7 @@ fun OrderContent(
   }
 
   if (loginResult == LoginResult.Success) {
+    val orders = ordersFlow.collectAsLazyPagingItems()
     LazyOrdersContent(
       profile = user?.profile ?: UserProfile.Other,
       orders = orders,

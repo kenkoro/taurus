@@ -16,7 +16,6 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginContent
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.util.LoginResult
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
@@ -27,7 +26,6 @@ fun LoginScreen(
   onSubject: (String) -> Unit,
   onPassword: (String) -> Unit,
   onLogin: suspend () -> Result<TokenDto>,
-  onLoginResult: (LoginResult) -> Unit,
   onEncryptAll: (String) -> Unit,
   onNavigateToOrderScreen: () -> Unit,
   networkStatus: NetworkStatus,
@@ -80,7 +78,6 @@ fun LoginScreen(
             onSubject = onSubject,
             onPassword = onPassword,
             onLogin = onLogin,
-            onLoginResult = onLoginResult,
             onEncryptAll = onEncryptAll,
             onNavigateToOrderScreen = onNavigateToOrderScreen,
             onInternetConnectionErrorShowSnackbar = {
@@ -125,7 +122,6 @@ private fun LoginScreenPrev() {
       onSubject = {},
       onPassword = {},
       onLogin = { Result.success(TokenDto("")) },
-      onLoginResult = {},
       onEncryptAll = {},
       onNavigateToOrderScreen = { /*TODO*/ },
       networkStatus = NetworkStatus.Available,

@@ -17,7 +17,6 @@ import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.util.LoginResult
 
 @Composable
 fun LoginContent(
@@ -26,7 +25,6 @@ fun LoginContent(
   onSubject: (String) -> Unit,
   onPassword: (String) -> Unit,
   onLogin: suspend () -> Result<TokenDto>,
-  onLoginResult: (LoginResult) -> Unit,
   onEncryptAll: (String) -> Unit,
   onNavigateToOrderScreen: () -> Unit,
   onInternetConnectionErrorShowSnackbar: suspend () -> SnackbarResult,
@@ -62,7 +60,6 @@ fun LoginContent(
         onSubject = onSubject,
         onPassword = onPassword,
         onLogin = onLogin,
-        onLoginResult = onLoginResult,
         onNavigateToOrderScreen = onNavigateToOrderScreen,
         onEncryptAll = onEncryptAll,
         onLoginErrorShowSnackbar = onLoginErrorShowSnackbar,

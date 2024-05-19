@@ -9,7 +9,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
@@ -24,7 +23,6 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.UserView
 fun AppNavHost(
   navController: NavHostController = rememberNavController(),
   startDestination: (String, String) -> Screen,
-  onRestartApp: () -> Unit,
 ) {
   val context = LocalContext.current
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
@@ -35,7 +33,6 @@ fun AppNavHost(
   val loginViewModel: LoginViewModel = hiltViewModel()
   val orderViewModel: OrderViewModel = hiltViewModel()
   val userViewModel: UserViewModel = hiltViewModel()
-  val orders = orderViewModel.orderPagingFlow.collectAsLazyPagingItems()
 
   val (subject, password) = loginViewModel.decryptSubjectAndPassword()
   NavHost(
@@ -49,7 +46,6 @@ fun AppNavHost(
         onSubject = loginViewModel::subject,
         onPassword = loginViewModel::password,
         onLogin = loginViewModel::login,
-        onLoginResult = loginViewModel::loginResult,
         onEncryptAll = loginViewModel::encryptAll,
         onNavigateToOrderScreen = { navController.navigate(Screen.OrderScreen.route) },
         networkStatus = networkStatus,
@@ -60,7 +56,7 @@ fun AppNavHost(
       OrderScreen(
         user = userViewModel.user,
         onUser = userViewModel::user,
-        orders = orders,
+        ordersFlow = orderViewModel.orderPagingFlow,
         loginResult = loginViewModel.loginResult,
         onLoginResult = loginViewModel::loginResult,
         onAddNewUserLocally = userViewModel::addNewUserLocally,
@@ -85,7 +81,8 @@ fun AppNavHost(
     composable(route = Screen.ProfileScreen.route) {
       ProfileScreen(
         onDeleteAllCredentials = orderViewModel::deleteAllCredentials,
-        onRestartApp = onRestartApp,
+        onNavigateToLoginScreen = { navController.navigate(Screen.LoginScreen.route) },
+        onLoginResult = loginViewModel::loginResult,
       )
     }
   }
