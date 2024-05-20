@@ -8,11 +8,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarResult
@@ -65,7 +65,11 @@ fun OrderItem(
   val heightAnimated by animateDpAsState(
     targetValue =
       if (clicked) {
-        contentHeight.orderItemExpanded
+        if (allowedToUpdateOrderStatus(profile)) {
+          contentHeight.orderItemExpanded
+        } else {
+          contentHeight.orderItemExpandedWithoutActionButton
+        }
       } else {
         contentHeight.orderItemNotExpanded
       },
@@ -82,7 +86,7 @@ fun OrderItem(
             .width(contentWidth.orderItem)
             .height(heightAnimated)
             .clip(RoundedCornerShape(shape.medium))
-            .background(MaterialTheme.colorScheme.onBackground)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable { clicked = !clicked },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(contentHeight.large),
@@ -92,7 +96,7 @@ fun OrderItem(
             Modifier
               .fillMaxWidth()
               // TODO: Change the height for the profiles
-              .fillMaxHeight(.7F),
+              .wrapContentHeight(),
           verticalArrangement = Arrangement.Top,
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -137,7 +141,7 @@ private fun allowedToUpdateOrderStatus(profile: UserProfile): Boolean {
     profile != Manager
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun OrderItemPrev() {
   val order =
@@ -158,7 +162,7 @@ private fun OrderItemPrev() {
 
   AppTheme {
     OrderItem(
-      profile = UserProfile.Admin,
+      profile = UserProfile.Ceo,
       order = order,
       onAddNewOrderLocally = { _ -> },
       onDeleteOrderLocally = { _ -> },

@@ -24,8 +24,8 @@ fun TaurusSnackbar(
   snackbarHostState: SnackbarHostState,
   modifier: Modifier = Modifier,
   onDismiss: () -> Unit = {},
-  containerColor: Color = MaterialTheme.colorScheme.onBackground,
-  contentColor: Color = MaterialTheme.colorScheme.background,
+  containerColor: Color = MaterialTheme.colorScheme.onPrimary,
+  contentColor: Color = MaterialTheme.colorScheme.primary,
   centeredContent: Boolean = false,
 ) {
   val shape = LocalShape.current

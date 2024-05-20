@@ -13,13 +13,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -87,10 +85,6 @@ fun FieldsContent(
           ),
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
-        colors =
-          TextFieldDefaults.colors(
-            focusedIndicatorColor = MaterialTheme.colorScheme.onBackground,
-          ),
       )
       Spacer(modifier = Modifier.height(contentHeight.large))
       OutlinedTextField(
@@ -109,10 +103,6 @@ fun FieldsContent(
         visualTransformation = PasswordVisualTransformation(),
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
-        colors =
-          TextFieldDefaults.colors(
-            focusedIndicatorColor = MaterialTheme.colorScheme.onBackground,
-          ),
       )
       Spacer(modifier = Modifier.height(contentHeight.large))
     }
@@ -127,11 +117,6 @@ fun FieldsContent(
           Modifier
             .size(width = contentWidth.halfStandard, height = contentHeight.standard),
         shape = RoundedCornerShape(shape.medium),
-        colors =
-          ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.onBackground,
-            contentColor = MaterialTheme.colorScheme.background,
-          ),
         onClick = {
           scope.launch(Dispatchers.IO) {
             if (subject.isNotBlank() && password.isNotBlank()) {

@@ -12,9 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,11 +54,6 @@ fun OrderBottomBar(
           .height(contentHeight.halfStandard),
       onClick = { scope.launch(Dispatchers.Main) { onAddNewOrderShowSnackbar() } },
       shape = RoundedCornerShape(shape.medium),
-      colors =
-        ButtonDefaults.buttonColors(
-          containerColor = MaterialTheme.colorScheme.onBackground,
-          contentColor = MaterialTheme.colorScheme.background,
-        ),
     ) {
       Row(
         modifier = Modifier.fillMaxSize(),
