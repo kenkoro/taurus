@@ -7,13 +7,13 @@ import java.util.regex.Pattern
 private const val SUBJECT_VALIDATION_REGEX = "[a-zA-Z0-9]+"
 
 class SubjectState(
-  private val subject: String? = null,
-  private val errorMessage: String? = null,
-  private val emptySubjectErrorMessage: String = "",
+  subject: String? = null,
+  private val errorMessage: String = "",
+  private val emptyTextFieldErrorMessage: String = "",
 ) : TaurusTextFieldState(
     validator = ::isSubjectValid,
     errorFor = { text ->
-      subjectValidationError(text, errorMessage, emptySubjectErrorMessage)
+      subjectValidationError(text, errorMessage, emptyTextFieldErrorMessage)
     },
   ) {
   init {
@@ -23,19 +23,15 @@ class SubjectState(
   }
 }
 
-private fun subjectValidationError(
+fun subjectValidationError(
   subject: String,
-  errorMessage: String?,
-  emptySubjectErrorMessage: String,
+  errorMessage: String,
+  emptyTextFieldErrorMessage: String,
 ): String {
-  return if (errorMessage == null) {
-    "$subject is invalid"
+  return if (subject.isBlank()) {
+    emptyTextFieldErrorMessage
   } else {
-    if (subject.isBlank()) {
-      emptySubjectErrorMessage
-    } else {
-      "$subject $errorMessage!"
-    }
+    "$subject $errorMessage!"
   }
 }
 
