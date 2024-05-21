@@ -33,7 +33,7 @@ import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderBottomBar
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderTopBar
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.util.LoginResult
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.util.LoginState
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.flow.Flow
@@ -44,8 +44,8 @@ fun OrderScreen(
   user: User?,
   onUser: (User) -> Unit,
   ordersFlow: Flow<PagingData<Order>>,
-  loginResult: LoginResult,
-  onLoginResult: (LoginResult) -> Unit,
+  loginState: LoginState,
+  onLoginResult: (LoginState) -> Unit,
   onAddNewUserLocally: suspend (UserEntity) -> Unit,
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
@@ -143,7 +143,7 @@ fun OrderScreen(
             user = user,
             onUser = onUser,
             ordersFlow = ordersFlow,
-            loginResult = loginResult,
+            loginState = loginState,
             onLoginResult = onLoginResult,
             onAddNewUserLocally = onAddNewUserLocally,
             onAddNewOrderLocally = onAddNewOrderLocally,
@@ -239,7 +239,7 @@ private fun OrderScreenPrev() {
       user = null,
       onUser = {},
       ordersFlow = ordersFlow,
-      loginResult = LoginResult.Success,
+      loginState = LoginState.Success,
       onLoginResult = {},
       onAddNewUserLocally = { _ -> },
       onDeleteOrderLocally = { _ -> },

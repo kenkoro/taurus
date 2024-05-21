@@ -11,19 +11,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.util.LoginResult
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.util.LoginState
 
 @Composable
 fun ProfileScreen(
   onDeleteAllCredentials: () -> Boolean,
   onNavigateToLoginScreen: () -> Unit,
-  onLoginResult: (LoginResult) -> Unit,
+  onLoginResult: (LoginState) -> Unit,
 ) {
   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
     Button(
       onClick = {
         val result = onDeleteAllCredentials()
-        onLoginResult(LoginResult.NotLoggedYet)
+        onLoginResult(LoginState.NotLoggedYet)
         onNavigateToLoginScreen()
       },
       colors =

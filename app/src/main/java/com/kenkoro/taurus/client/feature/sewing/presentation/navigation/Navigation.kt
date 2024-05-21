@@ -57,7 +57,7 @@ fun AppNavHost(
         user = userViewModel.user,
         onUser = userViewModel::user,
         ordersFlow = orderViewModel.orderPagingFlow,
-        loginResult = loginViewModel.loginResult,
+        loginState = loginViewModel.loginState,
         onLoginResult = loginViewModel::loginResult,
         onAddNewUserLocally = userViewModel::addNewUserLocally,
         onAddNewOrderLocally = orderViewModel::addNewOrderLocally,

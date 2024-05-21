@@ -9,7 +9,7 @@ import com.kenkoro.taurus.client.core.crypto.EncryptedCredentialService
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.LoginDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.repository.LoginRepositoryImpl
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.util.LoginResult
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.util.LoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -27,7 +27,7 @@ class LoginViewModel
     var password by mutableStateOf("")
       private set
 
-    var loginResult by mutableStateOf(LoginResult.NotLoggedYet)
+    var loginState by mutableStateOf(LoginState.NotLoggedYet)
       private set
 
     fun subject(subject: String) {
@@ -38,8 +38,8 @@ class LoginViewModel
       this.password = password
     }
 
-    fun loginResult(loginResult: LoginResult) {
-      this.loginResult = loginResult
+    fun loginResult(loginState: LoginState) {
+      this.loginState = loginState
     }
 
     suspend fun login(

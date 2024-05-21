@@ -65,7 +65,7 @@ fun FieldsContent(
     verticalArrangement = Arrangement.Center,
   ) {
     Text(
-      text = stringResource(id = R.string.login_credentials_label),
+      text = stringResource(id = R.string.login_screen_title),
       style = MaterialTheme.typography.headlineLarge,
     )
     Spacer(modifier = Modifier.height(contentHeight.large * 2))

@@ -2,7 +2,7 @@
     <string name="app_name">Taurus</string>
     <string name="continue_button">Продолжить</string>
     <string name="login_forgot_password">Забыли пароль?</string>
-    <string name="login_credentials_label">Войти</string>
+    <string name="login_screen_title">Войти</string>
     <string name="login_subject">Логин</string>
     <string name="login_password">Пароль</string>
     <string name="not_implemented_yet">Ещё не имплементировано</string>
@@ -39,4 +39,8 @@
     <string name="order_was_cut">Раскроенно</string>
     <string name="order_was_checked">Оприходовано</string>
     <string name="quit_from_account">Выйти из аккаунта</string>
+    <string name="subject_error_message">некорректный логин</string>
+    <string name="empty_text_field_error_message">Не может быть пустым</string>
+    <string name="subject_supporting_text">Логин должен состоять из английских букв и, возможно, цифр.</string>
+    <string name="full_subject_supporting_text">Максимум 20 символов.</string>
 </resources>

@@ -38,7 +38,6 @@ fun LoginScreen(
   val requestErrorMessage = stringResource(id = R.string.request_error)
   val subjectAndPasswordCannotBeBlankMessage =
     stringResource(id = R.string.subject_and_password_cannot_be_blank)
-  val notImplementedYetMessage = stringResource(id = R.string.not_implemented_yet)
 
   val okActionLabel = stringResource(id = R.string.ok)
 
@@ -95,12 +94,6 @@ fun LoginScreen(
             onInvalidLoginCredentialsShowSnackbar = {
               errorSnackbarHostState.showSnackbar(
                 message = subjectAndPasswordCannotBeBlankMessage,
-                actionLabel = okActionLabel,
-              )
-            },
-            onHelpTextClickShowSnackbar = {
-              snackbarHostState.showSnackbar(
-                message = notImplementedYetMessage,
                 actionLabel = okActionLabel,
               )
             },
