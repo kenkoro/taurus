@@ -59,27 +59,32 @@ fun LoginTextFields(
       LocalContentColor.current
     }
   }
+  val isSubjectInvalidWhilePasswordIsFocused = { !subject.isValid && password.isFocused }
+  val isSubjectInvalidWhilePasswordIsNotFocused = { !subject.isValid && !password.isFocused }
+  val isPasswordInvalidWhileNoFocus =
+    { !password.isValid && !password.isFocused && !subject.isFocused }
+  val areNotFocusedAtAllAtTheStart = { !subject.isFocusedOnce && !password.isFocusedOnce }
   val onSubmit = {
     if (subject.isValid && password.isValid) {
       onLoginSubmitted(subject.text, password.text)
       focusManager.clearFocus()
     }
 
-    if (!subject.isValid && password.isFocused) {
+    if (isSubjectInvalidWhilePasswordIsFocused() || isPasswordInvalidWhileNoFocus()) {
       focusManager.moveFocus(FocusDirection.Up)
     }
 
-    if (!subject.isValid && !password.isFocused) {
-      focusManager.moveFocus(FocusDirection.Up)
+    if (isSubjectInvalidWhilePasswordIsNotFocused() || areNotFocusedAtAllAtTheStart()) {
+      focusRequester.requestFocus()
       focusManager.moveFocus(FocusDirection.Up)
     }
   }
   val isLoginButtonEnable = { networkStatus == NetworkStatus.Available }
   val yTargetValue = {
     if (subject.isFocused || password.isFocused) {
-      (-80).dp
+      (-30).dp
     } else {
-      0.dp
+      50.dp
     }
   }
   val y by animateDpAsState(targetValue = yTargetValue(), label = "")

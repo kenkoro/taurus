@@ -40,6 +40,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * Use [LoginTextFields][com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginTextFields] instead.
+ */
+@Deprecated("There's a new form for login")
 @Composable
 fun FieldsContent(
   subject: String,

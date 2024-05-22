@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.kenkoro.taurus.client.R
 import kotlinx.coroutines.launch
 
+@Deprecated("Not in use anymore")
 @Composable
 fun HelpContent(
   onHelpTextClickShowSnackbar: suspend () -> SnackbarResult,
