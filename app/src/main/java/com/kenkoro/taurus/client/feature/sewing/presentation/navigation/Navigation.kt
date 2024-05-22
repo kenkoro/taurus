@@ -23,6 +23,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels.UserView
 fun AppNavHost(
   navController: NavHostController = rememberNavController(),
   startDestination: (String, String) -> Screen,
+  onExit: () -> Unit = {},
 ) {
   val context = LocalContext.current
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
@@ -41,14 +42,14 @@ fun AppNavHost(
   ) {
     composable(route = Screen.LoginScreen.route) {
       LoginScreen(
+        networkStatus = networkStatus,
         subject = loginViewModel.subject,
         password = loginViewModel.password,
-        onSubject = loginViewModel::subject,
-        onPassword = loginViewModel::password,
+        onSetErrorMessages = loginViewModel::setErrorMessages,
         onLogin = loginViewModel::login,
         onEncryptAll = loginViewModel::encryptAll,
         onNavigateToOrderScreen = { navController.navigate(Screen.OrderScreen.route) },
-        networkStatus = networkStatus,
+        onExit = onExit,
       )
     }
 

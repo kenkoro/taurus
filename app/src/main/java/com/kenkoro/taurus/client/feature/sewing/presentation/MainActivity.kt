@@ -53,6 +53,7 @@ class MainActivity : ComponentActivity() {
                 Screen.LoginScreen
               }
             },
+            onExit = { finish() },
           )
         }
       }

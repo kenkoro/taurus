@@ -10,33 +10,38 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.PasswordState
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.SubjectState
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.TaurusTextFieldState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginContent(
-  subject: String,
-  password: String,
-  onSubject: (String) -> Unit,
-  onPassword: (String) -> Unit,
-  onLogin: suspend () -> Result<TokenDto>,
-  onEncryptAll: (String) -> Unit,
+  modifier: Modifier = Modifier,
+  networkStatus: NetworkStatus,
+  subject: SubjectState,
+  password: PasswordState,
+  onSetErrorMessages: (TaurusTextFieldState, String, String) -> Unit,
+  onLogin: suspend (subject: String, password: String) -> Result<TokenDto>,
+  onEncryptAll: (String, String, String) -> Unit,
   onNavigateToOrderScreen: () -> Unit,
+  onExit: () -> Unit = {},
   onInternetConnectionErrorShowSnackbar: suspend () -> SnackbarResult,
   onLoginErrorShowSnackbar: suspend () -> SnackbarResult,
-  onInvalidLoginCredentialsShowSnackbar: suspend () -> SnackbarResult,
-  networkStatus: NetworkStatus,
-  modifier: Modifier = Modifier,
 ) {
   val contentWidth = LocalContentWidth.current
-  val contentHeight = LocalContentHeight.current
   val focusManager = LocalFocusManager.current
 
+  val scope = rememberCoroutineScope()
   val interactionSource = remember { MutableInteractionSource() }
 
   Column(
@@ -62,17 +67,23 @@ fun LoginContent(
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
       LoginTextFields(
+        modifier = Modifier.width(contentWidth.standard),
+        networkStatus = networkStatus,
         subject = subject,
         password = password,
-        onSubject = onSubject,
-        onPassword = onPassword,
-        onLogin = onLogin,
-        onNavigateToOrderScreen = onNavigateToOrderScreen,
-        onEncryptAll = onEncryptAll,
-        onLoginErrorShowSnackbar = onLoginErrorShowSnackbar,
-        onInvalidLoginCredentialsShowSnackbar = onInvalidLoginCredentialsShowSnackbar,
-        networkStatus = networkStatus,
-        modifier = Modifier.width(contentWidth.standard),
+        onSetErrorMessages = onSetErrorMessages,
+        onLoginSubmitted = { subject, password ->
+          scope.launch(Dispatchers.IO) {
+            val result = onLogin(subject, password)
+            result.onSuccess {
+              onEncryptAll(subject, password, it.token)
+              withContext(Dispatchers.Main) { onNavigateToOrderScreen() }
+            }
+
+            result.onFailure { onLoginErrorShowSnackbar() }
+          }
+        },
+        onExit = onExit,
       )
     }
   }

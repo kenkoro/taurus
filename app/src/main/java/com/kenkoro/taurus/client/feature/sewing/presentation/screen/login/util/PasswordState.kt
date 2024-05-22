@@ -4,13 +4,9 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.shared.TaurusTextFi
 
 class PasswordState(
   password: String? = null,
-  private val errorMessage: String = "",
-  private val emptyTextFieldErrorMessage: String = "",
 ) : TaurusTextFieldState(
     validator = ::isPasswordValid,
-    errorFor = { text ->
-      passwordValidationError(text, errorMessage, emptyTextFieldErrorMessage)
-    },
+    errorFor = ::passwordValidationError,
   ) {
   init {
     password?.let {

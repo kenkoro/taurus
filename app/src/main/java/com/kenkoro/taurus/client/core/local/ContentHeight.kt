@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.dp
 
 data class ContentHeight(
   val standard: Dp = 80.dp,
+  val loginButton: Dp = 60.dp,
   val halfStandard: Dp = 40.dp,
   val small: Dp = 5.dp,
   val medium: Dp = 10.dp,

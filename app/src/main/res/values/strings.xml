@@ -44,4 +44,5 @@
     <string name="subject_supporting_text">Логин должен состоять из английских букв и, возможно, цифр.</string>
     <string name="full_subject_supporting_text">Максимум 20 символов.</string>
     <string name="password_error_message">Пароль должен состоять минимум из 4 символов</string>
+    <string name="exit_button">Выйти</string>
 </resources>

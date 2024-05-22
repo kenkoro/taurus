@@ -57,9 +57,10 @@ fun Password(
   val onClearPassword = {
     passwordState.text = ""
 
-    if (vibrationEffect != null) {
-      view.performHapticFeedback(vibrationEffect)
+    vibrationEffect?.let {
+      view.performHapticFeedback(it)
     }
+    Unit
   }
   var isHidden by remember {
     mutableStateOf(true)

@@ -16,19 +16,22 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components.LoginContent
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.PasswordState
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.SubjectState
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.TaurusTextFieldState
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun LoginScreen(
-  subject: String,
-  password: String,
-  onSubject: (String) -> Unit,
-  onPassword: (String) -> Unit,
-  onLogin: suspend () -> Result<TokenDto>,
-  onEncryptAll: (String) -> Unit,
-  onNavigateToOrderScreen: () -> Unit,
   networkStatus: NetworkStatus,
+  subject: SubjectState,
+  password: PasswordState,
+  onSetErrorMessages: (TaurusTextFieldState, String, String) -> Unit,
+  onLogin: suspend (subject: String, password: String) -> Result<TokenDto>,
+  onEncryptAll: (String, String, String) -> Unit,
+  onNavigateToOrderScreen: () -> Unit,
+  onExit: () -> Unit = {},
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
@@ -36,8 +39,6 @@ fun LoginScreen(
 
   val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
   val requestErrorMessage = stringResource(id = R.string.request_error)
-  val subjectAndPasswordCannotBeBlankMessage =
-    stringResource(id = R.string.subject_and_password_cannot_be_blank)
 
   val okActionLabel = stringResource(id = R.string.ok)
 
@@ -72,13 +73,14 @@ fun LoginScreen(
               .padding(it),
         ) {
           LoginContent(
+            networkStatus = networkStatus,
             subject = subject,
             password = password,
-            onSubject = onSubject,
-            onPassword = onPassword,
+            onSetErrorMessages = onSetErrorMessages,
             onLogin = onLogin,
             onEncryptAll = onEncryptAll,
             onNavigateToOrderScreen = onNavigateToOrderScreen,
+            onExit = onExit,
             onInternetConnectionErrorShowSnackbar = {
               internetSnackbarHostState.showSnackbar(
                 message = internetConnectionErrorMessage,
@@ -91,13 +93,6 @@ fun LoginScreen(
                 actionLabel = okActionLabel,
               )
             },
-            onInvalidLoginCredentialsShowSnackbar = {
-              errorSnackbarHostState.showSnackbar(
-                message = subjectAndPasswordCannotBeBlankMessage,
-                actionLabel = okActionLabel,
-              )
-            },
-            networkStatus = networkStatus,
           )
         }
       },
@@ -110,14 +105,13 @@ fun LoginScreen(
 private fun LoginScreenPrev() {
   AppTheme {
     LoginScreen(
-      subject = "",
-      password = "",
-      onSubject = {},
-      onPassword = {},
-      onLogin = { Result.success(TokenDto("")) },
-      onEncryptAll = {},
-      onNavigateToOrderScreen = { /*TODO*/ },
       networkStatus = NetworkStatus.Available,
+      subject = SubjectState(),
+      password = PasswordState(),
+      onSetErrorMessages = { _, _, _ -> },
+      onLogin = { _, _ -> Result.success(TokenDto("")) },
+      onEncryptAll = { _, _, _ -> },
+      onNavigateToOrderScreen = {},
     )
   }
 }

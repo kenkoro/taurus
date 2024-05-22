@@ -34,6 +34,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.T
 
 @Composable
 fun Subject(
+  modifier: Modifier = Modifier,
   subjectState: TaurusTextFieldState = remember { SubjectState() },
   imeAction: ImeAction = ImeAction.Next,
   onImeAction: () -> Unit = {},
@@ -50,9 +51,10 @@ fun Subject(
   val onClearSubject = {
     subjectState.text = ""
 
-    if (vibrationEffect != null) {
-      view.performHapticFeedback(vibrationEffect)
+    vibrationEffect?.let {
+      view.performHapticFeedback(it)
     }
+    Unit
   }
 
   OutlinedTextField(

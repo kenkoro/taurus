@@ -9,7 +9,10 @@ import com.kenkoro.taurus.client.core.crypto.EncryptedCredentialService
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.LoginDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.repository.LoginRepositoryImpl
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.PasswordState
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.SubjectState
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.util.LoginState
+import com.kenkoro.taurus.client.feature.sewing.presentation.shared.TaurusTextFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -21,21 +24,21 @@ class LoginViewModel
     private val encryptedCredentialService: EncryptedCredentialService,
     private val decryptedCredentialService: DecryptedCredentialService,
   ) : ViewModel() {
-    var subject by mutableStateOf("")
+    var subject by mutableStateOf(SubjectState(subject = ""))
       private set
 
-    var password by mutableStateOf("")
+    var password by mutableStateOf(PasswordState(password = ""))
       private set
 
     var loginState by mutableStateOf(LoginState.NotLoggedYet)
       private set
 
-    fun subject(subject: String) {
-      this.subject = subject
-    }
-
-    fun password(password: String) {
-      this.password = password
+    fun setErrorMessages(
+      state: TaurusTextFieldState,
+      errorMessage: String,
+      emptyTextFieldErrorMessage: String,
+    ) {
+      state.setErrorMessages(errorMessage, emptyTextFieldErrorMessage)
     }
 
     fun loginResult(loginState: LoginState) {
@@ -43,8 +46,8 @@ class LoginViewModel
     }
 
     suspend fun login(
-      subject: String = this.subject,
-      password: String = this.password,
+      subject: String,
+      password: String,
     ): Result<TokenDto> =
       loginRepository.login(
         LoginDto(
@@ -53,7 +56,11 @@ class LoginViewModel
         ),
       )
 
-    fun encryptAll(token: String) {
+    fun encryptAll(
+      subject: String,
+      password: String,
+      token: String,
+    ) {
       encryptedCredentialService.putSubject(subject)
       encryptedCredentialService.putPassword(password)
       encryptedCredentialService.putToken(token)
