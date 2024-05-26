@@ -8,13 +8,7 @@
     <string name="not_implemented_yet">Ещё не имплементировано</string>
     <string name="check_internet_connection">Интернет отсутствует</string>
     <string name="bottom_bar_host_orders">Заказы</string>
-    <string name="get_user">Посмотреть пользователя</string>
-    <string name="delete_user">Удалить пользователя</string>
-    <string name="create_user">Создать нового пользователя</string>
-    <string name="update_user">Обновить данные пользователя</string>
-    <string name="retry">Повторить</string>
     <string name="request_error">Упс, что-то пошло не так</string>
-    <string name="subject_and_password_cannot_be_blank">Логин / пароль не могут быть пустыми</string>
     <string name="ok">Хорошо</string>
     <string name="order_status_idle">Не начато</string>
     <string name="order_status_cut">Раскроенно</string>
@@ -32,17 +26,16 @@
     <string name="cancel">Отмена</string>
     <string name="order_was_deleted">Заказ удален</string>
     <string name="all_orders">Все заказы</string>
-    <string name="order_id_field">Номер заказа</string>
-    <string name="order_title">Наименование</string>
     <string name="paginated_orders_error">Не удалось загрузить заказы</string>
     <string name="login_fail">Не удалось войти</string>
     <string name="order_was_cut">Раскроенно</string>
     <string name="order_was_checked">Оприходовано</string>
     <string name="quit_from_account">Выйти из аккаунта</string>
-    <string name="subject_error_message">некорректный логин</string>
-    <string name="empty_text_field_error_message">Не может быть пустым</string>
+    <string name="subject_error">некорректный логин</string>
+    <string name="empty_text_field_error">Не может быть пустым</string>
     <string name="subject_supporting_text">Логин должен состоять из английских букв и, возможно, цифр.</string>
     <string name="full_subject_supporting_text">Максимум 20 символов.</string>
-    <string name="password_error_message">Пароль должен состоять минимум из 4 символов</string>
+    <string name="password_error">Пароль должен состоять минимум из 4 символов</string>
     <string name="exit_button">Выйти</string>
+    <string name="orders_access_error">Вы не можете смотреть заказы!</string>
 </resources>
