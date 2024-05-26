@@ -1,6 +1,7 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
 
 import android.util.Log
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,7 +18,8 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.UserDto
 import com.kenkoro.taurus.client.feature.sewing.domain.model.NewOrder
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
-import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile
+import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Other
+import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Tailor
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.util.LoginState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -25,11 +27,14 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun OrderContent(
+  modifier: Modifier = Modifier,
+  networkStatus: NetworkStatus,
   user: User?,
   onUser: (User) -> Unit,
   ordersFlow: Flow<PagingData<Order>>,
   loginState: LoginState,
-  onLoginResult: (LoginState) -> Unit,
+  lazyOrdersState: LazyListState,
+  onLoginState: (LoginState) -> Unit,
   onAddNewUserLocally: suspend (UserEntity) -> Unit,
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
@@ -42,11 +47,10 @@ fun OrderContent(
   onLoginErrorShowSnackbar: suspend () -> SnackbarResult,
   onDeleteOrderShowSnackbar: suspend () -> SnackbarResult,
   onAppendNewOrdersErrorShowSnackbar: suspend () -> SnackbarResult,
+  onOrderAccessErrorShowSnackbar: suspend () -> SnackbarResult,
   onEncryptToken: (String) -> Unit,
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
   onDecryptToken: () -> String,
-  networkStatus: NetworkStatus,
-  modifier: Modifier = Modifier,
 ) {
   if (networkStatus != NetworkStatus.Available) {
     LaunchedEffect(networkStatus) { onInternetConnectionErrorShowSnackbar() }
@@ -67,7 +71,7 @@ fun OrderContent(
           getUserResult.onSuccess { userDto ->
             onAddNewUserLocally(userDto.toUserEntity())
             onUser(userDto.toUser())
-            onLoginResult(LoginState.Success)
+            onLoginState(LoginState.Success)
           }
           getUserResult.onFailure {
             Log.d("kenkoro", it.message!!)
@@ -83,18 +87,25 @@ fun OrderContent(
   }
 
   if (loginState == LoginState.Success) {
-    val orders = ordersFlow.collectAsLazyPagingItems()
-    LazyOrdersContent(
-      profile = user?.profile ?: UserProfile.Other,
-      orders = orders,
-      onAddNewOrderLocally = onAddNewOrderLocally,
-      onDeleteOrderLocally = onDeleteOrderLocally,
-      onEditOrderLocally = onEditOrderLocally,
-      onEditOrderRemotely = onEditOrderRemotely,
-      onDeleteOrderRemotely = onDeleteOrderRemotely,
-      onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
-      onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,
-      networkStatus = networkStatus,
-    )
+    // TODO: Remove this to LazyOrdersContent
+    val userProfile = user?.profile ?: Other
+    if (userProfile == Tailor || userProfile == Other) {
+      LaunchedEffect(Unit, Dispatchers.Main) { onOrderAccessErrorShowSnackbar() }
+    } else {
+      val orders = ordersFlow.collectAsLazyPagingItems()
+      LazyOrdersContent(
+        networkStatus = networkStatus,
+        profile = userProfile,
+        orders = orders,
+        lazyOrdersState = lazyOrdersState,
+        onAddNewOrderLocally = onAddNewOrderLocally,
+        onDeleteOrderLocally = onDeleteOrderLocally,
+        onEditOrderLocally = onEditOrderLocally,
+        onEditOrderRemotely = onEditOrderRemotely,
+        onDeleteOrderRemotely = onDeleteOrderRemotely,
+        onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
+        onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,
+      )
+    }
   }
 }

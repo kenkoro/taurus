@@ -41,7 +41,7 @@ class LoginViewModel
       state.setErrorMessages(errorMessage, emptyTextFieldErrorMessage)
     }
 
-    fun loginResult(loginState: LoginState) {
+    fun loginState(loginState: LoginState) {
       this.loginState = loginState
     }
 

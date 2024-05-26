@@ -62,7 +62,7 @@ fun OrderItem(
   var visible by rememberSaveable {
     mutableStateOf(true)
   }
-  val heightAnimated by animateDpAsState(
+  val animatedHeight by animateDpAsState(
     targetValue =
       if (clicked) {
         if (allowedToUpdateOrderStatus(profile)) {
@@ -84,35 +84,34 @@ fun OrderItem(
         modifier =
           Modifier
             .width(contentWidth.orderItem)
-            .height(heightAnimated)
+            .height(animatedHeight)
             .clip(RoundedCornerShape(shape.medium))
             .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable { clicked = !clicked },
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(contentHeight.large),
+        verticalArrangement = Arrangement.SpaceBetween,
       ) {
         Column(
           modifier =
             Modifier
               .fillMaxWidth()
-              // TODO: Change the height for the profiles
               .wrapContentHeight(),
           verticalArrangement = Arrangement.Top,
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-          Spacer(modifier = Modifier.height(contentHeight.medium))
-          // TODO: Change order.status at the top of an order item as well
+          Spacer(modifier = Modifier.height(contentHeight.large))
           OrderItemContent(
             order = order,
             clicked = clicked,
           )
+          Spacer(modifier = Modifier.height(contentHeight.large))
         }
 
-        if (allowedToUpdateOrderStatus(profile)) {
+        if (allowedToUpdateOrderStatus(profile) && clicked) {
           Column(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom,
           ) {
             OrderItemButtonHandler(
               order = order,
@@ -162,7 +161,7 @@ private fun OrderItemPrev() {
 
   AppTheme {
     OrderItem(
-      profile = UserProfile.Ceo,
+      profile = UserProfile.Customer,
       order = order,
       onAddNewOrderLocally = { _ -> },
       onDeleteOrderLocally = { _ -> },

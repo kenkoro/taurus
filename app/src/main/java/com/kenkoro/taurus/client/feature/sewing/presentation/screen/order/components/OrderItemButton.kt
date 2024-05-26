@@ -1,8 +1,6 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -28,7 +26,6 @@ fun OrderItemButton(
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
 
-  Spacer(modifier = Modifier.height(contentHeight.large))
   Button(
     enabled = networkStatus == NetworkStatus.Available,
     modifier = modifier.size(contentWidth.standard, contentHeight.halfStandard),

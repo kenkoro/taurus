@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.shared.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -45,7 +45,7 @@ fun LoginButton(
   val contentHeight = LocalContentHeight.current
 
   val continueButtonColors =
-    ButtonDefaults.outlinedButtonColors(
+    ButtonDefaults.buttonColors(
       containerColor =
         if (isError) {
           MaterialTheme.colorScheme.error

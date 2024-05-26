@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,8 +17,11 @@ import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.T
 
 @Composable
 fun LazyOrdersContent(
+  modifier: Modifier = Modifier,
+  networkStatus: NetworkStatus,
   profile: UserProfile,
   orders: LazyPagingItems<Order>,
+  lazyOrdersState: LazyListState,
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
   onEditOrderLocally: suspend (NewOrder) -> Unit,
@@ -25,8 +29,6 @@ fun LazyOrdersContent(
   onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
   onDeleteOrderShowSnackbar: suspend () -> SnackbarResult,
   onAppendNewOrdersErrorShowSnackbar: suspend () -> SnackbarResult,
-  networkStatus: NetworkStatus,
-  modifier: Modifier = Modifier,
 ) {
   if (orders.loadState.append is LoadState.Error) {
     LaunchedEffect(Unit) { onAppendNewOrdersErrorShowSnackbar() }
@@ -34,15 +36,16 @@ fun LazyOrdersContent(
 
   if (allowedToSeeOrders(profile)) {
     LazyOrdersColumn(
+      networkStatus = networkStatus,
       profile = profile,
       orders = orders,
+      lazyOrdersState = lazyOrdersState,
       onAddNewOrderLocally = onAddNewOrderLocally,
       onDeleteOrderLocally = onDeleteOrderLocally,
       onEditOrderLocally = onEditOrderLocally,
       onDeleteOrderRemotely = onDeleteOrderRemotely,
       onEditOrderRemotely = onEditOrderRemotely,
       onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
-      networkStatus = networkStatus,
     )
   }
 }

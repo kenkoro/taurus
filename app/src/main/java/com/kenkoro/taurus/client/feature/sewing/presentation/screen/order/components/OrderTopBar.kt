@@ -44,11 +44,11 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun OrderTopBar(
+  modifier: Modifier = Modifier,
+  networkStatus: NetworkStatus,
   onFilterOrdersShowSnackbar: suspend () -> SnackbarResult,
   onSortOrdersShowSnackbar: suspend () -> SnackbarResult,
   onNavigateToProfileScreen: () -> Unit,
-  networkStatus: NetworkStatus,
-  modifier: Modifier = Modifier,
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current

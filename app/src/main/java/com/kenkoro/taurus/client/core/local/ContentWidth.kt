@@ -9,6 +9,7 @@ data class ContentWidth(
   val halfStandard: Dp = 165.dp,
   val small: Dp = 5.dp,
   val medium: Dp = 10.dp,
+  val orderItemButtonToExpand: Dp = 20.dp,
   val large: Dp = 40.dp,
   val orderItem: Dp = 350.dp,
 )

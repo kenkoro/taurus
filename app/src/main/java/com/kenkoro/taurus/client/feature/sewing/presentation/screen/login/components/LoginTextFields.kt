@@ -26,7 +26,6 @@ import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.PasswordState
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.SubjectState
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.TaurusTextFieldState
-import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.LoginButton
 
 @Composable
 fun LoginTextFields(
@@ -44,9 +43,9 @@ fun LoginTextFields(
   val focusManager = LocalFocusManager.current
   val contentHeight = LocalContentHeight.current
 
-  val subjectErrorMessage = stringResource(id = R.string.subject_error_message)
-  val passwordErrorMessage = stringResource(id = R.string.password_error_message)
-  val emptyTextFieldErrorMessage = stringResource(id = R.string.empty_text_field_error_message)
+  val subjectErrorMessage = stringResource(id = R.string.subject_error)
+  val passwordErrorMessage = stringResource(id = R.string.password_error)
+  val emptyTextFieldErrorMessage = stringResource(id = R.string.empty_text_field_error)
 
   val focusRequester = remember { FocusRequester() }
 

@@ -1,7 +1,7 @@
 package com.kenkoro.taurus.client.feature.sewing.data.util
 
 object Urls {
-  private const val HOST = "10.10.18.187"
+  private const val HOST = "10.10.234.96"
   private const val PROTOCOL = "http"
   private const val PORT = 8080
   private const val URL = "$PROTOCOL://$HOST:$PORT"

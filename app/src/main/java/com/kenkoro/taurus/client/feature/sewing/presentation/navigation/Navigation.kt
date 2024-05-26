@@ -60,7 +60,7 @@ fun AppNavHost(
         onUser = userViewModel::user,
         ordersFlow = orderViewModel.orderPagingFlow,
         loginState = loginViewModel.loginState,
-        onLoginResult = loginViewModel::loginResult,
+        onLoginState = loginViewModel::loginState,
         onAddNewUserLocally = userViewModel::addNewUserLocally,
         onAddNewOrderLocally = orderViewModel::addNewOrderLocally,
         onDeleteOrderLocally = orderViewModel::deleteOrderLocally,
@@ -84,7 +84,7 @@ fun AppNavHost(
       ProfileScreen(
         onDeleteAllCredentials = orderViewModel::deleteAllCredentials,
         onNavigateToLoginScreen = { navController.navigate(Screen.LoginScreen.route) },
-        onLoginResult = loginViewModel::loginResult,
+        onLoginResult = loginViewModel::loginState,
       )
     }
   }

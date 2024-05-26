@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
@@ -23,21 +24,23 @@ import java.util.UUID
 
 @Composable
 fun LazyOrdersColumn(
+  modifier: Modifier = Modifier,
+  networkStatus: NetworkStatus,
   profile: UserProfile,
   orders: LazyPagingItems<Order>,
+  lazyOrdersState: LazyListState,
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
   onEditOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
   onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
   onDeleteOrderShowSnackbar: suspend () -> SnackbarResult,
-  networkStatus: NetworkStatus,
-  modifier: Modifier = Modifier,
 ) {
   val strokeWidth = LocalStrokeWidth.current
   val contentHeight = LocalContentHeight.current
 
   LazyColumn(
+    state = lazyOrdersState,
     modifier = modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top,

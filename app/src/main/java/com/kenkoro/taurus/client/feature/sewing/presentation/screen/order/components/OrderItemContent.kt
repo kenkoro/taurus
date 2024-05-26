@@ -1,26 +1,37 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
-import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.OrderStatus
 
 @Composable
 fun OrderItemContent(
@@ -31,7 +42,16 @@ fun OrderItemContent(
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
 
-  Spacer(modifier = Modifier.height(contentHeight.large))
+  val animatedRotationOfKeyboardArrow by animateFloatAsState(
+    targetValue =
+      if (clicked) {
+        -180F
+      } else {
+        0F
+      },
+    label = "AnimatedRotationOfKeyboardArrow",
+  )
+
   Row(
     modifier = Modifier.fillMaxWidth(),
     verticalAlignment = Alignment.CenterVertically,
@@ -63,18 +83,26 @@ fun OrderItemContent(
       }
     }
 
-    val orderStatus =
-      when (order.status) {
-        OrderStatus.Idle -> stringResource(id = R.string.order_status_idle)
-        OrderStatus.Cut -> stringResource(id = R.string.order_status_cut)
-        OrderStatus.Checked -> stringResource(id = R.string.order_status_checked)
-      }
     Row(
       modifier = Modifier.fillMaxWidth(),
       horizontalArrangement = Arrangement.End,
     ) {
-      Text(text = orderStatus, color = MaterialTheme.colorScheme.onPrimaryContainer)
-      Spacer(modifier = Modifier.width(contentWidth.large))
+      Box(
+        modifier =
+          Modifier
+            .size(25.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primary),
+        contentAlignment = Alignment.Center,
+      ) {
+        Icon(
+          imageVector = Icons.Default.KeyboardArrowDown,
+          contentDescription = "ExpandOrderItemIcon",
+          tint = MaterialTheme.colorScheme.onPrimary,
+          modifier = Modifier.rotate(animatedRotationOfKeyboardArrow),
+        )
+      }
+      Spacer(modifier = Modifier.width(contentWidth.orderItemButtonToExpand))
     }
   }
 

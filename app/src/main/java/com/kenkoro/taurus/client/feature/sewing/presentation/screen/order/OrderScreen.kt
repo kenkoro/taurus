@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -29,7 +30,8 @@ import com.kenkoro.taurus.client.feature.sewing.domain.model.NewOrder
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.OrderStatus
-import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile
+import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Other
+import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Tailor
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderBottomBar
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderTopBar
@@ -45,7 +47,7 @@ fun OrderScreen(
   onUser: (User) -> Unit,
   ordersFlow: Flow<PagingData<Order>>,
   loginState: LoginState,
-  onLoginResult: (LoginState) -> Unit,
+  onLoginState: (LoginState) -> Unit,
   onAddNewUserLocally: suspend (UserEntity) -> Unit,
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
@@ -70,9 +72,12 @@ fun OrderScreen(
   val paginatedOrdersErrorMessage = stringResource(id = R.string.paginated_orders_error)
   val loginErrorMessage = stringResource(id = R.string.login_fail)
   val notImplementedYetMessage = stringResource(id = R.string.not_implemented_yet)
+  val orderAccessErrorMessage = stringResource(id = R.string.orders_access_error)
 
   val cancelOrderDeletionLabel = stringResource(id = R.string.cancel)
   val okActionLabel = stringResource(id = R.string.ok)
+
+  val lazyOrdersState = rememberLazyListState()
 
   AppTheme {
     Scaffold(
@@ -102,34 +107,41 @@ fun OrderScreen(
           .statusBarsPadding()
           .navigationBarsPadding(),
       topBar = {
-        OrderTopBar(
-          onSortOrdersShowSnackbar = {
-            snackbarHostState.showSnackbar(
-              message = notImplementedYetMessage,
-              actionLabel = okActionLabel,
-            )
-          },
-          onFilterOrdersShowSnackbar = {
-            snackbarHostState.showSnackbar(
-              message = notImplementedYetMessage,
-              actionLabel = okActionLabel,
-            )
-          },
-          onNavigateToProfileScreen = onNavigateToProfileScreen,
-          networkStatus = networkStatus,
-        )
+        if (!lazyOrdersState.isScrollInProgress) {
+          OrderTopBar(
+            onSortOrdersShowSnackbar = {
+              snackbarHostState.showSnackbar(
+                message = notImplementedYetMessage,
+                actionLabel = okActionLabel,
+              )
+            },
+            onFilterOrdersShowSnackbar = {
+              snackbarHostState.showSnackbar(
+                message = notImplementedYetMessage,
+                actionLabel = okActionLabel,
+              )
+            },
+            onNavigateToProfileScreen = onNavigateToProfileScreen,
+            networkStatus = networkStatus,
+          )
+        }
       },
       bottomBar = {
         // TODO: onAddNewOrderRemotely callback
-        OrderBottomBar(
-          onAddNewOrderShowSnackbar = {
-            snackbarHostState.showSnackbar(
-              message = notImplementedYetMessage,
-              actionLabel = okActionLabel,
+        val userProfile = user?.profile ?: Other
+        if (userProfile != Tailor && userProfile != Other) {
+          if (!lazyOrdersState.isScrollInProgress) {
+            OrderBottomBar(
+              onAddNewOrderShowSnackbar = {
+                snackbarHostState.showSnackbar(
+                  message = notImplementedYetMessage,
+                  actionLabel = okActionLabel,
+                )
+              },
+              networkStatus = networkStatus,
             )
-          },
-          networkStatus = networkStatus,
-        )
+          }
+        }
       },
       content = {
         Surface(
@@ -140,11 +152,13 @@ fun OrderScreen(
               .padding(it),
         ) {
           OrderContent(
+            networkStatus = networkStatus,
             user = user,
             onUser = onUser,
             ordersFlow = ordersFlow,
             loginState = loginState,
-            onLoginResult = onLoginResult,
+            lazyOrdersState = lazyOrdersState,
+            onLoginState = onLoginState,
             onAddNewUserLocally = onAddNewUserLocally,
             onAddNewOrderLocally = onAddNewOrderLocally,
             onDeleteOrderLocally = onDeleteOrderLocally,
@@ -178,10 +192,15 @@ fun OrderScreen(
                 actionLabel = okActionLabel,
               )
             },
+            onOrderAccessErrorShowSnackbar = {
+              errorSnackbarHostState.showSnackbar(
+                message = orderAccessErrorMessage,
+                actionLabel = okActionLabel,
+              )
+            },
             onEncryptToken = onEncryptToken,
             onDecryptSubjectAndPassword = onDecryptSubjectAndPassword,
             onDecryptToken = onDecryptToken,
-            networkStatus = networkStatus,
           )
         }
       },
@@ -230,7 +249,7 @@ private fun OrderScreenPrev() {
       firstName = "FirstName",
       lastName = "LastName",
       email = "Email",
-      profile = UserProfile.Other,
+      profile = Other,
       salt = "Salt",
     )
 
@@ -240,7 +259,7 @@ private fun OrderScreenPrev() {
       onUser = {},
       ordersFlow = ordersFlow,
       loginState = LoginState.Success,
-      onLoginResult = {},
+      onLoginState = {},
       onAddNewUserLocally = { _ -> },
       onDeleteOrderLocally = { _ -> },
       onAddNewOrderLocally = { _ -> },
