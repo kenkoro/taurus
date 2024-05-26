@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -8,7 +9,12 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +27,7 @@ import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.S
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.TaurusTextFieldState
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
@@ -32,6 +39,7 @@ fun LoginScreen(
   onEncryptAll: (String, String, String) -> Unit,
   onNavigateToOrderScreen: () -> Unit,
   onExit: () -> Unit = {},
+  onShowErrorTitle: () -> Boolean = { false },
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
@@ -41,6 +49,15 @@ fun LoginScreen(
   val requestErrorMessage = stringResource(id = R.string.request_error)
 
   val okActionLabel = stringResource(id = R.string.ok)
+
+  var visible by rememberSaveable {
+    mutableStateOf(false)
+  }
+
+  LaunchedEffect(Unit) {
+    delay(100L)
+    visible = true
+  }
 
   AppTheme {
     Scaffold(
@@ -72,28 +89,31 @@ fun LoginScreen(
               .fillMaxSize()
               .padding(it),
         ) {
-          LoginContent(
-            networkStatus = networkStatus,
-            subject = subject,
-            password = password,
-            onSetErrorMessages = onSetErrorMessages,
-            onLogin = onLogin,
-            onEncryptAll = onEncryptAll,
-            onNavigateToOrderScreen = onNavigateToOrderScreen,
-            onExit = onExit,
-            onInternetConnectionErrorShowSnackbar = {
-              internetSnackbarHostState.showSnackbar(
-                message = internetConnectionErrorMessage,
-                duration = SnackbarDuration.Indefinite,
-              )
-            },
-            onLoginErrorShowSnackbar = {
-              errorSnackbarHostState.showSnackbar(
-                message = requestErrorMessage,
-                actionLabel = okActionLabel,
-              )
-            },
-          )
+          AnimatedVisibility(visible = visible) {
+            LoginContent(
+              networkStatus = networkStatus,
+              subject = subject,
+              password = password,
+              onSetErrorMessages = onSetErrorMessages,
+              onLogin = onLogin,
+              onEncryptAll = onEncryptAll,
+              onNavigateToOrderScreen = onNavigateToOrderScreen,
+              onExit = onExit,
+              onInternetConnectionErrorShowSnackbar = {
+                internetSnackbarHostState.showSnackbar(
+                  message = internetConnectionErrorMessage,
+                  duration = SnackbarDuration.Indefinite,
+                )
+              },
+              onLoginErrorShowSnackbar = {
+                errorSnackbarHostState.showSnackbar(
+                  message = requestErrorMessage,
+                  actionLabel = okActionLabel,
+                )
+              },
+              onShowErrorTitle = onShowErrorTitle,
+            )
+          }
         }
       },
     )

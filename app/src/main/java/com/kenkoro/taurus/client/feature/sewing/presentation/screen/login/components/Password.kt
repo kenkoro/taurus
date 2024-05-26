@@ -10,9 +10,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Backspace
 import androidx.compose.material.icons.automirrored.outlined.Rule
-import androidx.compose.material.icons.automirrored.outlined.Wysiwyg
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.KeyOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -92,16 +93,24 @@ fun Password(
     trailingIcon = {
       Row {
         IconButton(onClick = { isHidden = !isHidden }) {
+          val imageVector =
+            if (isHidden) {
+              Icons.Default.KeyOff
+            } else {
+              Icons.Default.Key
+            }
           Icon(
-            imageVector = Icons.AutoMirrored.Outlined.Wysiwyg,
+            imageVector = imageVector,
             contentDescription = "ShowPasswordIcon",
           )
         }
-        IconButton(onClick = onClearPassword) {
-          Icon(
-            imageVector = Icons.AutoMirrored.Outlined.Backspace,
-            contentDescription = "ClearPasswordIcon",
-          )
+        if (passwordState.text.isNotEmpty()) {
+          IconButton(onClick = onClearPassword) {
+            Icon(
+              imageVector = Icons.Default.Close,
+              contentDescription = "ClearPasswordIcon",
+            )
+          }
         }
         Spacer(modifier = Modifier.width(contentWidth.small))
       }

@@ -50,6 +50,7 @@ fun AppNavHost(
         onEncryptAll = loginViewModel::encryptAll,
         onNavigateToOrderScreen = { navController.navigate(Screen.OrderScreen.route) },
         onExit = onExit,
+        onShowErrorTitle = loginViewModel::showErrorTitle,
       )
     }
 

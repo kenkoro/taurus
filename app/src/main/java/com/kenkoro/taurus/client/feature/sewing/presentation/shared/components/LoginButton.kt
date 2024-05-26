@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,17 +27,20 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
+import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun LoginButton(
   modifier: Modifier = Modifier,
+  isLogging: Boolean = false,
+  isError: Boolean = false,
   isLoginButtonEnable: () -> Boolean = { true },
   onSubmit: () -> Unit = {},
   onExit: () -> Unit = {},
-  isError: Boolean = false,
 ) {
   val shape = LocalShape.current
+  val strokeWidth = LocalStrokeWidth.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
 
@@ -102,10 +107,18 @@ fun LoginButton(
       ) {
         Text(text = stringResource(id = R.string.continue_button))
         Spacer(modifier = Modifier.width(contentWidth.medium))
-        Icon(
-          imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
-          contentDescription = "IconForLoginButton",
-        )
+        if (isLogging) {
+          CircularProgressIndicator(
+            strokeWidth = strokeWidth.small,
+            modifier = Modifier.size(15.dp),
+            color = MaterialTheme.colorScheme.onPrimary,
+          )
+        } else {
+          Icon(
+            imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
+            contentDescription = "IconForLoginButton",
+          )
+        }
       }
     }
   }

@@ -14,9 +14,11 @@ import com.kenkoro.taurus.client.core.local.LocalArrangement
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalElevation
+import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.core.local.LocalPadding
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
+import com.kenkoro.taurus.client.core.local.Offset
 import com.kenkoro.taurus.client.core.local.Padding
 import com.kenkoro.taurus.client.core.local.Shape
 import com.kenkoro.taurus.client.core.local.StrokeWidth
@@ -109,6 +111,7 @@ fun AppTheme(
     LocalArrangement provides Arrangement(),
     LocalPadding provides Padding(),
     LocalStrokeWidth provides StrokeWidth(),
+    LocalOffset provides Offset(),
   ) {
     MaterialTheme(
       colorScheme = colors,

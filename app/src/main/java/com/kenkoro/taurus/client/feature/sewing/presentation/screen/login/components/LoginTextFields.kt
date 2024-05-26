@@ -19,10 +19,10 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
+import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.PasswordState
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.util.SubjectState
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.TaurusTextFieldState
@@ -34,12 +34,15 @@ fun LoginTextFields(
   networkStatus: NetworkStatus,
   subject: SubjectState,
   password: PasswordState,
+  isLogging: Boolean,
   onSetErrorMessages: (TaurusTextFieldState, String, String) -> Unit,
   onLoginSubmitted: (subject: String, password: String) -> Unit,
   onExit: () -> Unit = {},
+  onShowErrorTitle: () -> Boolean = { false },
 ) {
-  val contentHeight = LocalContentHeight.current
+  val offset = LocalOffset.current
   val focusManager = LocalFocusManager.current
+  val contentHeight = LocalContentHeight.current
 
   val subjectErrorMessage = stringResource(id = R.string.subject_error_message)
   val passwordErrorMessage = stringResource(id = R.string.password_error_message)
@@ -49,45 +52,44 @@ fun LoginTextFields(
 
   onSetErrorMessages(subject, subjectErrorMessage, emptyTextFieldErrorMessage)
   onSetErrorMessages(password, passwordErrorMessage, emptyTextFieldErrorMessage)
-  val showErrorTitle = {
-    subject.showErrors() || password.showErrors()
-  }
-  val titleColor = @Composable {
-    if (showErrorTitle()) {
-      MaterialTheme.colorScheme.error
-    } else {
-      LocalContentColor.current
-    }
-  }
+
   val isSubjectInvalidWhilePasswordIsFocused = { !subject.isValid && password.isFocused }
   val isSubjectInvalidWhilePasswordIsNotFocused = { !subject.isValid && !password.isFocused }
   val isPasswordInvalidWhileNoFocus =
     { !password.isValid && !password.isFocused && !subject.isFocused }
-  val areNotFocusedAtAllAtTheStart = { !subject.isFocusedOnce && !password.isFocusedOnce }
+  val areNotFocusedAtAllFromTheBeginning = { !subject.isFocusedOnce && !password.isFocusedOnce }
   val onSubmit = {
     if (subject.isValid && password.isValid) {
-      onLoginSubmitted(subject.text, password.text)
       focusManager.clearFocus()
+      onLoginSubmitted(subject.text, password.text)
     }
 
     if (isSubjectInvalidWhilePasswordIsFocused() || isPasswordInvalidWhileNoFocus()) {
       focusManager.moveFocus(FocusDirection.Up)
     }
 
-    if (isSubjectInvalidWhilePasswordIsNotFocused() || areNotFocusedAtAllAtTheStart()) {
+    if (isSubjectInvalidWhilePasswordIsNotFocused() || areNotFocusedAtAllFromTheBeginning()) {
       focusRequester.requestFocus()
       focusManager.moveFocus(FocusDirection.Up)
     }
   }
   val isLoginButtonEnable = { networkStatus == NetworkStatus.Available }
+
   val yTargetValue = {
     if (subject.isFocused || password.isFocused) {
-      (-30).dp
+      offset.loginContentIsFocused
     } else {
-      50.dp
+      offset.none
     }
   }
-  val y by animateDpAsState(targetValue = yTargetValue(), label = "")
+  val y by animateDpAsState(targetValue = yTargetValue(), label = "AnimatedYOffset")
+  val titleColor = @Composable {
+    if (onShowErrorTitle()) {
+      MaterialTheme.colorScheme.error
+    } else {
+      LocalContentColor.current
+    }
+  }
 
   Column(
     modifier = modifier.offset(y = y),
@@ -113,9 +115,10 @@ fun LoginTextFields(
     Spacer(modifier = Modifier.height(contentHeight.medium))
     LoginButton(
       isLoginButtonEnable = isLoginButtonEnable,
+      isLogging = isLogging,
+      isError = subject.showErrors() || password.showErrors(),
       onSubmit = onSubmit,
       onExit = onExit,
-      isError = subject.showErrors() || password.showErrors(),
     )
   }
 }

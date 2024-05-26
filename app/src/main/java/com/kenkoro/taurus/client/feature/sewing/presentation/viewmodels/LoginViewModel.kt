@@ -46,8 +46,8 @@ class LoginViewModel
     }
 
     suspend fun login(
-      subject: String,
-      password: String,
+      subject: String = this.subject.text,
+      password: String = this.password.text,
     ): Result<TokenDto> =
       loginRepository.login(
         LoginDto(
@@ -71,5 +71,9 @@ class LoginViewModel
         decryptedCredentialService.storedSubject(),
         decryptedCredentialService.storedPassword(),
       )
+    }
+
+    fun showErrorTitle(): Boolean {
+      return subject.showErrors() || password.showErrors()
     }
   }

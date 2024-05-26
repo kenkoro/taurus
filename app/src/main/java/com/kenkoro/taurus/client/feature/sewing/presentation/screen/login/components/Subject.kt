@@ -10,8 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Backspace
 import androidx.compose.material.icons.automirrored.twotone.Login
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -82,13 +82,15 @@ fun Subject(
     },
     trailingIcon = {
       Row {
-        IconButton(onClick = onClearSubject) {
-          Icon(
-            imageVector = Icons.AutoMirrored.Outlined.Backspace,
-            contentDescription = "SubjectTrailingIcon",
-          )
+        if (subjectState.text.isNotEmpty()) {
+          IconButton(onClick = onClearSubject) {
+            Icon(
+              imageVector = Icons.Default.Close,
+              contentDescription = "SubjectTrailingIcon",
+            )
+          }
+          Spacer(modifier = Modifier.width(contentWidth.small))
         }
-        Spacer(modifier = Modifier.width(contentWidth.small))
       }
     },
     placeholder = {

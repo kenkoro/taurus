@@ -1,25 +1,23 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.screen.login.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
-import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.TokenDto
@@ -43,22 +41,22 @@ fun LoginContent(
   onExit: () -> Unit = {},
   onInternetConnectionErrorShowSnackbar: suspend () -> SnackbarResult,
   onLoginErrorShowSnackbar: suspend () -> SnackbarResult,
+  onShowErrorTitle: () -> Boolean = { false },
 ) {
   val contentWidth = LocalContentWidth.current
-  val contentHeight = LocalContentWidth.current
   val focusManager = LocalFocusManager.current
 
   val scope = rememberCoroutineScope()
   val interactionSource = remember { MutableInteractionSource() }
+  var isLogging by rememberSaveable {
+    mutableStateOf(false)
+  }
 
   Column(
     modifier =
       modifier
         .fillMaxSize()
-        .clickable(
-          interactionSource = interactionSource,
-          indication = null,
-        ) {
+        .clickable(interactionSource = interactionSource, indication = null) {
           focusManager.clearFocus()
         },
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -69,7 +67,7 @@ fun LoginContent(
     }
 
     Column(
-      modifier = Modifier.weight(1F),
+      modifier = Modifier.fillMaxSize(),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -78,10 +76,14 @@ fun LoginContent(
         networkStatus = networkStatus,
         subject = subject,
         password = password,
+        isLogging = isLogging,
         onSetErrorMessages = onSetErrorMessages,
         onLoginSubmitted = { subject, password ->
           scope.launch(Dispatchers.IO) {
+            isLogging = true
             val result = onLogin(subject, password)
+            isLogging = false
+
             result.onSuccess {
               onEncryptAll(subject, password, it.token)
               withContext(Dispatchers.Main) { onNavigateToOrderScreen() }
@@ -91,21 +93,7 @@ fun LoginContent(
           }
         },
         onExit = onExit,
-      )
-    }
-    Box(
-      modifier = Modifier.height(contentHeight.halfStandard),
-      contentAlignment = Alignment.BottomCenter,
-    ) {
-      val logoId =
-        if (isSystemInDarkTheme()) {
-          R.drawable.ic_splashscreen_night_foreground
-        } else {
-          R.drawable.ic_splashscreen_foreground
-        }
-      Image(
-        painter = painterResource(id = logoId),
-        contentDescription = "TaurusLogoOnLoginForm",
+        onShowErrorTitle = onShowErrorTitle,
       )
     }
   }

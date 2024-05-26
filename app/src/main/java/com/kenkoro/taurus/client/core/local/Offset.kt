@@ -4,9 +4,9 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-data class StrokeWidth(
-  val standard: Dp = 4.dp,
-  val small: Dp = 2.dp,
+data class Offset(
+  val loginContentIsFocused: Dp = (-80).dp,
+  val none: Dp = 0.dp,
 )
 
-val LocalStrokeWidth = compositionLocalOf { StrokeWidth() }
+val LocalOffset = compositionLocalOf { Offset() }
