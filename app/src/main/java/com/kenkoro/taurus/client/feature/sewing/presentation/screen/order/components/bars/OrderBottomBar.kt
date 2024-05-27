@@ -1,5 +1,6 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.bars
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,20 +32,31 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun OrderBottomBar(
-  onAddNewOrderShowSnackbar: suspend () -> SnackbarResult,
-  networkStatus: NetworkStatus,
   modifier: Modifier = Modifier,
+  networkStatus: NetworkStatus,
+  isScrollingInProgress: Boolean = false,
+  onAddNewOrderShowSnackbar: suspend () -> SnackbarResult,
 ) {
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
   val scope = rememberCoroutineScope()
 
+  val animatedHeight by animateDpAsState(
+    targetValue =
+      if (isScrollingInProgress) {
+        contentHeight.none
+      } else {
+        contentHeight.bottomBar
+      },
+    label = "AnimatedHeight",
+  )
+
   Column(
     modifier =
       modifier
         .fillMaxWidth()
-        .height(contentHeight.standard),
+        .height(animatedHeight),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {

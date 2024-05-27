@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.item.order
 
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable

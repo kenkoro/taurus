@@ -19,7 +19,6 @@ import com.kenkoro.taurus.client.feature.sewing.domain.model.NewOrder
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Other
-import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Tailor
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.util.LoginState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -34,6 +33,8 @@ fun OrderContent(
   ordersFlow: Flow<PagingData<Order>>,
   loginState: LoginState,
   lazyOrdersState: LazyListState,
+  selectedOrderRecordId: Int? = null,
+  onSelectOrder: (Int?) -> Unit = {},
   onLoginState: (LoginState) -> Unit,
   onAddNewUserLocally: suspend (UserEntity) -> Unit,
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
@@ -87,25 +88,23 @@ fun OrderContent(
   }
 
   if (loginState == LoginState.Success) {
-    // TODO: Remove this to LazyOrdersContent
     val userProfile = user?.profile ?: Other
-    if (userProfile == Tailor || userProfile == Other) {
-      LaunchedEffect(Unit, Dispatchers.Main) { onOrderAccessErrorShowSnackbar() }
-    } else {
-      val orders = ordersFlow.collectAsLazyPagingItems()
-      LazyOrdersContent(
-        networkStatus = networkStatus,
-        profile = userProfile,
-        orders = orders,
-        lazyOrdersState = lazyOrdersState,
-        onAddNewOrderLocally = onAddNewOrderLocally,
-        onDeleteOrderLocally = onDeleteOrderLocally,
-        onEditOrderLocally = onEditOrderLocally,
-        onEditOrderRemotely = onEditOrderRemotely,
-        onDeleteOrderRemotely = onDeleteOrderRemotely,
-        onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
-        onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,
-      )
-    }
+    val orders = ordersFlow.collectAsLazyPagingItems()
+    LazyOrdersContent(
+      networkStatus = networkStatus,
+      userProfile = userProfile,
+      orders = orders,
+      lazyOrdersState = lazyOrdersState,
+      selectedOrderRecordId = selectedOrderRecordId,
+      onSelectOrder = onSelectOrder,
+      onAddNewOrderLocally = onAddNewOrderLocally,
+      onDeleteOrderLocally = onDeleteOrderLocally,
+      onEditOrderLocally = onEditOrderLocally,
+      onEditOrderRemotely = onEditOrderRemotely,
+      onDeleteOrderRemotely = onDeleteOrderRemotely,
+      onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
+      onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,
+      onOrderAccessErrorShowSnackbar = onOrderAccessErrorShowSnackbar,
+    )
   }
 }

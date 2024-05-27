@@ -32,9 +32,9 @@ import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.OrderStatus
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Other
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Tailor
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderBottomBar
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderContent
-import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.OrderTopBar
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.bars.OrderBottomBar
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.bars.OrderTopBar
 import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.util.LoginState
 import com.kenkoro.taurus.client.feature.sewing.presentation.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
@@ -47,6 +47,9 @@ fun OrderScreen(
   onUser: (User) -> Unit,
   ordersFlow: Flow<PagingData<Order>>,
   loginState: LoginState,
+  networkStatus: NetworkStatus,
+  selectedOrderRecordId: Int? = null,
+  onSelectOrder: (Int?) -> Unit = {},
   onLoginState: (LoginState) -> Unit,
   onAddNewUserLocally: suspend (UserEntity) -> Unit,
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
@@ -61,7 +64,6 @@ fun OrderScreen(
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
   onDecryptToken: () -> String,
   onNavigateToProfileScreen: () -> Unit,
-  networkStatus: NetworkStatus,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
@@ -107,49 +109,47 @@ fun OrderScreen(
           .statusBarsPadding()
           .navigationBarsPadding(),
       topBar = {
-        if (!lazyOrdersState.isScrollInProgress) {
-          OrderTopBar(
-            onSortOrdersShowSnackbar = {
-              snackbarHostState.showSnackbar(
-                message = notImplementedYetMessage,
-                actionLabel = okActionLabel,
-              )
-            },
-            onFilterOrdersShowSnackbar = {
-              snackbarHostState.showSnackbar(
-                message = notImplementedYetMessage,
-                actionLabel = okActionLabel,
-              )
-            },
-            onNavigateToProfileScreen = onNavigateToProfileScreen,
-            networkStatus = networkStatus,
-          )
-        }
+        OrderTopBar(
+          networkStatus = networkStatus,
+          isScrollingInProgress = lazyOrdersState.isScrollInProgress,
+          onSortOrdersShowSnackbar = {
+            snackbarHostState.showSnackbar(
+              message = notImplementedYetMessage,
+              actionLabel = okActionLabel,
+            )
+          },
+          onFilterOrdersShowSnackbar = {
+            snackbarHostState.showSnackbar(
+              message = notImplementedYetMessage,
+              actionLabel = okActionLabel,
+            )
+          },
+          onNavigateToProfileScreen = onNavigateToProfileScreen,
+        )
       },
       bottomBar = {
         // TODO: onAddNewOrderRemotely callback
         val userProfile = user?.profile ?: Other
         if (userProfile != Tailor && userProfile != Other) {
-          if (!lazyOrdersState.isScrollInProgress) {
-            OrderBottomBar(
-              onAddNewOrderShowSnackbar = {
-                snackbarHostState.showSnackbar(
-                  message = notImplementedYetMessage,
-                  actionLabel = okActionLabel,
-                )
-              },
-              networkStatus = networkStatus,
-            )
-          }
+          OrderBottomBar(
+            networkStatus = networkStatus,
+            isScrollingInProgress = lazyOrdersState.isScrollInProgress,
+            onAddNewOrderShowSnackbar = {
+              snackbarHostState.showSnackbar(
+                message = notImplementedYetMessage,
+                actionLabel = okActionLabel,
+              )
+            },
+          )
         }
       },
-      content = {
+      content = { paddingValues ->
         Surface(
           modifier =
             Modifier
               .fillMaxSize()
               .background(MaterialTheme.colorScheme.background)
-              .padding(it),
+              .padding(paddingValues),
         ) {
           OrderContent(
             networkStatus = networkStatus,
@@ -158,6 +158,8 @@ fun OrderScreen(
             ordersFlow = ordersFlow,
             loginState = loginState,
             lazyOrdersState = lazyOrdersState,
+            selectedOrderRecordId = selectedOrderRecordId,
+            onSelectOrder = onSelectOrder,
             onLoginState = onLoginState,
             onAddNewUserLocally = onAddNewUserLocally,
             onAddNewOrderLocally = onAddNewOrderLocally,

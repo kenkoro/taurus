@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.item.order
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
@@ -37,34 +37,35 @@ import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Admin
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Ceo
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Manager
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.allowedToSeeOrders
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderItem(
+  modifier: Modifier = Modifier,
   order: Order,
   profile: UserProfile,
+  networkStatus: NetworkStatus,
+  selectedOrderRecordId: Int? = null,
+  onSelectOrder: (Int?) -> Unit = {},
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
   onEditOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
   onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
   onDeleteOrderShowSnackbar: suspend () -> SnackbarResult,
-  networkStatus: NetworkStatus,
-  modifier: Modifier = Modifier,
 ) {
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
 
-  var clicked by rememberSaveable {
-    mutableStateOf(false)
-  }
   var visible by rememberSaveable {
     mutableStateOf(true)
   }
+  val selected = { selectedOrderRecordId == order.recordId }
   val animatedHeight by animateDpAsState(
     targetValue =
-      if (clicked) {
+      if (selected()) {
         if (allowedToUpdateOrderStatus(profile)) {
           contentHeight.orderItemExpanded
         } else {
@@ -87,7 +88,13 @@ fun OrderItem(
             .height(animatedHeight)
             .clip(RoundedCornerShape(shape.medium))
             .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable { clicked = !clicked },
+            .clickable {
+              if (selected()) {
+                onSelectOrder(null)
+              } else {
+                onSelectOrder(order.recordId)
+              }
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
       ) {
@@ -102,12 +109,12 @@ fun OrderItem(
           Spacer(modifier = Modifier.height(contentHeight.large))
           OrderItemContent(
             order = order,
-            clicked = clicked,
+            clicked = selected(),
           )
           Spacer(modifier = Modifier.height(contentHeight.large))
         }
 
-        if (allowedToUpdateOrderStatus(profile) && clicked) {
+        if (allowedToUpdateOrderStatus(profile) && selected()) {
           Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,

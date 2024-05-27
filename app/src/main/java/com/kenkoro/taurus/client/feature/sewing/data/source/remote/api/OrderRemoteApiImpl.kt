@@ -17,7 +17,6 @@ import io.ktor.client.request.url
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.http.parameters
 
 class OrderRemoteApiException(message: String) : Exception(message)
 
@@ -55,12 +54,8 @@ class OrderRemoteApiImpl(
     token: String,
   ): PaginatedOrdersDto =
     client.get {
-      url(Urls.GET_PAGINATED_ORDERS)
+      url(Urls.GET_PAGINATED_ORDERS + "?page=$page&per_page=$perPage")
       contentType(ContentType.Application.Json)
-      parameters {
-        append("page", page.toString())
-        append("per_page", perPage.toString())
-      }
       headers {
         append("Authorization", "Bearer $token")
       }
@@ -74,13 +69,9 @@ class OrderRemoteApiImpl(
   ): HttpStatusCode {
     val status =
       client.put {
-        url(Urls.EDIT_ORDER)
+        url(Urls.EDIT_ORDER + "?order_id=$orderId&editor_subject=$editorSubject")
         contentType(ContentType.Application.Json)
         setBody(dto)
-        parameters {
-          append("order_id", orderId.toString())
-          append("editor_subject", editorSubject)
-        }
         headers {
           append("Authorization", "Bearer $token")
         }

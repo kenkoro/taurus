@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.CircularProgressIndicator
@@ -11,6 +12,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
@@ -20,15 +22,18 @@ import com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto.NewOrderD
 import com.kenkoro.taurus.client.feature.sewing.domain.model.NewOrder
 import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile
+import com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.item.order.OrderItem
 import java.util.UUID
 
 @Composable
 fun LazyOrdersColumn(
   modifier: Modifier = Modifier,
   networkStatus: NetworkStatus,
-  profile: UserProfile,
+  userProfile: UserProfile,
   orders: LazyPagingItems<Order>,
   lazyOrdersState: LazyListState,
+  selectedOrderRecordId: Int? = null,
+  onSelectOrder: (Int?) -> Unit = {},
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
   onEditOrderLocally: suspend (NewOrder) -> Unit,
@@ -55,25 +60,33 @@ fun LazyOrdersColumn(
       val order = orders[index]
       if (order != null) {
         OrderItem(
-          profile = profile,
+          profile = userProfile,
           order = order,
+          networkStatus = networkStatus,
+          selectedOrderRecordId = selectedOrderRecordId,
+          onSelectOrder = onSelectOrder,
           onAddNewOrderLocally = onAddNewOrderLocally,
           onDeleteOrderLocally = onDeleteOrderLocally,
           onEditOrderLocally = onEditOrderLocally,
           onEditOrderRemotely = onEditOrderRemotely,
           onDeleteOrderRemotely = onDeleteOrderRemotely,
           onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
-          networkStatus = networkStatus,
         )
       }
     }
     item {
+      Spacer(modifier = Modifier.height(contentHeight.large))
+    }
+    item {
       if (orders.loadState.append is LoadState.Loading) {
-        CircularProgressIndicator(strokeWidth = strokeWidth.standard)
+        CircularProgressIndicator(
+          modifier = Modifier.size(20.dp),
+          strokeWidth = strokeWidth.standard,
+        )
       }
     }
     item {
-      Spacer(modifier = Modifier.height(contentHeight.large))
+      Spacer(modifier = Modifier.height(contentHeight.bottomBar))
     }
   }
 }

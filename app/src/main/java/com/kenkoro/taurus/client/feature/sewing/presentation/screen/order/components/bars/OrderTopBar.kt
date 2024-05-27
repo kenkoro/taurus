@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.bars
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,11 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +42,7 @@ import kotlinx.coroutines.launch
 fun OrderTopBar(
   modifier: Modifier = Modifier,
   networkStatus: NetworkStatus,
+  isScrollingInProgress: Boolean = false,
   onFilterOrdersShowSnackbar: suspend () -> SnackbarResult,
   onSortOrdersShowSnackbar: suspend () -> SnackbarResult,
   onNavigateToProfileScreen: () -> Unit,
@@ -53,14 +50,6 @@ fun OrderTopBar(
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
   val scope = rememberCoroutineScope()
-
-  val selectCustomerText = stringResource(id = R.string.all_orders)
-  var expanded by rememberSaveable {
-    mutableStateOf(false)
-  }
-  val customer by rememberSaveable {
-    mutableStateOf(selectCustomerText)
-  }
 
   Row(
     modifier =

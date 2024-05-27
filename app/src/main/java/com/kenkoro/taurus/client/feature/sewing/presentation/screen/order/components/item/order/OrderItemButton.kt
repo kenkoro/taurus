@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components
+package com.kenkoro.taurus.client.feature.sewing.presentation.screen.order.components.item.order
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size

@@ -14,14 +14,17 @@ import com.kenkoro.taurus.client.feature.sewing.domain.model.Order
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Other
 import com.kenkoro.taurus.client.feature.sewing.domain.model.enums.UserProfile.Tailor
+import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun LazyOrdersContent(
   modifier: Modifier = Modifier,
   networkStatus: NetworkStatus,
-  profile: UserProfile,
+  userProfile: UserProfile,
   orders: LazyPagingItems<Order>,
   lazyOrdersState: LazyListState,
+  selectedOrderRecordId: Int? = null,
+  onSelectOrder: (Int?) -> Unit = {},
   onAddNewOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderLocally: suspend (Order) -> Unit,
   onEditOrderLocally: suspend (NewOrder) -> Unit,
@@ -29,17 +32,24 @@ fun LazyOrdersContent(
   onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
   onDeleteOrderShowSnackbar: suspend () -> SnackbarResult,
   onAppendNewOrdersErrorShowSnackbar: suspend () -> SnackbarResult,
+  onOrderAccessErrorShowSnackbar: suspend () -> SnackbarResult,
 ) {
   if (orders.loadState.append is LoadState.Error) {
     LaunchedEffect(Unit) { onAppendNewOrdersErrorShowSnackbar() }
   }
 
-  if (allowedToSeeOrders(profile)) {
+  if (userProfile == Tailor || userProfile == Other) {
+    LaunchedEffect(Unit, Dispatchers.Main) { onOrderAccessErrorShowSnackbar() }
+  }
+
+  if (allowedToSeeOrders(userProfile)) {
     LazyOrdersColumn(
       networkStatus = networkStatus,
-      profile = profile,
+      userProfile = userProfile,
       orders = orders,
       lazyOrdersState = lazyOrdersState,
+      selectedOrderRecordId = selectedOrderRecordId,
+      onSelectOrder = onSelectOrder,
       onAddNewOrderLocally = onAddNewOrderLocally,
       onDeleteOrderLocally = onDeleteOrderLocally,
       onEditOrderLocally = onEditOrderLocally,

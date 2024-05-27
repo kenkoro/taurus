@@ -1,5 +1,8 @@
 package com.kenkoro.taurus.client.feature.sewing.presentation.viewmodels
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -43,6 +46,13 @@ class OrderViewModel
         }
         .flowOn(Dispatchers.IO)
         .cachedIn(viewModelScope)
+
+    var selectOrderRecordId by mutableStateOf<Int?>(null)
+      private set
+
+    fun onSelectOrder(selectedOrderRecordId: Int?) {
+      this.selectOrderRecordId = selectedOrderRecordId
+    }
 
     suspend fun deleteOrderLocally(order: Order) {
       localDb.withTransaction {
