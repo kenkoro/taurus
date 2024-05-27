@@ -17,7 +17,7 @@
         android:theme="@style/Theme.TaurusMobileClient.Starting"
         tools:targetApi="31">
         <activity
-            android:name=".feature.sewing.presentation.MainActivity"
+            android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.TaurusMobileClient.Starting">
             <intent-filter>

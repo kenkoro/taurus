@@ -44,7 +44,7 @@ android {
     minSdk = 24
     targetSdk = 34
     versionCode = 1
-    versionName = "0.0.1"
+    versionName = "0.1.0-mvp"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables {
@@ -60,21 +60,10 @@ android {
 
   buildTypes {
     release {
-      isMinifyEnabled = false
-      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      signingConfig = signingConfigs.getByName("debug")
-    }
-    create("beta") {
-      isDebuggable = false
       isMinifyEnabled = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("debug")
-      applicationIdSuffix = ".beta"
-    }
-    create("betaDebug") {
-      isDebuggable = true
-      isMinifyEnabled = false
-      applicationIdSuffix = ".beta"
+      isDebuggable = false
     }
   }
   compileOptions {

@@ -1,6 +1,0 @@
-package com.kenkoro.taurus.client.feature.sewing.data.source.remote.dto
-
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class TokenDto(val token: String)
