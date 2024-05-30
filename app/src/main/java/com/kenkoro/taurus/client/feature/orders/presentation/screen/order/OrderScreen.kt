@@ -31,6 +31,7 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.compon
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderBottomBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderTopBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.LoginState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterContext
 import com.kenkoro.taurus.client.feature.profile.data.remote.dto.UserDto
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
@@ -45,9 +46,9 @@ import kotlinx.coroutines.flow.flow
 fun OrderScreen(
   user: User?,
   onUser: (User) -> Unit,
-  ordersFlow: Flow<PagingData<Order>>,
   loginState: LoginState,
   networkStatus: NetworkStatus,
+  onOrderPagingFlow: (OrderFilterContext) -> Flow<PagingData<Order>>,
   selectedOrderRecordId: Int? = null,
   onSelectOrder: (Int?) -> Unit = {},
   onLoginState: (LoginState) -> Unit,
@@ -155,9 +156,9 @@ fun OrderScreen(
             networkStatus = networkStatus,
             user = user,
             onUser = onUser,
-            ordersFlow = ordersFlow,
             loginState = loginState,
             lazyOrdersState = lazyOrdersState,
+            onOrderPagingFlow = onOrderPagingFlow,
             selectedOrderRecordId = selectedOrderRecordId,
             onSelectOrder = onSelectOrder,
             onLoginState = onLoginState,
@@ -259,8 +260,8 @@ private fun OrderScreenPrev() {
     OrderScreen(
       user = null,
       onUser = {},
-      ordersFlow = ordersFlow,
       loginState = LoginState.Success,
+      onOrderPagingFlow = { _ -> flow {} },
       onLoginState = {},
       onAddNewUserLocally = { _ -> },
       onDeleteOrderLocally = { _ -> },

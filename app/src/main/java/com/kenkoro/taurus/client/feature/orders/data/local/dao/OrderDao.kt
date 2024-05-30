@@ -21,9 +21,6 @@ interface OrderDao {
   @Query("delete from order_entities")
   suspend fun deleteAll()
 
-  @Query("select * from order_entities where order_id = :orderId")
-  suspend fun getOrderById(orderId: Int): OrderEntity?
-
   @Query("select * from order_entities")
   fun pagingSource(): PagingSource<Int, OrderEntity>
 }

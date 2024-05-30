@@ -1,34 +1,25 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components
 
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NotInterested
-import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.feature.login.data.local.UserEntity
 import com.kenkoro.taurus.client.feature.login.data.mappers.toUser
 import com.kenkoro.taurus.client.feature.login.data.mappers.toUserEntity
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.CutterOrderFilter
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.InspectorOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.LoginState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterContext
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
 import com.kenkoro.taurus.client.feature.profile.data.remote.dto.UserDto
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
@@ -43,10 +34,10 @@ import kotlinx.coroutines.withContext
 @Composable
 fun OrderContent(
   modifier: Modifier = Modifier,
-  networkStatus: NetworkStatus,
   user: User?,
+  networkStatus: NetworkStatus,
+  onOrderPagingFlow: (OrderFilterContext) -> Flow<PagingData<Order>>,
   onUser: (User) -> Unit,
-  ordersFlow: Flow<PagingData<Order>>,
   loginState: LoginState,
   lazyOrdersState: LazyListState,
   selectedOrderRecordId: Int? = null,
@@ -69,8 +60,6 @@ fun OrderContent(
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
   onDecryptToken: () -> String,
 ) {
-  val contentHeight = LocalContentHeight.current
-
   if (networkStatus != NetworkStatus.Available) {
     LaunchedEffect(networkStatus) { onInternetConnectionErrorShowSnackbar() }
   }
@@ -107,44 +96,45 @@ fun OrderContent(
 
   if (loginState == LoginState.Success) {
     val userProfile = user?.profile ?: Other
-    val orders = ordersFlow.collectAsLazyPagingItems()
-
-    // WARN: For now this is hard-coded
-    if (isNotImplementedYetFunctionalityFor(userProfile)) {
-      Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-      ) {
-        Icon(
-          imageVector = Icons.Default.NotInterested,
-          contentDescription = "NotImplementedOrdersFilter",
-          modifier = Modifier.size(30.dp),
-        )
-        Spacer(modifier = Modifier.height(contentHeight.medium))
-        Text(text = "Пока ведутся работы...")
+    val orderFilterContext =
+      findStrategy(userProfile).run {
+        OrderFilterContext(this)
       }
-    } else {
-      LazyOrdersContent(
-        networkStatus = networkStatus,
-        userProfile = userProfile,
-        orders = orders,
-        lazyOrdersState = lazyOrdersState,
-        selectedOrderRecordId = selectedOrderRecordId,
-        onSelectOrder = onSelectOrder,
-        onAddNewOrderLocally = onAddNewOrderLocally,
-        onDeleteOrderLocally = onDeleteOrderLocally,
-        onEditOrderLocally = onEditOrderLocally,
-        onEditOrderRemotely = onEditOrderRemotely,
-        onDeleteOrderRemotely = onDeleteOrderRemotely,
-        onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
-        onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,
-        onOrderAccessErrorShowSnackbar = onOrderAccessErrorShowSnackbar,
-      )
-    }
+    val orders =
+      onOrderPagingFlow(orderFilterContext)
+        .collectAsLazyPagingItems()
+
+    LazyOrdersContent(
+      networkStatus = networkStatus,
+      userProfile = userProfile,
+      orders = orders,
+      lazyOrdersState = lazyOrdersState,
+      selectedOrderRecordId = selectedOrderRecordId,
+      onSelectOrder = onSelectOrder,
+      onAddNewOrderLocally = onAddNewOrderLocally,
+      onDeleteOrderLocally = onDeleteOrderLocally,
+      onEditOrderLocally = onEditOrderLocally,
+      onEditOrderRemotely = onEditOrderRemotely,
+      onDeleteOrderRemotely = onDeleteOrderRemotely,
+      onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
+      onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,
+      onOrderAccessErrorShowSnackbar = onOrderAccessErrorShowSnackbar,
+    )
   }
 }
 
-private fun isNotImplementedYetFunctionalityFor(userProfile: UserProfile): Boolean {
-  return userProfile == Cutter || userProfile == Inspector
+private fun findStrategy(userProfile: UserProfile): OrderFilterStrategy? {
+  return when (userProfile) {
+    Cutter -> {
+      CutterOrderFilter()
+    }
+
+    Inspector -> {
+      InspectorOrderFilter()
+    }
+
+    else -> {
+      null
+    }
+  }
 }

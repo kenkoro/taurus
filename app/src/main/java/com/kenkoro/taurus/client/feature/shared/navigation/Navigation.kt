@@ -58,8 +58,9 @@ fun AppNavHost(
       OrderScreen(
         user = userViewModel.user,
         onUser = userViewModel::user,
-        ordersFlow = orderViewModel.orderPagingFlow,
         loginState = loginViewModel.loginState,
+        networkStatus = networkStatus,
+        onOrderPagingFlow = orderViewModel::orderPagingFlow,
         selectedOrderRecordId = orderViewModel.selectOrderRecordId,
         onSelectOrder = orderViewModel::onSelectOrder,
         onLoginState = loginViewModel::loginState,
@@ -78,7 +79,6 @@ fun AppNavHost(
         onDecryptSubjectAndPassword = loginViewModel::decryptSubjectAndPassword,
         onDecryptToken = userViewModel::decryptToken,
         onNavigateToProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
-        networkStatus = networkStatus,
       )
     }
 

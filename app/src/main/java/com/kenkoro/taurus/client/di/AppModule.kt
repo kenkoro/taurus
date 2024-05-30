@@ -91,7 +91,7 @@ object AppModule {
     orderRepository: OrderRepositoryImpl,
     decryptedCredentialService: DecryptedCredentialService,
   ): Pager<Int, OrderEntity> {
-    val pageSize = 25
+    val pageSize = 40
     return Pager(
       config = PagingConfig(pageSize = pageSize),
       remoteMediator =
