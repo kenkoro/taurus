@@ -36,7 +36,8 @@ fun OrderContent(
   modifier: Modifier = Modifier,
   user: User?,
   networkStatus: NetworkStatus,
-  onOrderPagingFlow: (OrderFilterContext) -> Flow<PagingData<Order>>,
+  ordersPagingFlow: Flow<PagingData<Order>>?,
+  onOrdersPagingFlow: (OrderFilterContext) -> Unit,
   onUser: (User) -> Unit,
   loginState: LoginState,
   lazyOrdersState: LazyListState,
@@ -94,32 +95,37 @@ fun OrderContent(
     }
   }
 
-  if (loginState == LoginState.Success) {
-    val userProfile = user?.profile ?: Other
-    val orderFilterContext =
-      findStrategy(userProfile).run {
-        OrderFilterContext(this)
-      }
-    val orders =
-      onOrderPagingFlow(orderFilterContext)
-        .collectAsLazyPagingItems()
+  LaunchedEffect(user) {
+    if (user != null) {
+      val orderFilterContext =
+        findStrategy(user.profile).run {
+          OrderFilterContext(this)
+        }
+      onOrdersPagingFlow(orderFilterContext)
+    }
+  }
 
-    LazyOrdersContent(
-      networkStatus = networkStatus,
-      userProfile = userProfile,
-      orders = orders,
-      lazyOrdersState = lazyOrdersState,
-      selectedOrderRecordId = selectedOrderRecordId,
-      onSelectOrder = onSelectOrder,
-      onAddNewOrderLocally = onAddNewOrderLocally,
-      onDeleteOrderLocally = onDeleteOrderLocally,
-      onEditOrderLocally = onEditOrderLocally,
-      onEditOrderRemotely = onEditOrderRemotely,
-      onDeleteOrderRemotely = onDeleteOrderRemotely,
-      onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
-      onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,
-      onOrderAccessErrorShowSnackbar = onOrderAccessErrorShowSnackbar,
-    )
+  if (loginState == LoginState.Success) {
+    val orders = ordersPagingFlow?.collectAsLazyPagingItems()
+
+    if (orders != null) {
+      LazyOrdersContent(
+        networkStatus = networkStatus,
+        userProfile = user?.profile ?: Other,
+        orders = orders,
+        lazyOrdersState = lazyOrdersState,
+        selectedOrderRecordId = selectedOrderRecordId,
+        onSelectOrder = onSelectOrder,
+        onAddNewOrderLocally = onAddNewOrderLocally,
+        onDeleteOrderLocally = onDeleteOrderLocally,
+        onEditOrderLocally = onEditOrderLocally,
+        onEditOrderRemotely = onEditOrderRemotely,
+        onDeleteOrderRemotely = onDeleteOrderRemotely,
+        onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
+        onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,
+        onOrderAccessErrorShowSnackbar = onOrderAccessErrorShowSnackbar,
+      )
+    }
   }
 }
 
