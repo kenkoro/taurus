@@ -1,14 +1,16 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util
 
-import androidx.paging.PagingData
-import com.kenkoro.taurus.client.feature.orders.data.local.OrderEntity
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.kenkoro.taurus.client.feature.orders.domain.Order
 
-class OrderFilterContext(private var strategy: OrderFilterStrategy? = null) {
+class OrderFilterContext {
+  private var strategy by mutableStateOf<OrderFilterStrategy?>(null)
+
   fun strategy(strategy: OrderFilterStrategy?) {
     this.strategy = strategy
   }
 
-  fun filter(pagingData: PagingData<OrderEntity>) {
-    strategy?.filter(pagingData)
-  }
+  fun filter(order: Order): Boolean = strategy?.filter(order) ?: true
 }

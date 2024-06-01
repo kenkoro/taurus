@@ -18,13 +18,11 @@ import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.CutterOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.InspectorOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.LoginState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterContext
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
 import com.kenkoro.taurus.client.feature.profile.data.remote.dto.UserDto
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
-import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 import kotlinx.coroutines.Dispatchers
@@ -36,12 +34,12 @@ fun OrderContent(
   modifier: Modifier = Modifier,
   user: User?,
   networkStatus: NetworkStatus,
-  ordersPagingFlow: Flow<PagingData<Order>>?,
-  onOrdersPagingFlow: (OrderFilterContext) -> Unit,
-  onUser: (User) -> Unit,
   loginState: LoginState,
   lazyOrdersState: LazyListState,
   selectedOrderRecordId: Int? = null,
+  ordersPagingFlow: Flow<PagingData<Order>>,
+  onStrategy: (OrderFilterStrategy?) -> Unit = {},
+  onUser: (User) -> Unit,
   onSelectOrder: (Int?) -> Unit = {},
   onLoginState: (LoginState) -> Unit,
   onAddNewUserLocally: suspend (UserEntity) -> Unit,
@@ -97,35 +95,29 @@ fun OrderContent(
 
   LaunchedEffect(user) {
     if (user != null) {
-      val orderFilterContext =
-        findStrategy(user.profile).run {
-          OrderFilterContext(this)
-        }
-      onOrdersPagingFlow(orderFilterContext)
+      onStrategy(findStrategy(user.profile))
     }
   }
 
-  if (loginState == LoginState.Success) {
-    val orders = ordersPagingFlow?.collectAsLazyPagingItems()
+  if (loginState == LoginState.Success && user != null) {
+    val orders = ordersPagingFlow.collectAsLazyPagingItems()
 
-    if (orders != null) {
-      LazyOrdersContent(
-        networkStatus = networkStatus,
-        userProfile = user?.profile ?: Other,
-        orders = orders,
-        lazyOrdersState = lazyOrdersState,
-        selectedOrderRecordId = selectedOrderRecordId,
-        onSelectOrder = onSelectOrder,
-        onAddNewOrderLocally = onAddNewOrderLocally,
-        onDeleteOrderLocally = onDeleteOrderLocally,
-        onEditOrderLocally = onEditOrderLocally,
-        onEditOrderRemotely = onEditOrderRemotely,
-        onDeleteOrderRemotely = onDeleteOrderRemotely,
-        onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
-        onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,
-        onOrderAccessErrorShowSnackbar = onOrderAccessErrorShowSnackbar,
-      )
-    }
+    LazyOrdersContent(
+      networkStatus = networkStatus,
+      userProfile = user.profile,
+      orders = orders,
+      lazyOrdersState = lazyOrdersState,
+      selectedOrderRecordId = selectedOrderRecordId,
+      onSelectOrder = onSelectOrder,
+      onAddNewOrderLocally = onAddNewOrderLocally,
+      onDeleteOrderLocally = onDeleteOrderLocally,
+      onEditOrderLocally = onEditOrderLocally,
+      onEditOrderRemotely = onEditOrderRemotely,
+      onDeleteOrderRemotely = onDeleteOrderRemotely,
+      onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
+      onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,
+      onOrderAccessErrorShowSnackbar = onOrderAccessErrorShowSnackbar,
+    )
   }
 }
 

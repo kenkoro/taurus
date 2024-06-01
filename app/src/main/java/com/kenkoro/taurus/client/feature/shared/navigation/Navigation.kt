@@ -16,6 +16,7 @@ import com.kenkoro.taurus.client.feature.login.presentation.LoginScreen
 import com.kenkoro.taurus.client.feature.login.presentation.LoginViewModel
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderViewModel
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.LoginState
 import com.kenkoro.taurus.client.feature.profile.presentation.ProfileScreen
 import com.kenkoro.taurus.client.feature.profile.presentation.UserViewModel
 
@@ -24,6 +25,7 @@ fun AppNavHost(
   navController: NavHostController = rememberNavController(),
   startDestination: (String, String) -> Screen,
   onExit: () -> Unit = {},
+  onRestart: () -> Unit = {},
 ) {
   val context = LocalContext.current
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
@@ -61,9 +63,9 @@ fun AppNavHost(
         loginState = loginViewModel.loginState,
         networkStatus = networkStatus,
         ordersPagingFlow = orderViewModel.ordersPagingFlow,
-        onOrdersPagingFlow = orderViewModel::ordersPagingFlow,
+        onStrategy = orderViewModel::strategy,
         selectedOrderRecordId = orderViewModel.selectedOrderRecordId,
-        onSelectOrder = orderViewModel::onSelectOrder,
+        onSelectOrder = orderViewModel::selectedOrderRecordId,
         onLoginState = loginViewModel::loginState,
         onAddNewUserLocally = userViewModel::addNewUserLocally,
         onAddNewOrderLocally = orderViewModel::addNewOrderLocally,
@@ -87,7 +89,8 @@ fun AppNavHost(
       ProfileScreen(
         onDeleteAllCredentials = orderViewModel::deleteAllCredentials,
         onNavigateToLoginScreen = { navController.navigate(Screen.LoginScreen.route) },
-        onLoginResult = loginViewModel::loginState,
+        onResetLoginState = { loginViewModel.loginState(LoginState.NotLoggedYet) },
+        onRestart = onRestart,
       )
     }
   }

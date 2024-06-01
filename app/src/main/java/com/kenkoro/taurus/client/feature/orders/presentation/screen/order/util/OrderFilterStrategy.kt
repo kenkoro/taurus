@@ -1,8 +1,7 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util
 
-import androidx.paging.PagingData
-import com.kenkoro.taurus.client.feature.orders.data.local.OrderEntity
+import com.kenkoro.taurus.client.feature.orders.domain.Order
 
 interface OrderFilterStrategy {
-  fun filter(pagingData: PagingData<OrderEntity>)
+  fun filter(order: Order): Boolean
 }

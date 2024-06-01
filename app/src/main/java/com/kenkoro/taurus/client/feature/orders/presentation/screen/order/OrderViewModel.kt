@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.filter
 import androidx.paging.map
 import androidx.room.withTransaction
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
@@ -22,11 +22,11 @@ import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepo
 import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterContext
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
 import com.kenkoro.taurus.client.feature.shared.data.local.LocalDatabase
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.DeleteDto
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -35,30 +35,32 @@ import javax.inject.Inject
 class OrderViewModel
   @Inject
   constructor(
-    private val pager: Pager<Int, OrderEntity>,
+    pager: Pager<Int, OrderEntity>,
     private val localDb: LocalDatabase,
     private val orderRepository: OrderRepositoryImpl,
     private val decryptedCredentialService: DecryptedCredentialService,
     private val encryptedCredentialService: EncryptedCredentialService,
   ) : ViewModel() {
-    var ordersPagingFlow: Flow<PagingData<Order>>? = null
-      private set
+    private val orderFilterContext = OrderFilterContext()
+
+    val ordersPagingFlow =
+      pager.flow
+        .map { pagingData ->
+          pagingData
+            .map { it.toOrder() }
+            .filter(orderFilterContext::filter)
+        }
+        .flowOn(Dispatchers.IO)
+        .cachedIn(viewModelScope)
 
     var selectedOrderRecordId by mutableStateOf<Int?>(null)
       private set
 
-    fun ordersPagingFlow(orderFilterContext: OrderFilterContext) {
-      ordersPagingFlow =
-        pager.flow
-          .map { pagingData ->
-            orderFilterContext.filter(pagingData)
-            pagingData.map { it.toOrder() }
-          }
-          .flowOn(Dispatchers.IO)
-          .cachedIn(viewModelScope)
+    fun strategy(strategy: OrderFilterStrategy?) {
+      orderFilterContext.strategy(strategy)
     }
 
-    fun onSelectOrder(selectedOrderRecordId: Int?) {
+    fun selectedOrderRecordId(selectedOrderRecordId: Int?) {
       this.selectedOrderRecordId = selectedOrderRecordId
     }
 

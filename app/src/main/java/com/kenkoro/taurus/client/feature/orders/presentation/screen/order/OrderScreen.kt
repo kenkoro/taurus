@@ -31,7 +31,7 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.compon
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderBottomBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderTopBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.LoginState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterContext
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
 import com.kenkoro.taurus.client.feature.profile.data.remote.dto.UserDto
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
@@ -48,9 +48,9 @@ fun OrderScreen(
   onUser: (User) -> Unit,
   loginState: LoginState,
   networkStatus: NetworkStatus,
-  ordersPagingFlow: Flow<PagingData<Order>>?,
-  onOrdersPagingFlow: (OrderFilterContext) -> Unit,
   selectedOrderRecordId: Int? = null,
+  ordersPagingFlow: Flow<PagingData<Order>>,
+  onStrategy: (OrderFilterStrategy?) -> Unit = {},
   onSelectOrder: (Int?) -> Unit = {},
   onLoginState: (LoginState) -> Unit,
   onAddNewUserLocally: suspend (UserEntity) -> Unit,
@@ -160,8 +160,8 @@ fun OrderScreen(
             loginState = loginState,
             lazyOrdersState = lazyOrdersState,
             ordersPagingFlow = ordersPagingFlow,
-            onOrdersPagingFlow = onOrdersPagingFlow,
             selectedOrderRecordId = selectedOrderRecordId,
+            onStrategy = onStrategy,
             onSelectOrder = onSelectOrder,
             onLoginState = onLoginState,
             onAddNewUserLocally = onAddNewUserLocally,
@@ -264,7 +264,6 @@ private fun OrderScreenPrev() {
       onUser = {},
       loginState = LoginState.Success,
       ordersPagingFlow = ordersFlow,
-      onOrdersPagingFlow = { _ -> },
       onLoginState = {},
       onAddNewUserLocally = { _ -> },
       onDeleteOrderLocally = { _ -> },

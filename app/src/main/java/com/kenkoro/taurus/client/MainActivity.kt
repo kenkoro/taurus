@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -54,6 +55,11 @@ class MainActivity : ComponentActivity() {
               }
             },
             onExit = { finish() },
+            onRestart = {
+              val intent = Intent(this, MainActivity::class.java)
+              startActivity(intent)
+              finishAffinity()
+            },
           )
         }
       }

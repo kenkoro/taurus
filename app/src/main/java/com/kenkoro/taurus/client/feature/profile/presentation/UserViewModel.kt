@@ -25,7 +25,7 @@ class UserViewModel
     var user by mutableStateOf<User?>(null)
       private set
 
-    fun user(user: User) {
+    fun user(user: User?) {
       this.user = user
     }
 
