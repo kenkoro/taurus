@@ -13,5 +13,5 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "taurus-mobile-client"
+rootProject.name = "taurus-android"
 include(":app")
