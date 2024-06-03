@@ -25,6 +25,7 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.compon
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import java.util.UUID
 
+@Deprecated("Not in use anymore")
 @Composable
 fun LazyOrdersColumn(
   modifier: Modifier = Modifier,

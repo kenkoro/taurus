@@ -65,15 +65,15 @@ fun OrderItem(
   val selected = { selectedOrderRecordId == order.recordId }
   val animatedHeight by animateDpAsState(
     targetValue =
-      if (selected()) {
-        if (allowedToUpdateOrderStatus(profile)) {
-          contentHeight.orderItemExpanded
-        } else {
-          contentHeight.orderItemExpandedWithoutActionButton
-        }
+    if (selected()) {
+      if (allowedToUpdateOrderStatus(profile)) {
+        contentHeight.orderItemExpanded
       } else {
-        contentHeight.orderItemNotExpanded
-      },
+        contentHeight.orderItemExpandedWithoutActionButton
+      }
+    } else {
+      contentHeight.orderItemNotExpanded
+    },
     label = "AnimatedHeightOfOrderItem",
     animationSpec = tween(300),
   )
@@ -83,33 +83,33 @@ fun OrderItem(
       Spacer(modifier = Modifier.height(contentHeight.medium))
       Column(
         modifier =
-          Modifier
-            .width(contentWidth.orderItem)
-            .height(animatedHeight)
-            .clip(RoundedCornerShape(shape.medium))
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable {
-              if (selected()) {
-                onSelectOrder(null)
-              } else {
-                onSelectOrder(order.recordId)
-              }
-            },
+        Modifier
+          .width(contentWidth.orderItem)
+          .height(animatedHeight)
+          .clip(RoundedCornerShape(shape.medium))
+          .background(MaterialTheme.colorScheme.primaryContainer)
+          .clickable {
+            if (selected()) {
+              onSelectOrder(null)
+            } else {
+              onSelectOrder(order.recordId)
+            }
+          },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
       ) {
         Column(
           modifier =
-            Modifier
-              .fillMaxWidth()
-              .wrapContentHeight(),
+          Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
           verticalArrangement = Arrangement.Top,
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
           Spacer(modifier = Modifier.height(contentHeight.large))
           OrderItemContent(
             order = order,
-            clicked = selected(),
+            selected = selected(),
           )
           Spacer(modifier = Modifier.height(contentHeight.large))
         }
@@ -153,15 +153,15 @@ private fun OrderItemPrev() {
   val order =
     Order(
       recordId = 0,
-      orderId = 0,
-      customer = "Customer",
-      date = 0L,
-      title = "Title",
-      model = "Model",
-      size = "Size",
-      color = "Color",
-      category = "Category",
-      quantity = 0,
+      orderId = 410,
+      customer = "Suborbia",
+      date = 1717427278111L,
+      title = "Жилет",
+      model = "Grand",
+      size = "OS",
+      color = "Black",
+      category = "Жилеты",
+      quantity = 4,
       status = OrderStatus.Checked,
       creatorId = 0,
     )
@@ -170,6 +170,7 @@ private fun OrderItemPrev() {
     OrderItem(
       profile = UserProfile.Customer,
       order = order,
+      selectedOrderRecordId = 0,
       onAddNewOrderLocally = { _ -> },
       onDeleteOrderLocally = { _ -> },
       onEditOrderLocally = { _ -> },

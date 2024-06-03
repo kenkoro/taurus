@@ -1,112 +1,49 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.background
+import android.graphics.Color
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.orders.domain.Order
+import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
+import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderItemContent(
-  order: Order,
-  clicked: Boolean,
   modifier: Modifier = Modifier,
+  order: Order,
+  selected: Boolean,
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
 
-  val animatedRotationOfKeyboardArrow by animateFloatAsState(
-    targetValue =
-      if (clicked) {
-        -180F
-      } else {
-        0F
-      },
-    label = "AnimatedRotationOfKeyboardArrow",
-  )
-
-  Row(
-    modifier = Modifier.fillMaxWidth(),
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Row(
-      modifier = Modifier.fillMaxWidth(.5F),
-      horizontalArrangement = Arrangement.Start,
-    ) {
-      Spacer(modifier = Modifier.width(contentWidth.large))
-      Column(
-        modifier = Modifier.width(contentWidth.halfStandard),
-        horizontalAlignment = Alignment.Start,
-      ) {
-        Text(
-          text = order.date.toString(),
-          color = MaterialTheme.colorScheme.onPrimaryContainer,
-          style = MaterialTheme.typography.bodySmall,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-        )
-        Spacer(modifier = Modifier.height(contentHeight.small))
-        Text(
-          text = order.title,
-          color = MaterialTheme.colorScheme.onPrimaryContainer,
-          style = MaterialTheme.typography.bodyMedium,
-          maxLines = 1,
-          overflow = TextOverflow.Ellipsis,
-        )
-      }
-    }
-
+  Column(verticalArrangement = Arrangement.Top) {
     Row(
       modifier = Modifier.fillMaxWidth(),
-      horizontalArrangement = Arrangement.End,
+      verticalAlignment = Alignment.CenterVertically,
     ) {
-      Box(
-        modifier =
-          Modifier
-            .size(25.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary),
-        contentAlignment = Alignment.Center,
-      ) {
-        Icon(
-          imageVector = Icons.Default.KeyboardArrowDown,
-          contentDescription = "ExpandOrderItemIcon",
-          tint = MaterialTheme.colorScheme.onPrimary,
-          modifier = Modifier.rotate(animatedRotationOfKeyboardArrow),
-        )
-      }
-      Spacer(modifier = Modifier.width(contentWidth.orderItemButtonToExpand))
+      OrderItemDateAndTitleRow(orderDate = order.date, orderTitle = order.title)
+      OrderItemKeyboardArrowIconRow(selected = selected)
     }
-  }
 
-  if (clicked) {
     val orderInfo =
       listOf(
         Pair(stringResource(id = R.string.order_id), order.orderId.toString()),
@@ -119,13 +56,16 @@ fun OrderItemContent(
       )
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-      item {
-        Spacer(modifier = Modifier.height(contentHeight.large))
-      }
       items(orderInfo) { pair ->
-        Row {
+        Row(
+          modifier = Modifier
+            .height(contentHeight.orderItemField)
+            .clickable {},
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
           Spacer(modifier = Modifier.width(contentWidth.large))
           Text(
+            modifier = Modifier.fillMaxWidth(),
             text = "${pair.first}: ${pair.second}",
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             style = MaterialTheme.typography.bodyMedium,
@@ -135,5 +75,29 @@ fun OrderItemContent(
         }
       }
     }
+  }
+}
+
+@Preview(showBackground = true, backgroundColor = Color.WHITE.toLong())
+@Composable
+private fun OrderItemContentPrev() {
+  val order =
+    Order(
+      recordId = 0,
+      orderId = 0,
+      customer = "Customer",
+      date = 1717427278111L,
+      title = "Title",
+      model = "Model",
+      size = "Size",
+      color = "Color",
+      category = "Category",
+      quantity = 0,
+      status = OrderStatus.Checked,
+      creatorId = 0,
+    )
+
+  AppTheme {
+    OrderItemContent(order = order, selected = true)
   }
 }
