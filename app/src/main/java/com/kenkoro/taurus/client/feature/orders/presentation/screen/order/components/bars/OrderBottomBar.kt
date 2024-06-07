@@ -46,44 +46,47 @@ fun OrderBottomBar(
   val scope = rememberCoroutineScope()
 
   val animatedYOffset by animateDpAsState(
-    targetValue = if (isScrollingInProgress) {
-      offset.bottomBar
-    } else {
-      offset.none
-    },
+    targetValue =
+      if (isScrollingInProgress) {
+        offset.bottomBar
+      } else {
+        offset.none
+      },
     label = "AnimatedYOffset",
   )
   val animatedBottomBarHeight by animateDpAsState(
-    targetValue = if (isScrollingInProgress) {
-      contentHeight.none
-    } else {
-      contentHeight.bottomBar
-    },
+    targetValue =
+      if (isScrollingInProgress) {
+        contentHeight.none
+      } else {
+        contentHeight.bottomBar
+      },
     label = "AnimatedBottomBarHeight",
   )
   val animatedBottomBarButtonHeight by animateDpAsState(
-    targetValue = if (isScrollingInProgress) {
-      contentHeight.none
-    } else {
-      contentHeight.halfStandard
-    },
+    targetValue =
+      if (isScrollingInProgress) {
+        contentHeight.none
+      } else {
+        contentHeight.halfStandard
+      },
     label = "AnimatedBottomBarButtonHeight",
   )
 
   Column(
     modifier =
-    modifier
-      .fillMaxWidth()
-      .height(animatedBottomBarHeight)
-      .offset(y = animatedYOffset),
+      modifier
+        .fillMaxWidth()
+        .height(animatedBottomBarHeight)
+        .offset(y = animatedYOffset),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {
     Button(
       modifier =
-      Modifier
-        .width(contentWidth.orderItem)
-        .height(animatedBottomBarButtonHeight),
+        Modifier
+          .width(contentWidth.orderItem)
+          .height(animatedBottomBarButtonHeight),
       onClick = { scope.launch(Dispatchers.Main) { onAddNewOrderShowSnackbar() } },
       shape = RoundedCornerShape(shape.medium),
     ) {

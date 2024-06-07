@@ -55,27 +55,27 @@ fun OrderTopBar(
 
   Row(
     modifier =
-    modifier
-      .fillMaxWidth()
-      .height(contentHeight.topBar)
-      .background(MaterialTheme.colorScheme.background),
+      modifier
+        .fillMaxWidth()
+        .height(contentHeight.topBar)
+        .background(MaterialTheme.colorScheme.background),
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically,
   ) {
     Box(modifier = Modifier.size(contentHeight.topBar)) {
       Box(
         modifier =
-        Modifier
-          .padding(8.dp)
-          .fillMaxSize()
-          .clip(CircleShape)
-          .background(MaterialTheme.colorScheme.background)
-          .border(
-            width = 2.dp,
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-          )
-          .clickable { onNavigateToProfileScreen() },
+          Modifier
+            .padding(8.dp)
+            .fillMaxSize()
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.background)
+            .border(
+              width = 2.dp,
+              shape = CircleShape,
+              color = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+            .clickable { onNavigateToProfileScreen() },
         contentAlignment = Alignment.Center,
         content = {
           if (!userName.isNullOrEmpty()) {
@@ -90,14 +90,14 @@ fun OrderTopBar(
     }
     Row(
       modifier =
-      Modifier
-        .fillMaxHeight()
-        .fillMaxWidth(.8F)
-        .clickable {
-          scope.launch(Dispatchers.Main) {
-            onFilterOrdersShowSnackbar()
-          }
-        },
+        Modifier
+          .fillMaxHeight()
+          .fillMaxWidth(.8F)
+          .clickable {
+            scope.launch(Dispatchers.Main) {
+              onFilterOrdersShowSnackbar()
+            }
+          },
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Center,
     ) {
@@ -109,19 +109,20 @@ fun OrderTopBar(
       )
     }
     Box(
-      modifier = Modifier
-        .size(contentHeight.topBar)
-        .clickable {
-          scope.launch(Dispatchers.Main) {
-            onSortOrdersShowSnackbar()
-          }
-        },
+      modifier =
+        Modifier
+          .size(contentHeight.topBar)
+          .clickable {
+            scope.launch(Dispatchers.Main) {
+              onSortOrdersShowSnackbar()
+            }
+          },
     ) {
       Box(
         modifier =
-        Modifier
-          .padding(5.dp)
-          .fillMaxSize(),
+          Modifier
+            .padding(5.dp)
+            .fillMaxSize(),
         contentAlignment = Alignment.Center,
       ) {
         Icon(
@@ -142,7 +143,7 @@ private fun OrderTopBarPrev() {
       onFilterOrdersShowSnackbar = { SnackbarResult.ActionPerformed },
       onNavigateToProfileScreen = {},
       networkStatus = NetworkStatus.Available,
-      userName = "Peter"
+      userName = "Peter",
     )
   }
 }

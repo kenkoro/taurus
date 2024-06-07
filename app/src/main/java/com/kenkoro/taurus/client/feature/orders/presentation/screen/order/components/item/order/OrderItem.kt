@@ -65,15 +65,15 @@ fun OrderItem(
   val selected = { selectedOrderRecordId == order.recordId }
   val animatedHeight by animateDpAsState(
     targetValue =
-    if (selected()) {
-      if (allowedToUpdateOrderStatus(profile)) {
-        contentHeight.orderItemExpanded
+      if (selected()) {
+        if (allowedToUpdateOrderStatus(profile)) {
+          contentHeight.orderItemExpanded
+        } else {
+          contentHeight.orderItemExpandedWithoutActionButton
+        }
       } else {
-        contentHeight.orderItemExpandedWithoutActionButton
-      }
-    } else {
-      contentHeight.orderItemNotExpanded
-    },
+        contentHeight.orderItemNotExpanded
+      },
     label = "AnimatedHeightOfOrderItem",
     animationSpec = tween(300),
   )
@@ -83,26 +83,26 @@ fun OrderItem(
       Spacer(modifier = Modifier.height(contentHeight.medium))
       Column(
         modifier =
-        Modifier
-          .width(contentWidth.orderItem)
-          .height(animatedHeight)
-          .clip(RoundedCornerShape(shape.medium))
-          .background(MaterialTheme.colorScheme.primaryContainer)
-          .clickable {
-            if (selected()) {
-              onSelectOrder(null)
-            } else {
-              onSelectOrder(order.recordId)
-            }
-          },
+          Modifier
+            .width(contentWidth.orderItem)
+            .height(animatedHeight)
+            .clip(RoundedCornerShape(shape.medium))
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clickable {
+              if (selected()) {
+                onSelectOrder(null)
+              } else {
+                onSelectOrder(order.recordId)
+              }
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
       ) {
         Column(
           modifier =
-          Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
+            Modifier
+              .fillMaxWidth()
+              .wrapContentHeight(),
           verticalArrangement = Arrangement.Top,
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {

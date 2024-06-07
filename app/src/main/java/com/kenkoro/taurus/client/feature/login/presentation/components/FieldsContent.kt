@@ -80,10 +80,10 @@ fun FieldsContent(
           Text(text = stringResource(id = R.string.login_subject))
         },
         keyboardOptions =
-        KeyboardOptions.Default.copy(
-          imeAction = ImeAction.Next,
-          keyboardType = KeyboardType.Text,
-        ),
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Text,
+          ),
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
       )
@@ -97,10 +97,10 @@ fun FieldsContent(
           Text(text = stringResource(id = R.string.login_password))
         },
         keyboardOptions =
-        KeyboardOptions.Default.copy(
-          imeAction = ImeAction.Done,
-          keyboardType = KeyboardType.Password,
-        ),
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password,
+          ),
         visualTransformation = PasswordVisualTransformation(),
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
@@ -115,8 +115,8 @@ fun FieldsContent(
       Button(
         enabled = networkStatus == NetworkStatus.Available,
         modifier =
-        Modifier
-          .size(width = contentWidth.halfStandard, height = contentHeight.standard),
+          Modifier
+            .size(width = contentWidth.halfStandard, height = contentHeight.standard),
         shape = RoundedCornerShape(shape.medium),
         onClick = {
           scope.launch(Dispatchers.IO) {

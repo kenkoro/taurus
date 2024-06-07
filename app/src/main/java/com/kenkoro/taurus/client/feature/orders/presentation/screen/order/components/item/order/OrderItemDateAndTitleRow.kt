@@ -67,7 +67,10 @@ fun OrderItemDateAndTitleRow(
   }
 }
 
-private fun dateFromMillis(dateInMillis: Long, inFormat: String = "dd.MM.yyyy hh:mm:ss"): String {
+private fun dateFromMillis(
+  dateInMillis: Long,
+  inFormat: String = "dd.MM.yyyy hh:mm:ss",
+): String {
   return DateFormat
     .format(inFormat, dateInMillis)
     .toString()

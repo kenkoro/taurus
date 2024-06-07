@@ -33,11 +33,11 @@ fun OrderItemKeyboardArrowIconRow(
 
   val animatedRotationOfKeyboardArrow by animateFloatAsState(
     targetValue =
-    if (selected) {
-      -180F
-    } else {
-      0F
-    },
+      if (selected) {
+        -180F
+      } else {
+        0F
+      },
     label = "AnimatedRotationOfKeyboardArrow",
   )
 
@@ -47,10 +47,10 @@ fun OrderItemKeyboardArrowIconRow(
   ) {
     Box(
       modifier =
-      Modifier
-        .size(size.large)
-        .clip(CircleShape)
-        .background(MaterialTheme.colorScheme.primary),
+        Modifier
+          .size(size.large)
+          .clip(CircleShape)
+          .background(MaterialTheme.colorScheme.primary),
       contentAlignment = Alignment.Center,
     ) {
       Icon(

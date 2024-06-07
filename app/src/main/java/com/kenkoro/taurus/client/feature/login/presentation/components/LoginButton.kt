@@ -49,17 +49,17 @@ fun LoginButton(
   val continueButtonColors =
     ButtonDefaults.buttonColors(
       containerColor =
-      if (isError) {
-        MaterialTheme.colorScheme.error
-      } else {
-        MaterialTheme.colorScheme.primary
-      },
+        if (isError) {
+          MaterialTheme.colorScheme.error
+        } else {
+          MaterialTheme.colorScheme.primary
+        },
       contentColor =
-      if (isError) {
-        MaterialTheme.colorScheme.onError
-      } else {
-        MaterialTheme.colorScheme.onPrimary
-      },
+        if (isError) {
+          MaterialTheme.colorScheme.onError
+        } else {
+          MaterialTheme.colorScheme.onPrimary
+        },
     )
 
   Row(
@@ -70,9 +70,9 @@ fun LoginButton(
       onClick = { onExit() },
       enabled = isLoginButtonEnable(),
       modifier =
-      modifier
-        .width(contentWidth.halfStandard)
-        .height(contentHeight.loginButton),
+        modifier
+          .width(contentWidth.halfStandard)
+          .height(contentHeight.loginButton),
       shape = RoundedCornerShape(topStart = shape.medium, bottomStart = shape.medium),
     ) {
       Row(
@@ -89,18 +89,18 @@ fun LoginButton(
     }
     Divider(
       modifier =
-      Modifier
-        .height(contentHeight.loginButton)
-        .width(1.dp),
+        Modifier
+          .height(contentHeight.loginButton)
+          .width(1.dp),
     )
     Button(
       onClick = { onSubmit() },
       enabled = isLoginButtonEnable(),
       colors = continueButtonColors,
       modifier =
-      modifier
-        .width(contentWidth.halfStandard)
-        .height(contentHeight.loginButton),
+        modifier
+          .width(contentWidth.halfStandard)
+          .height(contentHeight.loginButton),
       shape = RoundedCornerShape(topEnd = shape.medium, bottomEnd = shape.medium),
     ) {
       Row(

@@ -45,7 +45,6 @@ fun OrderItemContent(
       Pair(stringResource(id = R.string.order_quantity), order.quantity.toString()),
     )
 
-
   Column(verticalArrangement = Arrangement.Top) {
     Row(
       modifier = Modifier.fillMaxWidth(),
@@ -54,7 +53,7 @@ fun OrderItemContent(
       OrderItemDateAndTitleRow(
         orderDate = order.date,
         orderTitle = order.title,
-        orderStatus = order.status
+        orderStatus = order.status,
       )
       OrderItemKeyboardArrowIconRow(selected = selected)
     }
@@ -63,9 +62,10 @@ fun OrderItemContent(
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
       items(orderInfo) { pair ->
         Row(
-          modifier = Modifier
-            .height(contentHeight.orderItemField)
-            .clickable {},
+          modifier =
+            Modifier
+              .height(contentHeight.orderItemField)
+              .clickable {},
           verticalAlignment = Alignment.CenterVertically,
         ) {
           Spacer(modifier = Modifier.width(contentWidth.large))
