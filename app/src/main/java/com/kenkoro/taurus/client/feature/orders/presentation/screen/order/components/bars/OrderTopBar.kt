@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.R
@@ -43,6 +44,7 @@ fun OrderTopBar(
   modifier: Modifier = Modifier,
   networkStatus: NetworkStatus,
   isScrollingInProgress: Boolean = false,
+  userName: String? = null,
   onFilterOrdersShowSnackbar: suspend () -> SnackbarResult,
   onSortOrdersShowSnackbar: suspend () -> SnackbarResult,
   onNavigateToProfileScreen: () -> Unit,
@@ -53,40 +55,49 @@ fun OrderTopBar(
 
   Row(
     modifier =
-      modifier
-        .fillMaxWidth()
-        .height(contentHeight.topBar)
-        .background(MaterialTheme.colorScheme.background),
+    modifier
+      .fillMaxWidth()
+      .height(contentHeight.topBar)
+      .background(MaterialTheme.colorScheme.background),
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically,
   ) {
     Box(modifier = Modifier.size(contentHeight.topBar)) {
       Box(
         modifier =
-          Modifier
-            .padding(8.dp)
-            .fillMaxSize()
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.background)
-            .border(
-              width = 2.dp,
-              shape = CircleShape,
-              color = MaterialTheme.colorScheme.onPrimaryContainer,
+        Modifier
+          .padding(8.dp)
+          .fillMaxSize()
+          .clip(CircleShape)
+          .background(MaterialTheme.colorScheme.background)
+          .border(
+            width = 2.dp,
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+          )
+          .clickable { onNavigateToProfileScreen() },
+        contentAlignment = Alignment.Center,
+        content = {
+          if (!userName.isNullOrEmpty()) {
+            Text(
+              text = userName.first().toString(),
+              modifier = Modifier.fillMaxWidth(),
+              textAlign = TextAlign.Center,
             )
-            .clickable { onNavigateToProfileScreen() },
-        content = {},
+          }
+        },
       )
     }
     Row(
       modifier =
-        Modifier
-          .fillMaxHeight()
-          .fillMaxWidth(.8F)
-          .clickable {
-            scope.launch(Dispatchers.Main) {
-              onFilterOrdersShowSnackbar()
-            }
-          },
+      Modifier
+        .fillMaxHeight()
+        .fillMaxWidth(.8F)
+        .clickable {
+          scope.launch(Dispatchers.Main) {
+            onFilterOrdersShowSnackbar()
+          }
+        },
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Center,
     ) {
@@ -97,21 +108,23 @@ fun OrderTopBar(
         contentDescription = "SelectACustomerForFilteringOrders",
       )
     }
-    Box(modifier = Modifier.size(contentHeight.topBar)) {
+    Box(
+      modifier = Modifier
+        .size(contentHeight.topBar)
+        .clickable {
+          scope.launch(Dispatchers.Main) {
+            onSortOrdersShowSnackbar()
+          }
+        },
+    ) {
       Box(
         modifier =
-          Modifier
-            .padding(5.dp)
-            .fillMaxSize(),
+        Modifier
+          .padding(5.dp)
+          .fillMaxSize(),
         contentAlignment = Alignment.Center,
       ) {
         Icon(
-          modifier =
-            Modifier.clickable {
-              scope.launch(Dispatchers.Main) {
-                onSortOrdersShowSnackbar()
-              }
-            },
           imageVector = Icons.AutoMirrored.Default.Sort,
           contentDescription = "SortOrders",
         )
@@ -129,6 +142,7 @@ private fun OrderTopBarPrev() {
       onFilterOrdersShowSnackbar = { SnackbarResult.ActionPerformed },
       onNavigateToProfileScreen = {},
       networkStatus = NetworkStatus.Available,
+      userName = "Peter"
     )
   }
 }
