@@ -77,6 +77,7 @@ fun OrderScreen(
   val loginErrorMessage = stringResource(id = R.string.login_fail)
   val notImplementedYetMessage = stringResource(id = R.string.not_implemented_yet)
   val orderAccessErrorMessage = stringResource(id = R.string.orders_access_error)
+  val apiRequestErrorMessage = stringResource(id = R.string.request_error)
 
   val cancelOrderDeletionLabel = stringResource(id = R.string.cancel)
   val okActionLabel = stringResource(id = R.string.ok)
@@ -107,9 +108,9 @@ fun OrderScreen(
         )
       },
       modifier =
-        Modifier
-          .statusBarsPadding()
-          .navigationBarsPadding(),
+      Modifier
+        .statusBarsPadding()
+        .navigationBarsPadding(),
       topBar = {
         OrderTopBar(
           networkStatus = networkStatus,
@@ -149,10 +150,10 @@ fun OrderScreen(
       content = { paddingValues ->
         Surface(
           modifier =
-            Modifier
-              .fillMaxSize()
-              .background(MaterialTheme.colorScheme.background)
-              .padding(paddingValues),
+          Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(paddingValues),
         ) {
           OrderContent(
             networkStatus = networkStatus,
@@ -185,16 +186,15 @@ fun OrderScreen(
                 actionLabel = okActionLabel,
               )
             },
-            onDeleteOrderShowSnackbar = {
-              snackbarHostState.showSnackbar(
-                message = orderWasDeletedMessage,
-                actionLabel = cancelOrderDeletionLabel,
-                duration = SnackbarDuration.Short,
-              )
-            },
             onAppendNewOrdersErrorShowSnackbar = {
               errorSnackbarHostState.showSnackbar(
                 message = paginatedOrdersErrorMessage,
+                actionLabel = okActionLabel,
+              )
+            },
+            onApiErrorShowSnackbar = {
+              errorSnackbarHostState.showSnackbar(
+                message = apiRequestErrorMessage,
                 actionLabel = okActionLabel,
               )
             },

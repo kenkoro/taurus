@@ -48,7 +48,7 @@ fun LoginContent(
 
   val scope = rememberCoroutineScope()
   val interactionSource = remember { MutableInteractionSource() }
-  var isLogging by rememberSaveable {
+  var isAuthenticating by rememberSaveable {
     mutableStateOf(false)
   }
 
@@ -76,13 +76,13 @@ fun LoginContent(
         networkStatus = networkStatus,
         subject = subject,
         password = password,
-        isLogging = isLogging,
+        isAuthenticating = isAuthenticating,
         onSetErrorMessages = onSetErrorMessages,
         onLoginSubmitted = { subject, password ->
           scope.launch(Dispatchers.IO) {
-            isLogging = true
+            isAuthenticating = true
             val result = onLogin(subject, password)
-            isLogging = false
+            isAuthenticating = false
 
             result.onSuccess {
               onEncryptAll(subject, password, it.token)

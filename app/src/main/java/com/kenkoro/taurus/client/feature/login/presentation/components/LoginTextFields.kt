@@ -33,7 +33,7 @@ fun LoginTextFields(
   networkStatus: NetworkStatus,
   subject: SubjectState,
   password: PasswordState,
-  isLogging: Boolean,
+  isAuthenticating: Boolean,
   onSetErrorMessages: (TaurusTextFieldState, String, String) -> Unit,
   onLoginSubmitted: (subject: String, password: String) -> Unit,
   onExit: () -> Unit = {},
@@ -114,7 +114,7 @@ fun LoginTextFields(
     Spacer(modifier = Modifier.height(contentHeight.medium))
     LoginButton(
       isLoginButtonEnable = isLoginButtonEnable,
-      isLogging = isLogging,
+      isLogging = isAuthenticating,
       isError = subject.showErrors() || password.showErrors(),
       onSubmit = onSubmit,
       onExit = onExit,

@@ -45,9 +45,10 @@ fun LazyOrdersContent(
   onEditOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
   onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
-  onDeleteOrderShowSnackbar: suspend () -> SnackbarResult,
   onAppendNewOrdersErrorShowSnackbar: suspend () -> SnackbarResult,
   onOrderAccessErrorShowSnackbar: suspend () -> SnackbarResult,
+  onApiErrorShowSnackbar: suspend () -> SnackbarResult,
+  onDecryptToken: () -> String,
 ) {
   val size = LocalSize.current
   val strokeWidth = LocalStrokeWidth.current
@@ -89,7 +90,8 @@ fun LazyOrdersContent(
             onEditOrderLocally = onEditOrderLocally,
             onEditOrderRemotely = onEditOrderRemotely,
             onDeleteOrderRemotely = onDeleteOrderRemotely,
-            onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
+            onDecryptToken = onDecryptToken,
+            onApiErrorShowSnackbar = onApiErrorShowSnackbar,
           )
         }
       }

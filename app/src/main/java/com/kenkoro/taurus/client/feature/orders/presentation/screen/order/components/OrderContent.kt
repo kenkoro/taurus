@@ -52,9 +52,9 @@ fun OrderContent(
   onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
   onInternetConnectionErrorShowSnackbar: suspend () -> SnackbarResult,
   onLoginErrorShowSnackbar: suspend () -> SnackbarResult,
-  onDeleteOrderShowSnackbar: suspend () -> SnackbarResult,
   onAppendNewOrdersErrorShowSnackbar: suspend () -> SnackbarResult,
   onOrderAccessErrorShowSnackbar: suspend () -> SnackbarResult,
+  onApiErrorShowSnackbar: suspend () -> SnackbarResult,
   onEncryptToken: (String) -> Unit,
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
   onDecryptToken: () -> String,
@@ -115,9 +115,10 @@ fun OrderContent(
       onEditOrderLocally = onEditOrderLocally,
       onEditOrderRemotely = onEditOrderRemotely,
       onDeleteOrderRemotely = onDeleteOrderRemotely,
-      onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
       onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,
       onOrderAccessErrorShowSnackbar = onOrderAccessErrorShowSnackbar,
+      onApiErrorShowSnackbar = onApiErrorShowSnackbar,
+      onDecryptToken = onDecryptToken,
     )
   }
 }

@@ -55,7 +55,8 @@ fun OrderItem(
   onEditOrderLocally: suspend (NewOrder) -> Unit,
   onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
   onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
-  onDeleteOrderShowSnackbar: suspend () -> SnackbarResult,
+  onDecryptToken: () -> String,
+  onApiErrorShowSnackbar: suspend () -> SnackbarResult,
 ) {
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
@@ -67,15 +68,15 @@ fun OrderItem(
   val selected = { selectedOrderRecordId == order.recordId }
   val animatedHeight by animateDpAsState(
     targetValue =
-      if (selected()) {
-        if (allowedToUpdateOrderStatus(profile)) {
-          contentHeight.orderItemExpanded
-        } else {
-          contentHeight.orderItemExpandedWithoutActionButton
-        }
+    if (selected()) {
+      if (allowedToUpdateOrderStatus(profile)) {
+        contentHeight.orderItemExpanded
       } else {
-        contentHeight.orderItemNotExpanded
-      },
+        contentHeight.orderItemExpandedWithoutActionButton
+      }
+    } else {
+      contentHeight.orderItemNotExpanded
+    },
     label = "AnimatedHeightOfOrderItem",
     animationSpec = tween(300),
   )
@@ -85,26 +86,26 @@ fun OrderItem(
       Spacer(modifier = Modifier.height(contentHeight.medium))
       Column(
         modifier =
-          Modifier
-            .width(contentWidth.orderItem)
-            .height(animatedHeight)
-            .clip(RoundedCornerShape(shape.medium))
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable {
-              if (selected()) {
-                onSelectOrder(null)
-              } else {
-                onSelectOrder(order.recordId)
-              }
-            },
+        Modifier
+          .width(contentWidth.orderItem)
+          .height(animatedHeight)
+          .clip(RoundedCornerShape(shape.medium))
+          .background(MaterialTheme.colorScheme.primaryContainer)
+          .clickable {
+            if (selected()) {
+              onSelectOrder(null)
+            } else {
+              onSelectOrder(order.recordId)
+            }
+          },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
       ) {
         Column(
           modifier =
-            Modifier
-              .fillMaxWidth()
-              .wrapContentHeight(),
+          Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
           verticalArrangement = Arrangement.Top,
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -125,13 +126,15 @@ fun OrderItem(
               order = order,
               profile = profile,
               networkStatus = networkStatus,
-              deleterSubject = user?.subject,
+              userSubject = user?.subject,
               onAddNewOrderLocally = onAddNewOrderLocally,
               onDeleteOrderLocally = onDeleteOrderLocally,
               onEditOrderLocally = onEditOrderLocally,
               onDeleteOrderRemotely = onDeleteOrderRemotely,
               onEditOrderRemotely = onEditOrderRemotely,
               onHide = { visible = false },
+              onDecryptToken = onDecryptToken,
+              onApiErrorShowSnackbar = onApiErrorShowSnackbar,
             )
             Spacer(modifier = Modifier.height(contentHeight.large))
           }
@@ -177,8 +180,9 @@ private fun OrderItemPrev() {
       onEditOrderLocally = { _ -> },
       onDeleteOrderRemotely = { _, _ -> false },
       onEditOrderRemotely = { _, _, _, _ -> false },
-      onDeleteOrderShowSnackbar = { SnackbarResult.Dismissed },
       networkStatus = NetworkStatus.Available,
+      onDecryptToken = { "" },
+      onApiErrorShowSnackbar = { SnackbarResult.Dismissed }
     )
   }
 }
