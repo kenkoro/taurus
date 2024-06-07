@@ -34,27 +34,32 @@ fun OrderItemContent(
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
+  val orderInfo =
+    listOf(
+      Pair(stringResource(id = R.string.order_id), order.orderId.toString()),
+      Pair(stringResource(id = R.string.order_size), order.size),
+      Pair(stringResource(id = R.string.order_model), order.model),
+      Pair(stringResource(id = R.string.order_category), order.category),
+      Pair(stringResource(id = R.string.order_color), order.color),
+      Pair(stringResource(id = R.string.order_customer), order.customer),
+      Pair(stringResource(id = R.string.order_quantity), order.quantity.toString()),
+    )
+
 
   Column(verticalArrangement = Arrangement.Top) {
     Row(
       modifier = Modifier.fillMaxWidth(),
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      OrderItemDateAndTitleRow(orderDate = order.date, orderTitle = order.title)
+      OrderItemDateAndTitleRow(
+        orderDate = order.date,
+        orderTitle = order.title,
+        orderStatus = order.status
+      )
       OrderItemKeyboardArrowIconRow(selected = selected)
     }
 
-    val orderInfo =
-      listOf(
-        Pair(stringResource(id = R.string.order_id), order.orderId.toString()),
-        Pair(stringResource(id = R.string.order_size), order.size),
-        Pair(stringResource(id = R.string.order_model), order.model),
-        Pair(stringResource(id = R.string.order_category), order.category),
-        Pair(stringResource(id = R.string.order_color), order.color),
-        Pair(stringResource(id = R.string.order_customer), order.customer),
-        Pair(stringResource(id = R.string.order_quantity), order.quantity.toString()),
-      )
-
+    Spacer(modifier = Modifier.height(contentHeight.large))
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
       items(orderInfo) { pair ->
         Row(

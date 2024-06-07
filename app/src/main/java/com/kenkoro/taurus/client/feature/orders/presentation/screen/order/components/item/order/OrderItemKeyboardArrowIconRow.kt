@@ -20,14 +20,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
+import com.kenkoro.taurus.client.core.local.LocalSize
 
 @Composable
 fun OrderItemKeyboardArrowIconRow(
   modifier: Modifier = Modifier,
   selected: Boolean,
 ) {
+  val size = LocalSize.current
   val contentWidth = LocalContentWidth.current
 
   val animatedRotationOfKeyboardArrow by animateFloatAsState(
@@ -47,7 +48,7 @@ fun OrderItemKeyboardArrowIconRow(
     Box(
       modifier =
       Modifier
-        .size(25.dp)
+        .size(size.large)
         .clip(CircleShape)
         .background(MaterialTheme.colorScheme.primary),
       contentAlignment = Alignment.Center,

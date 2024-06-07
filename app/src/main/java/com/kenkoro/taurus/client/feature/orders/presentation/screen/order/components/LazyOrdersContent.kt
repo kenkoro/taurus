@@ -13,11 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
+import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
@@ -47,6 +47,7 @@ fun LazyOrdersContent(
   onAppendNewOrdersErrorShowSnackbar: suspend () -> SnackbarResult,
   onOrderAccessErrorShowSnackbar: suspend () -> SnackbarResult,
 ) {
+  val size = LocalSize.current
   val strokeWidth = LocalStrokeWidth.current
   val contentHeight = LocalContentHeight.current
 
@@ -95,7 +96,7 @@ fun LazyOrdersContent(
       item {
         if (orders.loadState.append is LoadState.Loading) {
           CircularProgressIndicator(
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(size.medium),
             strokeWidth = strokeWidth.standard,
           )
         }

@@ -17,12 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
+import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 
 @Composable
 fun OrderItemDateAndTitleRow(
   modifier: Modifier = Modifier,
   orderDate: Long,
   orderTitle: String,
+  orderStatus: OrderStatus? = null,
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
@@ -31,29 +33,36 @@ fun OrderItemDateAndTitleRow(
     modifier = Modifier.fillMaxWidth(.5F),
     horizontalArrangement = Arrangement.Start,
   ) {
-    Spacer(modifier = Modifier.width(contentWidth.large))
     Column(
       modifier = Modifier.width(contentWidth.halfStandard),
       horizontalAlignment = Alignment.Start,
     ) {
-      Text(
-        text = dateFromMillis(orderDate),
-        color = MaterialTheme.colorScheme.onPrimaryContainer,
-        style = MaterialTheme.typography.bodySmall,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-      )
+      Row {
+        Spacer(modifier = Modifier.width(contentWidth.large))
+        Text(
+          text = dateFromMillis(orderDate),
+          color = MaterialTheme.colorScheme.onPrimaryContainer,
+          style = MaterialTheme.typography.bodySmall,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+        )
+      }
       Spacer(modifier = Modifier.height(contentHeight.small))
-      Text(
-        modifier = Modifier
-          .fillMaxWidth()
-          .clickable {},
-        text = orderTitle,
-        color = MaterialTheme.colorScheme.onPrimaryContainer,
-        style = MaterialTheme.typography.bodyMedium,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-      )
+      Row(modifier = Modifier.clickable {}) {
+        Spacer(modifier = Modifier.width(contentWidth.large))
+        Text(
+          modifier = Modifier.width(contentWidth.orderTitle),
+          text = orderTitle,
+          color = MaterialTheme.colorScheme.onPrimaryContainer,
+          style = MaterialTheme.typography.bodyMedium,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+        )
+        Spacer(modifier = Modifier.width(contentWidth.small))
+        if (orderStatus != null) {
+          OrderStatusIcon(orderStatus = orderStatus)
+        }
+      }
     }
   }
 }

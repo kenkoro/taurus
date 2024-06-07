@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -26,6 +27,7 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
+import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.core.local.LocalShape
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,34 +39,51 @@ fun OrderBottomBar(
   isScrollingInProgress: Boolean = false,
   onAddNewOrderShowSnackbar: suspend () -> SnackbarResult,
 ) {
+  val offset = LocalOffset.current
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
   val scope = rememberCoroutineScope()
 
-  val animatedHeight by animateDpAsState(
-    targetValue =
-      if (isScrollingInProgress) {
-        contentHeight.none
-      } else {
-        contentHeight.bottomBar
-      },
-    label = "AnimatedHeight",
+  val animatedYOffset by animateDpAsState(
+    targetValue = if (isScrollingInProgress) {
+      offset.bottomBar
+    } else {
+      offset.none
+    },
+    label = "AnimatedYOffset",
+  )
+  val animatedBottomBarHeight by animateDpAsState(
+    targetValue = if (isScrollingInProgress) {
+      contentHeight.none
+    } else {
+      contentHeight.bottomBar
+    },
+    label = "AnimatedBottomBarHeight",
+  )
+  val animatedBottomBarButtonHeight by animateDpAsState(
+    targetValue = if (isScrollingInProgress) {
+      contentHeight.none
+    } else {
+      contentHeight.halfStandard
+    },
+    label = "AnimatedBottomBarButtonHeight",
   )
 
   Column(
     modifier =
-      modifier
-        .fillMaxWidth()
-        .height(animatedHeight),
+    modifier
+      .fillMaxWidth()
+      .height(animatedBottomBarHeight)
+      .offset(y = animatedYOffset),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {
     Button(
       modifier =
-        Modifier
-          .width(contentWidth.orderItem)
-          .height(contentHeight.halfStandard),
+      Modifier
+        .width(contentWidth.orderItem)
+        .height(animatedBottomBarButtonHeight),
       onClick = { scope.launch(Dispatchers.Main) { onAddNewOrderShowSnackbar() } },
       shape = RoundedCornerShape(shape.medium),
     ) {

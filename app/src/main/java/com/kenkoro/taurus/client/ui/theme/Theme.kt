@@ -17,10 +17,12 @@ import com.kenkoro.taurus.client.core.local.LocalElevation
 import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.core.local.LocalPadding
 import com.kenkoro.taurus.client.core.local.LocalShape
+import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.core.local.Offset
 import com.kenkoro.taurus.client.core.local.Padding
 import com.kenkoro.taurus.client.core.local.Shape
+import com.kenkoro.taurus.client.core.local.Size
 import com.kenkoro.taurus.client.core.local.StrokeWidth
 
 private val LightColors =
@@ -93,7 +95,7 @@ private val DarkColors =
 fun AppTheme(
   useDarkTheme: Boolean = isSystemInDarkTheme(),
   content:
-    @Composable()
+  @Composable()
     () -> Unit,
 ) {
   val colors =
@@ -112,6 +114,7 @@ fun AppTheme(
     LocalPadding provides Padding(),
     LocalStrokeWidth provides StrokeWidth(),
     LocalOffset provides Offset(),
+    LocalSize provides Size(),
   ) {
     MaterialTheme(
       colorScheme = colors,

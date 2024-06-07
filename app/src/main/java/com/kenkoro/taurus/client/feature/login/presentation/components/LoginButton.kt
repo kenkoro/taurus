@@ -27,6 +27,7 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
+import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
@@ -39,6 +40,7 @@ fun LoginButton(
   onSubmit: () -> Unit = {},
   onExit: () -> Unit = {},
 ) {
+  val size = LocalSize.current
   val shape = LocalShape.current
   val strokeWidth = LocalStrokeWidth.current
   val contentWidth = LocalContentWidth.current
@@ -47,17 +49,17 @@ fun LoginButton(
   val continueButtonColors =
     ButtonDefaults.buttonColors(
       containerColor =
-        if (isError) {
-          MaterialTheme.colorScheme.error
-        } else {
-          MaterialTheme.colorScheme.primary
-        },
+      if (isError) {
+        MaterialTheme.colorScheme.error
+      } else {
+        MaterialTheme.colorScheme.primary
+      },
       contentColor =
-        if (isError) {
-          MaterialTheme.colorScheme.onError
-        } else {
-          MaterialTheme.colorScheme.onPrimary
-        },
+      if (isError) {
+        MaterialTheme.colorScheme.onError
+      } else {
+        MaterialTheme.colorScheme.onPrimary
+      },
     )
 
   Row(
@@ -68,9 +70,9 @@ fun LoginButton(
       onClick = { onExit() },
       enabled = isLoginButtonEnable(),
       modifier =
-        modifier
-          .width(contentWidth.halfStandard)
-          .height(contentHeight.loginButton),
+      modifier
+        .width(contentWidth.halfStandard)
+        .height(contentHeight.loginButton),
       shape = RoundedCornerShape(topStart = shape.medium, bottomStart = shape.medium),
     ) {
       Row(
@@ -87,18 +89,18 @@ fun LoginButton(
     }
     Divider(
       modifier =
-        Modifier
-          .height(contentHeight.loginButton)
-          .width(1.dp),
+      Modifier
+        .height(contentHeight.loginButton)
+        .width(1.dp),
     )
     Button(
       onClick = { onSubmit() },
       enabled = isLoginButtonEnable(),
       colors = continueButtonColors,
       modifier =
-        modifier
-          .width(contentWidth.halfStandard)
-          .height(contentHeight.loginButton),
+      modifier
+        .width(contentWidth.halfStandard)
+        .height(contentHeight.loginButton),
       shape = RoundedCornerShape(topEnd = shape.medium, bottomEnd = shape.medium),
     ) {
       Row(
@@ -110,7 +112,7 @@ fun LoginButton(
         if (isLogging) {
           CircularProgressIndicator(
             strokeWidth = strokeWidth.small,
-            modifier = Modifier.size(15.dp),
+            modifier = Modifier.size(size.small),
             color = MaterialTheme.colorScheme.onPrimary,
           )
         } else {

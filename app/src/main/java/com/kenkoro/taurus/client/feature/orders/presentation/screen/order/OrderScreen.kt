@@ -114,6 +114,7 @@ fun OrderScreen(
         OrderTopBar(
           networkStatus = networkStatus,
           isScrollingInProgress = lazyOrdersState.isScrollInProgress,
+          userName = user?.firstName,
           onSortOrdersShowSnackbar = {
             snackbarHostState.showSnackbar(
               message = notImplementedYetMessage,

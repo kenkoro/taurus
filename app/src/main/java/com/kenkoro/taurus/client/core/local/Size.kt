@@ -4,10 +4,10 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-data class Offset(
-  val standard: Dp = (-80).dp,
-  val bottomBar: Dp = 60.dp,
-  val none: Dp = 0.dp,
+data class Size(
+  val small: Dp = 15.dp,
+  val medium: Dp = 20.dp,
+  val large: Dp = 25.dp,
 )
 
-val LocalOffset = compositionLocalOf { Offset() }
+val LocalSize = compositionLocalOf { Size() }

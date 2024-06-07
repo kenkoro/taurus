@@ -76,7 +76,7 @@ fun LoginTextFields(
 
   val yTargetValue = {
     if (subject.isFocused || password.isFocused) {
-      offset.loginContentIsFocused
+      offset.standard
     } else {
       offset.none
     }

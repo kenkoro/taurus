@@ -156,7 +156,7 @@ private fun OrderItemPrev() {
       orderId = 410,
       customer = "Suborbia",
       date = 1717427278111L,
-      title = "Жилет",
+      title = "Some large title, hello world!",
       model = "Grand",
       size = "OS",
       color = "Black",
@@ -170,7 +170,7 @@ private fun OrderItemPrev() {
     OrderItem(
       profile = UserProfile.Customer,
       order = order,
-      selectedOrderRecordId = 0,
+      selectedOrderRecordId = null,
       onAddNewOrderLocally = { _ -> },
       onDeleteOrderLocally = { _ -> },
       onEditOrderLocally = { _ -> },
