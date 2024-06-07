@@ -58,15 +58,15 @@ fun OrderItemBottomButton(
           scope.launch(Dispatchers.IO) {
             onEditOrderLocally(order.toCutOrder())
             /**
-             * TODO: Release this completely
-             * val wasAcknowledged = onEditOrderRemotely(
-             *   order.toCutOrder().toNewOrderDto(),
-             *   order.orderId,
-             *   "editorSubject",
-             *   "token",
-             * )
-             * Log.d("kenkoro", "Attempted to edit the order remotely! Result: $wasAcknowledged")
-             */
+     * TODO: Release this completely
+     * val wasAcknowledged = onEditOrderRemotely(
+     *   order.toCutOrder().toNewOrderDto(),
+     *   order.orderId,
+     *   "editorSubject",
+     *   "token",
+     * )
+     * Log.d("kenkoro", "Attempted to edit the order remotely! Result: $wasAcknowledged")
+     */
           }
           Unit
         }
@@ -87,15 +87,15 @@ fun OrderItemBottomButton(
           scope.launch(Dispatchers.IO) {
             onEditOrderLocally(order.toCheckedOrder())
             /**
-             * TODO: Release this as well
-             * val wasAcknowledged = onEditOrderRemotely(
-             *   order.toCheckedOrder().toNewOrderDto(),
-             *   order.orderId,
-             *   "editorSubject",
-             *   "token",
-             * )
-             * Log.d("kenkoro", "Attempted to edit the order remotely! Result: $wasAcknowledged")
-             */
+     * TODO: Release this as well
+     * val wasAcknowledged = onEditOrderRemotely(
+     *   order.toCheckedOrder().toNewOrderDto(),
+     *   order.orderId,
+     *   "editorSubject",
+     *   "token",
+     * )
+     * Log.d("kenkoro", "Attempted to edit the order remotely! Result: $wasAcknowledged")
+     */
           }
           Unit
         }
@@ -109,7 +109,7 @@ fun OrderItemBottomButton(
         )
       }
     }
-    */
+     */
 
     else -> {}
   }
