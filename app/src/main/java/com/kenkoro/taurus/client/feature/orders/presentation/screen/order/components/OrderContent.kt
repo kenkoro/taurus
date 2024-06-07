@@ -106,6 +106,7 @@ fun OrderContent(
       networkStatus = networkStatus,
       userProfile = user.profile,
       orders = orders,
+      user = user,
       lazyOrdersState = lazyOrdersState,
       selectedOrderRecordId = selectedOrderRecordId,
       onSelectOrder = onSelectOrder,

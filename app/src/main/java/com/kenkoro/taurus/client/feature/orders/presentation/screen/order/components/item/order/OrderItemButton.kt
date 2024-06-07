@@ -15,12 +15,11 @@ import com.kenkoro.taurus.client.feature.orders.domain.Order
 
 @Composable
 fun OrderItemButton(
+  modifier: Modifier = Modifier,
   order: Order,
-  onVisible: (Boolean) -> Unit,
   onClick: () -> Unit,
   text: String,
   networkStatus: NetworkStatus,
-  modifier: Modifier = Modifier,
 ) {
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current

@@ -38,11 +38,13 @@ import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Admin
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Ceo
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Manager
+import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderItem(
   modifier: Modifier = Modifier,
+  user: User? = null,
   order: Order,
   profile: UserProfile,
   networkStatus: NetworkStatus,
@@ -65,15 +67,15 @@ fun OrderItem(
   val selected = { selectedOrderRecordId == order.recordId }
   val animatedHeight by animateDpAsState(
     targetValue =
-      if (selected()) {
-        if (allowedToUpdateOrderStatus(profile)) {
-          contentHeight.orderItemExpanded
-        } else {
-          contentHeight.orderItemExpandedWithoutActionButton
-        }
+    if (selected()) {
+      if (allowedToUpdateOrderStatus(profile)) {
+        contentHeight.orderItemExpanded
       } else {
-        contentHeight.orderItemNotExpanded
-      },
+        contentHeight.orderItemExpandedWithoutActionButton
+      }
+    } else {
+      contentHeight.orderItemNotExpanded
+    },
     label = "AnimatedHeightOfOrderItem",
     animationSpec = tween(300),
   )
@@ -83,26 +85,26 @@ fun OrderItem(
       Spacer(modifier = Modifier.height(contentHeight.medium))
       Column(
         modifier =
-          Modifier
-            .width(contentWidth.orderItem)
-            .height(animatedHeight)
-            .clip(RoundedCornerShape(shape.medium))
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable {
-              if (selected()) {
-                onSelectOrder(null)
-              } else {
-                onSelectOrder(order.recordId)
-              }
-            },
+        Modifier
+          .width(contentWidth.orderItem)
+          .height(animatedHeight)
+          .clip(RoundedCornerShape(shape.medium))
+          .background(MaterialTheme.colorScheme.primaryContainer)
+          .clickable {
+            if (selected()) {
+              onSelectOrder(null)
+            } else {
+              onSelectOrder(order.recordId)
+            }
+          },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
       ) {
         Column(
           modifier =
-            Modifier
-              .fillMaxWidth()
-              .wrapContentHeight(),
+          Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
           verticalArrangement = Arrangement.Top,
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -111,7 +113,6 @@ fun OrderItem(
             order = order,
             selected = selected(),
           )
-          Spacer(modifier = Modifier.height(contentHeight.large))
         }
 
         if (allowedToUpdateOrderStatus(profile) && selected()) {
@@ -120,17 +121,17 @@ fun OrderItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom,
           ) {
-            OrderItemButtonHandler(
+            OrderItemBottomButton(
               order = order,
               profile = profile,
+              networkStatus = networkStatus,
+              deleterSubject = user?.subject,
               onAddNewOrderLocally = onAddNewOrderLocally,
               onDeleteOrderLocally = onDeleteOrderLocally,
               onEditOrderLocally = onEditOrderLocally,
               onDeleteOrderRemotely = onDeleteOrderRemotely,
               onEditOrderRemotely = onEditOrderRemotely,
-              onDeleteOrderShowSnackbar = onDeleteOrderShowSnackbar,
-              onVisible = { visible = it },
-              networkStatus = networkStatus,
+              onHide = { visible = false }
             )
             Spacer(modifier = Modifier.height(contentHeight.large))
           }
@@ -162,15 +163,15 @@ private fun OrderItemPrev() {
       color = "Black",
       category = "Жилеты",
       quantity = 4,
-      status = OrderStatus.Checked,
+      status = OrderStatus.Idle,
       creatorId = 0,
     )
 
   AppTheme {
     OrderItem(
-      profile = UserProfile.Customer,
+      profile = UserProfile.Cutter,
       order = order,
-      selectedOrderRecordId = null,
+      selectedOrderRecordId = 0,
       onAddNewOrderLocally = { _ -> },
       onDeleteOrderLocally = { _ -> },
       onEditOrderLocally = { _ -> },

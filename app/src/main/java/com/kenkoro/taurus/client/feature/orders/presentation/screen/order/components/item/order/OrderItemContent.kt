@@ -63,9 +63,9 @@ fun OrderItemContent(
       items(orderInfo) { pair ->
         Row(
           modifier =
-            Modifier
-              .height(contentHeight.orderItemField)
-              .clickable {},
+          Modifier
+            .height(contentHeight.orderItemField)
+            .clickable {},
           verticalAlignment = Alignment.CenterVertically,
         ) {
           Spacer(modifier = Modifier.width(contentWidth.large))

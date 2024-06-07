@@ -26,12 +26,14 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.compon
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Tailor
+import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 
 @Composable
 fun LazyOrdersContent(
   modifier: Modifier = Modifier,
+  user: User? = null,
   networkStatus: NetworkStatus,
   userProfile: UserProfile,
   orders: LazyPagingItems<Order>,
@@ -79,6 +81,7 @@ fun LazyOrdersContent(
             profile = userProfile,
             order = order,
             networkStatus = networkStatus,
+            user = user,
             selectedOrderRecordId = selectedOrderRecordId,
             onSelectOrder = onSelectOrder,
             onAddNewOrderLocally = onAddNewOrderLocally,
