@@ -38,7 +38,7 @@ fun OrderItemBottomButton(
   onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
   onHide: () -> Unit = {},
   onDecryptToken: () -> String,
-  onApiErrorShowSnackbar: suspend () -> SnackbarResult
+  onApiErrorShowSnackbar: suspend () -> SnackbarResult,
 ) {
   val scope = rememberCoroutineScope()
 
@@ -55,10 +55,11 @@ fun OrderItemBottomButton(
               delay(400L)
 
               onDeleteOrderLocally(order)
-              val wasAcknowledged = onDeleteOrderRemotely(
-                order.orderId,
-                userSubject ?: ""
-              )
+              val wasAcknowledged =
+                onDeleteOrderRemotely(
+                  order.orderId,
+                  userSubject ?: "",
+                )
               if (!wasAcknowledged) {
                 withContext(Dispatchers.Main) { onApiErrorShowSnackbar() }
               }
@@ -78,12 +79,13 @@ fun OrderItemBottomButton(
             scope.launch(Dispatchers.IO) {
               val cutOrder = order.toCutOrder()
               onEditOrderLocally(cutOrder)
-              val wasAcknowledged = onEditOrderRemotely(
-                cutOrder.toNewOrderDto(),
-                order.orderId,
-                userSubject ?: "",
-                onDecryptToken(),
-              )
+              val wasAcknowledged =
+                onEditOrderRemotely(
+                  cutOrder.toNewOrderDto(),
+                  order.orderId,
+                  userSubject ?: "",
+                  onDecryptToken(),
+                )
               if (!wasAcknowledged) {
                 withContext(Dispatchers.Main) { onApiErrorShowSnackbar() }
               }
@@ -103,12 +105,13 @@ fun OrderItemBottomButton(
             scope.launch(Dispatchers.IO) {
               val checkedOrder = order.toCheckedOrder()
               onEditOrderLocally(checkedOrder)
-              val wasAcknowledged = onEditOrderRemotely(
-                checkedOrder.toNewOrderDto(),
-                order.orderId,
-                userSubject ?: "",
-                onDecryptToken(),
-              )
+              val wasAcknowledged =
+                onEditOrderRemotely(
+                  checkedOrder.toNewOrderDto(),
+                  order.orderId,
+                  userSubject ?: "",
+                  onDecryptToken(),
+                )
               if (!wasAcknowledged) {
                 withContext(Dispatchers.Main) { onApiErrorShowSnackbar() }
               }

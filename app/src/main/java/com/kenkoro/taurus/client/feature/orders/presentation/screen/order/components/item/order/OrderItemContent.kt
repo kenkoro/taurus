@@ -1,7 +1,6 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order
 
 import android.graphics.Color
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.kenkoro.taurus.client.R
@@ -60,23 +60,33 @@ fun OrderItemContent(
 
     Spacer(modifier = Modifier.height(contentHeight.large))
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-      items(orderInfo) { pair ->
+      items(orderInfo) { keyValuePair ->
         Row(
           modifier =
             Modifier
-              .height(contentHeight.orderItemField)
-              .clickable {},
+              .fillMaxWidth()
+              .height(contentHeight.orderItemField),
           verticalAlignment = Alignment.CenterVertically,
         ) {
           Spacer(modifier = Modifier.width(contentWidth.large))
           Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = "${pair.first}: ${pair.second}",
+            modifier = Modifier.weight(8F),
+            text = keyValuePair.first,
             color = MaterialTheme.colorScheme.onPrimaryContainer,
             style = MaterialTheme.typography.bodyMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
           )
+          Text(
+            modifier = Modifier.weight(2F),
+            text = keyValuePair.second,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.End,
+          )
+          Spacer(modifier = Modifier.width(contentWidth.large))
         }
       }
     }

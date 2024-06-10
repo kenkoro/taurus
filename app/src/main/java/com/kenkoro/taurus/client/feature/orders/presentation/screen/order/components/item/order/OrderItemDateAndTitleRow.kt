@@ -1,7 +1,6 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order
 
 import android.text.format.DateFormat
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,7 +47,7 @@ fun OrderItemDateAndTitleRow(
         )
       }
       Spacer(modifier = Modifier.height(contentHeight.small))
-      Row(modifier = Modifier.clickable {}) {
+      Row {
         Spacer(modifier = Modifier.width(contentWidth.large))
         Text(
           modifier = Modifier.width(contentWidth.orderTitle),

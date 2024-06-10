@@ -108,9 +108,9 @@ fun OrderScreen(
         )
       },
       modifier =
-      Modifier
-        .statusBarsPadding()
-        .navigationBarsPadding(),
+        Modifier
+          .statusBarsPadding()
+          .navigationBarsPadding(),
       topBar = {
         OrderTopBar(
           networkStatus = networkStatus,
@@ -150,10 +150,10 @@ fun OrderScreen(
       content = { paddingValues ->
         Surface(
           modifier =
-          Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(paddingValues),
+            Modifier
+              .fillMaxSize()
+              .background(MaterialTheme.colorScheme.background)
+              .padding(paddingValues),
         ) {
           OrderContent(
             networkStatus = networkStatus,

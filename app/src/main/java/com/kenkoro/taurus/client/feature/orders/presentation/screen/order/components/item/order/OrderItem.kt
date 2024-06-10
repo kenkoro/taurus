@@ -33,10 +33,15 @@ import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
+import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Cut
+import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.allowedToSeeOrders
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Admin
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Ceo
+import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
+import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
+import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Manager
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.ui.theme.AppTheme
@@ -68,15 +73,18 @@ fun OrderItem(
   val selected = { selectedOrderRecordId == order.recordId }
   val animatedHeight by animateDpAsState(
     targetValue =
-    if (selected()) {
-      if (allowedToUpdateOrderStatus(profile)) {
-        contentHeight.orderItemExpanded
+      if (selected()) {
+        if (
+          allowedToUpdateOrderStatus(profile) &&
+          orderStatusCorrespondsToUserProfile(profile, order.status)
+        ) {
+          contentHeight.orderItemExpanded
+        } else {
+          contentHeight.orderItemExpandedWithoutActionButton
+        }
       } else {
-        contentHeight.orderItemExpandedWithoutActionButton
-      }
-    } else {
-      contentHeight.orderItemNotExpanded
-    },
+        contentHeight.orderItemNotExpanded
+      },
     label = "AnimatedHeightOfOrderItem",
     animationSpec = tween(300),
   )
@@ -86,26 +94,26 @@ fun OrderItem(
       Spacer(modifier = Modifier.height(contentHeight.medium))
       Column(
         modifier =
-        Modifier
-          .width(contentWidth.orderItem)
-          .height(animatedHeight)
-          .clip(RoundedCornerShape(shape.medium))
-          .background(MaterialTheme.colorScheme.primaryContainer)
-          .clickable {
-            if (selected()) {
-              onSelectOrder(null)
-            } else {
-              onSelectOrder(order.recordId)
-            }
-          },
+          Modifier
+            .width(contentWidth.orderItem)
+            .height(animatedHeight)
+            .clip(RoundedCornerShape(shape.medium))
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .clickable {
+              if (selected()) {
+                onSelectOrder(null)
+              } else {
+                onSelectOrder(order.recordId)
+              }
+            },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
       ) {
         Column(
           modifier =
-          Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
+            Modifier
+              .fillMaxWidth()
+              .wrapContentHeight(),
           verticalArrangement = Arrangement.Top,
           horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -151,6 +159,17 @@ private fun allowedToUpdateOrderStatus(profile: UserProfile): Boolean {
     profile != Manager
 }
 
+private fun orderStatusCorrespondsToUserProfile(
+  userProfile: UserProfile,
+  orderStatus: OrderStatus,
+): Boolean {
+  return when (userProfile) {
+    Cutter -> orderStatus == Idle
+    Inspector -> orderStatus == Cut
+    else -> true
+  }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun OrderItemPrev() {
@@ -166,13 +185,13 @@ private fun OrderItemPrev() {
       color = "Black",
       category = "Жилеты",
       quantity = 4,
-      status = OrderStatus.Idle,
+      status = OrderStatus.Checked,
       creatorId = 0,
     )
 
   AppTheme {
     OrderItem(
-      profile = UserProfile.Cutter,
+      profile = Customer,
       order = order,
       selectedOrderRecordId = 0,
       onAddNewOrderLocally = { _ -> },
@@ -182,7 +201,7 @@ private fun OrderItemPrev() {
       onEditOrderRemotely = { _, _, _, _ -> false },
       networkStatus = NetworkStatus.Available,
       onDecryptToken = { "" },
-      onApiErrorShowSnackbar = { SnackbarResult.Dismissed }
+      onApiErrorShowSnackbar = { SnackbarResult.Dismissed },
     )
   }
 }
