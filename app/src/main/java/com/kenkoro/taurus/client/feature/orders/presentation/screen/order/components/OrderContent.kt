@@ -18,11 +18,13 @@ import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.CutterOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.InspectorOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.LoginState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.ManagerOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
 import com.kenkoro.taurus.client.feature.profile.data.remote.dto.UserDto
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
+import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Manager
 import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 import kotlinx.coroutines.Dispatchers
@@ -131,6 +133,10 @@ private fun findStrategy(userProfile: UserProfile): OrderFilterStrategy? {
 
     Inspector -> {
       InspectorOrderFilter()
+    }
+
+    Manager -> {
+      ManagerOrderFilter()
     }
 
     else -> {

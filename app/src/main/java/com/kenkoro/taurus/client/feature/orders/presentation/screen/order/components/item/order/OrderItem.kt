@@ -61,6 +61,7 @@ fun OrderItem(
   onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
   onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
   onDecryptToken: () -> String,
+  onRefresh: () -> Unit = {},
   onApiErrorShowSnackbar: suspend () -> SnackbarResult,
 ) {
   val shape = LocalShape.current
@@ -142,6 +143,7 @@ fun OrderItem(
               onEditOrderRemotely = onEditOrderRemotely,
               onHide = { visible = false },
               onDecryptToken = onDecryptToken,
+              onRefresh = onRefresh,
               onApiErrorShowSnackbar = onApiErrorShowSnackbar,
             )
             Spacer(modifier = Modifier.height(contentHeight.large))

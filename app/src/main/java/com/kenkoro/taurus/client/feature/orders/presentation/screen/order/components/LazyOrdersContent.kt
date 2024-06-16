@@ -91,6 +91,7 @@ fun LazyOrdersContent(
             onEditOrderRemotely = onEditOrderRemotely,
             onDeleteOrderRemotely = onDeleteOrderRemotely,
             onDecryptToken = onDecryptToken,
+            onRefresh = orders::refresh,
             onApiErrorShowSnackbar = onApiErrorShowSnackbar,
           )
         }

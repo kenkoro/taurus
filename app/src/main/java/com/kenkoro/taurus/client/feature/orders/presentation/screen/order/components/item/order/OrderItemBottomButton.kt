@@ -38,9 +38,15 @@ fun OrderItemBottomButton(
   onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
   onHide: () -> Unit = {},
   onDecryptToken: () -> String,
+  onRefresh: () -> Unit = {},
   onApiErrorShowSnackbar: suspend () -> SnackbarResult,
 ) {
   val scope = rememberCoroutineScope()
+  val onHideWithDelay =
+    suspend {
+      onHide()
+      delay(400L)
+    }
 
   when (profile) {
     Customer -> {
@@ -51,8 +57,7 @@ fun OrderItemBottomButton(
         onClick = {
           scope.launch {
             launch(Dispatchers.IO) {
-              onHide()
-              delay(400L)
+              onHideWithDelay()
 
               onDeleteOrderLocally(order)
               val wasAcknowledged =
@@ -60,7 +65,9 @@ fun OrderItemBottomButton(
                   order.orderId,
                   userSubject ?: "",
                 )
-              if (!wasAcknowledged) {
+              if (wasAcknowledged) {
+                onRefresh()
+              } else {
                 withContext(Dispatchers.Main) { onApiErrorShowSnackbar() }
               }
             }
@@ -77,6 +84,8 @@ fun OrderItemBottomButton(
           networkStatus = networkStatus,
           onClick = {
             scope.launch(Dispatchers.IO) {
+              onHideWithDelay()
+
               val cutOrder = order.toCutOrder()
               onEditOrderLocally(cutOrder)
               val wasAcknowledged =
@@ -86,7 +95,9 @@ fun OrderItemBottomButton(
                   userSubject ?: "",
                   onDecryptToken(),
                 )
-              if (!wasAcknowledged) {
+              if (wasAcknowledged) {
+                onRefresh()
+              } else {
                 withContext(Dispatchers.Main) { onApiErrorShowSnackbar() }
               }
             }
@@ -103,6 +114,8 @@ fun OrderItemBottomButton(
           networkStatus = networkStatus,
           onClick = {
             scope.launch(Dispatchers.IO) {
+              onHideWithDelay()
+
               val checkedOrder = order.toCheckedOrder()
               onEditOrderLocally(checkedOrder)
               val wasAcknowledged =
@@ -112,7 +125,9 @@ fun OrderItemBottomButton(
                   userSubject ?: "",
                   onDecryptToken(),
                 )
-              if (!wasAcknowledged) {
+              if (wasAcknowledged) {
+                onRefresh()
+              } else {
                 withContext(Dispatchers.Main) { onApiErrorShowSnackbar() }
               }
             }
