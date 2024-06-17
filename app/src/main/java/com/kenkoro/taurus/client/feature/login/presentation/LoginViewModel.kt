@@ -10,7 +10,7 @@ import com.kenkoro.taurus.client.feature.login.data.remote.dto.LoginDto
 import com.kenkoro.taurus.client.feature.login.data.remote.repository.LoginRepositoryImpl
 import com.kenkoro.taurus.client.feature.login.presentation.util.PasswordState
 import com.kenkoro.taurus.client.feature.login.presentation.util.SubjectState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.LoginState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.LoginState
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel

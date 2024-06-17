@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
           color = MaterialTheme.colorScheme.background,
         ) {
           AppNavHost(
-            startDestination = { subject, password ->
+            onLoginChooseDestination = { subject, password ->
               if (subject.isNotBlank() && password.isNotBlank()) {
                 Screen.OrderScreen
               } else {

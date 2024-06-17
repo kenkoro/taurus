@@ -2,7 +2,7 @@ package com.kenkoro.taurus.client.feature.login.data.mappers
 
 import com.kenkoro.taurus.client.feature.login.data.local.UserEntity
 import com.kenkoro.taurus.client.feature.profile.data.remote.dto.UserDto
-import com.kenkoro.taurus.client.feature.sewing.domain.model.User
+import com.kenkoro.taurus.client.feature.profile.domain.User
 
 fun UserDto.toUserEntity(): UserEntity =
   UserEntity(

@@ -19,23 +19,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.PagingData
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.feature.login.data.local.UserEntity
 import com.kenkoro.taurus.client.feature.login.data.mappers.toUserDto
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrderDto
-import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
-import com.kenkoro.taurus.client.feature.orders.data.remote.dto.OrderDto
-import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderBottomBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderTopBar
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.LoginState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.LoginState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
-import com.kenkoro.taurus.client.feature.profile.data.remote.dto.UserDto
+import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
-import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import com.kenkoro.taurus.client.feature.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 import com.kenkoro.taurus.client.ui.theme.AppTheme
@@ -44,28 +41,22 @@ import kotlinx.coroutines.flow.flow
 
 @Composable
 fun OrderScreen(
-  user: User?,
-  onUser: (User) -> Unit,
+  modifier: Modifier = Modifier,
+  ordersPagingFlow: Flow<PagingData<Order>>,
+  user: User? = null,
   loginState: LoginState,
   networkStatus: NetworkStatus,
   selectedOrderRecordId: Int? = null,
-  ordersPagingFlow: Flow<PagingData<Order>>,
-  onStrategy: (OrderFilterStrategy?) -> Unit = {},
+  onUser: (User) -> Unit = {},
+  onFilterStrategy: (OrderFilterStrategy?) -> Unit = {},
   onSelectOrder: (Int?) -> Unit = {},
-  onLoginState: (LoginState) -> Unit,
-  onAddNewUserLocally: suspend (UserEntity) -> Unit,
-  onAddNewOrderLocally: suspend (NewOrder) -> Unit,
-  onDeleteOrderLocally: suspend (Order) -> Unit,
-  onEditOrderLocally: suspend (NewOrder) -> Unit,
-  onLogin: suspend (storedSubject: String, storedPassword: String) -> Result<TokenDto>,
-  onGetUserRemotely: suspend (subject: String, token: String) -> Result<UserDto>,
-  onAddNewOrderRemotely: suspend (NewOrder) -> Result<OrderDto>,
-  onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
-  onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
-  onEncryptToken: (String) -> Unit,
+  onLoginState: (LoginState) -> Unit = {},
+  localHandler: LocalHandler = LocalHandler(),
+  remoteHandler: RemoteHandler,
+  onEncryptToken: (String) -> Unit = {},
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
   onDecryptToken: () -> String,
-  onNavigateToProfileScreen: () -> Unit,
+  onNavigateToProfileScreen: () -> Unit = {},
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
@@ -83,6 +74,21 @@ fun OrderScreen(
   val okActionLabel = stringResource(id = R.string.ok)
 
   val lazyOrdersState = rememberLazyListState()
+
+  val onShowNotImplementedSnackbar =
+    suspend {
+      snackbarHostState.showSnackbar(
+        message = notImplementedYetMessage,
+        actionLabel = okActionLabel,
+      )
+    }
+  val onInternetConnectionShowSnackbar =
+    suspend {
+      internetSnackbarHostState.showSnackbar(
+        message = internetConnectionErrorMessage,
+        duration = SnackbarDuration.Indefinite,
+      )
+    }
 
   AppTheme {
     Scaffold(
@@ -116,25 +122,13 @@ fun OrderScreen(
           networkStatus = networkStatus,
           isScrollingInProgress = lazyOrdersState.isScrollInProgress,
           userName = user?.firstName,
-          onSortOrdersShowSnackbar = {
-            snackbarHostState.showSnackbar(
-              message = notImplementedYetMessage,
-              actionLabel = okActionLabel,
-            )
-          },
-          onFilterOrdersShowSnackbar = {
-            snackbarHostState.showSnackbar(
-              message = notImplementedYetMessage,
-              actionLabel = okActionLabel,
-            )
-          },
+          onSortOrdersShowSnackbar = onShowNotImplementedSnackbar,
+          onFilterOrdersShowSnackbar = onShowNotImplementedSnackbar,
           onNavigateToProfileScreen = onNavigateToProfileScreen,
         )
       },
       bottomBar = {
-        // TODO: onAddNewOrderRemotely callback
-        val userProfile = user?.profile ?: Other
-        if (userProfile == Customer) {
+        if (user != null && user.profile == Customer) {
           OrderBottomBar(
             networkStatus = networkStatus,
             isScrollingInProgress = lazyOrdersState.isScrollInProgress,
@@ -150,36 +144,25 @@ fun OrderScreen(
       content = { paddingValues ->
         Surface(
           modifier =
-            Modifier
+            modifier
               .fillMaxSize()
               .background(MaterialTheme.colorScheme.background)
               .padding(paddingValues),
         ) {
           OrderContent(
+            ordersPagingFlow = ordersPagingFlow,
             networkStatus = networkStatus,
             user = user,
             onUser = onUser,
             loginState = loginState,
             lazyOrdersState = lazyOrdersState,
-            ordersPagingFlow = ordersPagingFlow,
             selectedOrderRecordId = selectedOrderRecordId,
-            onStrategy = onStrategy,
+            onFilterStrategy = onFilterStrategy,
             onSelectOrder = onSelectOrder,
             onLoginState = onLoginState,
-            onAddNewUserLocally = onAddNewUserLocally,
-            onAddNewOrderLocally = onAddNewOrderLocally,
-            onDeleteOrderLocally = onDeleteOrderLocally,
-            onEditOrderLocally = onEditOrderLocally,
-            onLogin = onLogin,
-            onGetUserRemotely = onGetUserRemotely,
-            onDeleteOrderRemotely = onDeleteOrderRemotely,
-            onEditOrderRemotely = onEditOrderRemotely,
-            onInternetConnectionErrorShowSnackbar = {
-              internetSnackbarHostState.showSnackbar(
-                message = internetConnectionErrorMessage,
-                duration = SnackbarDuration.Indefinite,
-              )
-            },
+            localHandler = localHandler,
+            remoteHandler = remoteHandler,
+            onInternetConnectionErrorShowSnackbar = onInternetConnectionShowSnackbar,
             onLoginErrorShowSnackbar = {
               errorSnackbarHostState.showSnackbar(
                 message = loginErrorMessage,
@@ -245,7 +228,6 @@ private fun OrderScreenPrev() {
       )
     }
   val orderDto = order.toOrderDto()
-
   val user =
     User(
       userId = 0,
@@ -258,28 +240,23 @@ private fun OrderScreenPrev() {
       profile = Other,
       salt = "Salt",
     )
+  val remoteHandler =
+    RemoteHandler(
+      login = { _, _ -> Result.success(TokenDto("")) },
+      getUser = { _, _ -> Result.success(user.toUserDto()) },
+      addNewOrder = { _ -> Result.success(orderDto) },
+    )
 
   AppTheme {
     OrderScreen(
-      user = null,
-      onUser = {},
-      loginState = LoginState.Success,
       ordersPagingFlow = ordersFlow,
-      onLoginState = {},
-      onAddNewUserLocally = { _ -> },
-      onDeleteOrderLocally = { _ -> },
-      onAddNewOrderLocally = { _ -> },
-      onEditOrderLocally = { _ -> },
-      onLogin = { _, _ -> Result.success(TokenDto("")) },
-      onGetUserRemotely = { _, _ -> Result.success(user.toUserDto()) },
-      onAddNewOrderRemotely = { _ -> Result.success(orderDto) },
-      onDeleteOrderRemotely = { _, _ -> false },
-      onEditOrderRemotely = { _, _, _, _ -> false },
-      onEncryptToken = {},
+      user = user,
+      loginState = LoginState.NotLoggedYet,
+      networkStatus = NetworkStatus.Unavailable,
+      selectedOrderRecordId = null,
+      remoteHandler = remoteHandler,
       onDecryptSubjectAndPassword = { Pair("", "") },
       onDecryptToken = { "" },
-      onNavigateToProfileScreen = {},
-      networkStatus = NetworkStatus.Available,
     )
   }
 }

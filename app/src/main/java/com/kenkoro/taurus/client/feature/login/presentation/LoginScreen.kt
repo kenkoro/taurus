@@ -31,15 +31,16 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
-  networkStatus: NetworkStatus,
+  modifier: Modifier = Modifier,
   subject: SubjectState,
   password: PasswordState,
+  networkStatus: NetworkStatus,
   onSetErrorMessages: (TaurusTextFieldState, String, String) -> Unit,
   onLogin: suspend (subject: String, password: String) -> Result<TokenDto>,
   onEncryptAll: (String, String, String) -> Unit,
-  onNavigateToOrderScreen: () -> Unit,
   onExit: () -> Unit = {},
   onShowErrorTitle: () -> Boolean = { false },
+  onNavigateToOrderScreen: () -> Unit,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
@@ -85,7 +86,7 @@ fun LoginScreen(
       content = {
         Surface(
           modifier =
-            Modifier
+            modifier
               .fillMaxSize()
               .padding(it),
         ) {

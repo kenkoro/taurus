@@ -6,10 +6,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.room.withTransaction
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
-import com.kenkoro.taurus.client.feature.login.data.local.UserEntity
+import com.kenkoro.taurus.client.core.crypto.EncryptedCredentialService
+import com.kenkoro.taurus.client.feature.login.data.mappers.toUserEntity
 import com.kenkoro.taurus.client.feature.profile.data.remote.dto.UserDto
 import com.kenkoro.taurus.client.feature.profile.data.remote.repository.UserRepositoryImpl
-import com.kenkoro.taurus.client.feature.sewing.domain.model.User
+import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.shared.data.local.LocalDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -21,6 +22,7 @@ class UserViewModel
     private val userRepository: UserRepositoryImpl,
     private val localDb: LocalDatabase,
     private val decryptedCredentialService: DecryptedCredentialService,
+    private val encryptedCredentialService: EncryptedCredentialService,
   ) : ViewModel() {
     var user by mutableStateOf<User?>(null)
       private set
@@ -34,13 +36,17 @@ class UserViewModel
       token: String,
     ): Result<UserDto> = userRepository.getUser(subject, token)
 
-    suspend fun addNewUserLocally(userEntity: UserEntity) {
+    suspend fun addNewUserLocally(user: User) {
       localDb.withTransaction {
-        localDb.userDao.upsert(userEntity)
+        localDb.userDao.upsert(user.toUserEntity())
       }
     }
 
-    fun decryptSubject(): String = decryptedCredentialService.storedSubject()
-
     fun decryptToken(): String = decryptedCredentialService.storedToken()
+
+    fun encryptToken(token: String) {
+      encryptedCredentialService.putToken(token)
+    }
+
+    fun deleteAllCredentials(): Boolean = decryptedCredentialService.deleteAll()
   }

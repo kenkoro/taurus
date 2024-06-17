@@ -1,6 +1,5 @@
-package com.kenkoro.taurus.client.feature.sewing.domain.model
+package com.kenkoro.taurus.client.feature.profile.domain
 
-import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import kotlinx.serialization.Serializable
 
 @Serializable

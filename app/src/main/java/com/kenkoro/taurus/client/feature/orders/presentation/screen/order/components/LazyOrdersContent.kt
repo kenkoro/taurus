@@ -19,32 +19,34 @@ import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
-import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
-import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order.OrderItem
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.LoginState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
+import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Tailor
-import com.kenkoro.taurus.client.feature.sewing.domain.model.User
 import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 
 @Composable
 fun LazyOrdersContent(
   modifier: Modifier = Modifier,
-  user: User? = null,
-  networkStatus: NetworkStatus,
-  userProfile: UserProfile,
   orders: LazyPagingItems<Order>,
-  lazyOrdersState: LazyListState,
+  user: User,
+  networkStatus: NetworkStatus,
+  loginState: LoginState,
   selectedOrderRecordId: Int? = null,
+  lazyOrdersState: LazyListState,
+  onFilterStrategy: (OrderFilterStrategy?) -> Unit = {},
+  onUser: (User) -> Unit,
   onSelectOrder: (Int?) -> Unit = {},
-  onAddNewOrderLocally: suspend (NewOrder) -> Unit,
-  onDeleteOrderLocally: suspend (Order) -> Unit,
-  onEditOrderLocally: suspend (NewOrder) -> Unit,
-  onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
-  onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
+  onLoginState: (LoginState) -> Unit,
+  localHandler: LocalHandler,
+  remoteHandler: RemoteHandler,
   onAppendNewOrdersErrorShowSnackbar: suspend () -> SnackbarResult,
   onOrderAccessErrorShowSnackbar: suspend () -> SnackbarResult,
   onApiErrorShowSnackbar: suspend () -> SnackbarResult,
@@ -58,11 +60,11 @@ fun LazyOrdersContent(
     LaunchedEffect(Unit) { onAppendNewOrdersErrorShowSnackbar() }
   }
 
-  if (userProfile == Tailor || userProfile == Other) {
+  if (user.profile == Tailor || user.profile == Other) {
     LaunchedEffect(Unit, Dispatchers.Main) { onOrderAccessErrorShowSnackbar() }
   }
 
-  if (allowedToSeeOrders(userProfile)) {
+  if (allowedToSeeOrders(user.profile)) {
     LazyColumn(
       state = lazyOrdersState,
       modifier = modifier.fillMaxSize(),
@@ -79,17 +81,13 @@ fun LazyOrdersContent(
         val order = orders[index]
         if (order != null) {
           OrderItem(
-            profile = userProfile,
             order = order,
             networkStatus = networkStatus,
             user = user,
             selectedOrderRecordId = selectedOrderRecordId,
             onSelectOrder = onSelectOrder,
-            onAddNewOrderLocally = onAddNewOrderLocally,
-            onDeleteOrderLocally = onDeleteOrderLocally,
-            onEditOrderLocally = onEditOrderLocally,
-            onEditOrderRemotely = onEditOrderRemotely,
-            onDeleteOrderRemotely = onDeleteOrderRemotely,
+            localHandler = localHandler,
+            remoteHandler = remoteHandler,
             onDecryptToken = onDecryptToken,
             onRefresh = orders::refresh,
             onApiErrorShowSnackbar = onApiErrorShowSnackbar,

@@ -11,7 +11,6 @@ import androidx.paging.filter
 import androidx.paging.map
 import androidx.room.withTransaction
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
-import com.kenkoro.taurus.client.core.crypto.EncryptedCredentialService
 import com.kenkoro.taurus.client.feature.orders.data.local.OrderEntity
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toNewOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrder
@@ -39,7 +38,6 @@ class OrderViewModel
     private val localDb: LocalDatabase,
     private val orderRepository: OrderRepositoryImpl,
     private val decryptedCredentialService: DecryptedCredentialService,
-    private val encryptedCredentialService: EncryptedCredentialService,
   ) : ViewModel() {
     private val orderFilterContext = OrderFilterContext()
 
@@ -56,11 +54,11 @@ class OrderViewModel
     var selectedOrderRecordId by mutableStateOf<Int?>(null)
       private set
 
-    fun strategy(strategy: OrderFilterStrategy?) {
+    fun filterStrategy(strategy: OrderFilterStrategy?) {
       orderFilterContext.strategy(strategy)
     }
 
-    fun selectedOrderRecordId(selectedOrderRecordId: Int?) {
+    fun selectOrder(selectedOrderRecordId: Int?) {
       this.selectedOrderRecordId = selectedOrderRecordId
     }
 
@@ -118,10 +116,4 @@ class OrderViewModel
 
       return result.isSuccess
     }
-
-    fun encryptToken(token: String) {
-      encryptedCredentialService.putToken(token)
-    }
-
-    fun deleteAllCredentials(): Boolean = decryptedCredentialService.deleteAll()
   }

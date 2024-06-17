@@ -45,7 +45,7 @@ fun OrderItemContent(
       Pair(stringResource(id = R.string.order_quantity), order.quantity.toString()),
     )
 
-  Column(verticalArrangement = Arrangement.Top) {
+  Column(modifier = modifier, verticalArrangement = Arrangement.Top) {
     Row(
       modifier = Modifier.fillMaxWidth(),
       verticalAlignment = Alignment.CenterVertically,

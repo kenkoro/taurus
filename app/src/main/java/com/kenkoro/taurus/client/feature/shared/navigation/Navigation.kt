@@ -16,31 +16,50 @@ import com.kenkoro.taurus.client.feature.login.presentation.LoginScreen
 import com.kenkoro.taurus.client.feature.login.presentation.LoginViewModel
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderViewModel
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.LoginState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.LoginState
 import com.kenkoro.taurus.client.feature.profile.presentation.ProfileScreen
 import com.kenkoro.taurus.client.feature.profile.presentation.UserViewModel
 
 @Composable
 fun AppNavHost(
   navController: NavHostController = rememberNavController(),
-  startDestination: (String, String) -> Screen,
+  onLoginChooseDestination: (String, String) -> Screen,
   onExit: () -> Unit = {},
   onRestart: () -> Unit = {},
 ) {
+  val loginViewModel: LoginViewModel = hiltViewModel()
+  val orderViewModel: OrderViewModel = hiltViewModel()
+  val userViewModel: UserViewModel = hiltViewModel()
+
   val context = LocalContext.current
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
   val networkStatus by networkConnectivityObserver
     .observer()
     .collectAsState(initial = NetworkStatus.Unavailable)
-
-  val loginViewModel: LoginViewModel = hiltViewModel()
-  val orderViewModel: OrderViewModel = hiltViewModel()
-  val userViewModel: UserViewModel = hiltViewModel()
-
   val (subject, password) = loginViewModel.decryptSubjectAndPassword()
+  val startDestination = onLoginChooseDestination(subject, password).route
+
+  val localHandler =
+    LocalHandler(
+      addNewUser = userViewModel::addNewUserLocally,
+      addNewOrder = orderViewModel::addNewOrderLocally,
+      deleteOrder = orderViewModel::deleteOrderLocally,
+      editOrder = orderViewModel::editOrderLocally,
+    )
+  val remoteHandler =
+    RemoteHandler(
+      login = loginViewModel::login,
+      getUser = userViewModel::getUser,
+      addNewOrder = orderViewModel::addNewOrderRemotely,
+      deleteOrder = orderViewModel::deleteOrderRemotely,
+      editOrder = orderViewModel::editOrderRemotely,
+    )
+
   NavHost(
     navController = navController,
-    startDestination = startDestination(subject, password).route,
+    startDestination = startDestination,
   ) {
     composable(route = Screen.LoginScreen.route) {
       LoginScreen(
@@ -58,27 +77,18 @@ fun AppNavHost(
 
     composable(route = Screen.OrderScreen.route) {
       OrderScreen(
+        ordersPagingFlow = orderViewModel.ordersPagingFlow,
         user = userViewModel.user,
-        onUser = userViewModel::user,
         loginState = loginViewModel.loginState,
         networkStatus = networkStatus,
-        ordersPagingFlow = orderViewModel.ordersPagingFlow,
-        onStrategy = orderViewModel::strategy,
         selectedOrderRecordId = orderViewModel.selectedOrderRecordId,
-        onSelectOrder = orderViewModel::selectedOrderRecordId,
+        onUser = userViewModel::user,
+        onFilterStrategy = orderViewModel::filterStrategy,
+        onSelectOrder = orderViewModel::selectOrder,
         onLoginState = loginViewModel::loginState,
-        onAddNewUserLocally = userViewModel::addNewUserLocally,
-        onAddNewOrderLocally = orderViewModel::addNewOrderLocally,
-        onDeleteOrderLocally = orderViewModel::deleteOrderLocally,
-        onEditOrderLocally = orderViewModel::editOrderLocally,
-        onLogin = { subject, password ->
-          loginViewModel.login(subject, password)
-        },
-        onGetUserRemotely = userViewModel::getUser,
-        onAddNewOrderRemotely = orderViewModel::addNewOrderRemotely,
-        onDeleteOrderRemotely = orderViewModel::deleteOrderRemotely,
-        onEditOrderRemotely = orderViewModel::editOrderRemotely,
-        onEncryptToken = orderViewModel::encryptToken,
+        localHandler = localHandler,
+        remoteHandler = remoteHandler,
+        onEncryptToken = userViewModel::encryptToken,
         onDecryptSubjectAndPassword = loginViewModel::decryptSubjectAndPassword,
         onDecryptToken = userViewModel::decryptToken,
         onNavigateToProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
@@ -87,7 +97,7 @@ fun AppNavHost(
 
     composable(route = Screen.ProfileScreen.route) {
       ProfileScreen(
-        onDeleteAllCredentials = orderViewModel::deleteAllCredentials,
+        onDeleteAllCredentials = userViewModel::deleteAllCredentials,
         onNavigateToLoginScreen = { navController.navigate(Screen.LoginScreen.route) },
         onResetLoginState = { loginViewModel.loginState(LoginState.NotLoggedYet) },
         onRestart = onRestart,

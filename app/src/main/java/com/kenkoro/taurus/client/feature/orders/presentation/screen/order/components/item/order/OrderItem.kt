@@ -29,40 +29,38 @@ import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
-import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
-import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
+import com.kenkoro.taurus.client.feature.login.data.mappers.toUserDto
+import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrderDto
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Cut
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.allowedToSeeOrders
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
+import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Admin
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Ceo
-import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Manager
-import com.kenkoro.taurus.client.feature.sewing.domain.model.User
+import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderItem(
   modifier: Modifier = Modifier,
-  user: User? = null,
+  user: User,
   order: Order,
-  profile: UserProfile,
   networkStatus: NetworkStatus,
   selectedOrderRecordId: Int? = null,
   onSelectOrder: (Int?) -> Unit = {},
-  onAddNewOrderLocally: suspend (NewOrder) -> Unit,
-  onDeleteOrderLocally: suspend (Order) -> Unit,
-  onEditOrderLocally: suspend (NewOrder) -> Unit,
-  onDeleteOrderRemotely: suspend (orderId: Int, deleterSubject: String) -> Boolean,
-  onEditOrderRemotely: suspend (NewOrderDto, Int, String, String) -> Boolean,
+  localHandler: LocalHandler = LocalHandler(),
+  remoteHandler: RemoteHandler,
+  onApiErrorShowSnackbar: suspend () -> SnackbarResult,
   onDecryptToken: () -> String,
   onRefresh: () -> Unit = {},
-  onApiErrorShowSnackbar: suspend () -> SnackbarResult,
 ) {
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
@@ -76,8 +74,8 @@ fun OrderItem(
     targetValue =
       if (selected()) {
         if (
-          allowedToUpdateOrderStatus(profile) &&
-          orderStatusCorrespondsToUserProfile(profile, order.status)
+          allowedToUpdateOrderStatus(user.profile) &&
+          orderStatusCorrespondsToUserProfile(user.profile, order.status)
         ) {
           contentHeight.orderItemExpanded
         } else {
@@ -91,7 +89,7 @@ fun OrderItem(
   )
 
   AnimatedVisibility(visible = visible) {
-    Column {
+    Column(modifier = modifier) {
       Spacer(modifier = Modifier.height(contentHeight.medium))
       Column(
         modifier =
@@ -125,7 +123,7 @@ fun OrderItem(
           )
         }
 
-        if (allowedToUpdateOrderStatus(profile) && selected()) {
+        if (allowedToUpdateOrderStatus(user.profile) && selected()) {
           Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -133,18 +131,15 @@ fun OrderItem(
           ) {
             OrderItemBottomButton(
               order = order,
-              profile = profile,
+              profile = user.profile,
               networkStatus = networkStatus,
-              userSubject = user?.subject,
-              onAddNewOrderLocally = onAddNewOrderLocally,
-              onDeleteOrderLocally = onDeleteOrderLocally,
-              onEditOrderLocally = onEditOrderLocally,
-              onDeleteOrderRemotely = onDeleteOrderRemotely,
-              onEditOrderRemotely = onEditOrderRemotely,
+              userSubject = user.subject,
+              localHandler = localHandler,
+              remoteHandler = remoteHandler,
+              onApiErrorShowSnackbar = onApiErrorShowSnackbar,
               onHide = { visible = false },
               onDecryptToken = onDecryptToken,
               onRefresh = onRefresh,
-              onApiErrorShowSnackbar = onApiErrorShowSnackbar,
             )
             Spacer(modifier = Modifier.height(contentHeight.large))
           }
@@ -190,17 +185,31 @@ private fun OrderItemPrev() {
       status = OrderStatus.Checked,
       creatorId = 0,
     )
+  val user =
+    User(
+      userId = 0,
+      subject = "Subject",
+      password = "Password",
+      image = "Image",
+      firstName = "FirstName",
+      lastName = "LastName",
+      email = "Email",
+      profile = UserProfile.Other,
+      salt = "Salt",
+    )
+  val remoteHandler =
+    RemoteHandler(
+      login = { _, _ -> Result.success(TokenDto("")) },
+      getUser = { _, _ -> Result.success(user.toUserDto()) },
+      addNewOrder = { _ -> Result.success(order.toOrderDto()) },
+    )
 
   AppTheme {
     OrderItem(
-      profile = Customer,
+      user = user,
       order = order,
       selectedOrderRecordId = 0,
-      onAddNewOrderLocally = { _ -> },
-      onDeleteOrderLocally = { _ -> },
-      onEditOrderLocally = { _ -> },
-      onDeleteOrderRemotely = { _, _ -> false },
-      onEditOrderRemotely = { _, _, _, _ -> false },
+      remoteHandler = remoteHandler,
       networkStatus = NetworkStatus.Available,
       onDecryptToken = { "" },
       onApiErrorShowSnackbar = { SnackbarResult.Dismissed },
