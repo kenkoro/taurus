@@ -15,10 +15,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -38,6 +39,7 @@ import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.allowedToSeeOrders
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Admin
@@ -58,7 +60,7 @@ fun OrderItem(
   onSelectOrder: (Int?) -> Unit = {},
   localHandler: LocalHandler = LocalHandler(),
   remoteHandler: RemoteHandler,
-  onApiErrorShowSnackbar: suspend () -> SnackbarResult,
+  snackbarsHolder: SnackbarsHolder,
   onDecryptToken: () -> String,
   onRefresh: () -> Unit = {},
 ) {
@@ -136,7 +138,7 @@ fun OrderItem(
               userSubject = user.subject,
               localHandler = localHandler,
               remoteHandler = remoteHandler,
-              onApiErrorShowSnackbar = onApiErrorShowSnackbar,
+              snackbarsHolder = snackbarsHolder,
               onHide = { visible = false },
               onDecryptToken = onDecryptToken,
               onRefresh = onRefresh,
@@ -203,6 +205,7 @@ private fun OrderItemPrev() {
       getUser = { _, _ -> Result.success(user.toUserDto()) },
       addNewOrder = { _ -> Result.success(order.toOrderDto()) },
     )
+  val snackbarHostState = remember { SnackbarHostState() }
 
   AppTheme {
     OrderItem(
@@ -210,9 +213,14 @@ private fun OrderItemPrev() {
       order = order,
       selectedOrderRecordId = 0,
       remoteHandler = remoteHandler,
+      snackbarsHolder =
+        SnackbarsHolder(
+          snackbarHostState = snackbarHostState,
+          errorSnackbarHostState = snackbarHostState,
+          internetErrorSnackbarHostState = snackbarHostState,
+        ),
       networkStatus = NetworkStatus.Available,
       onDecryptToken = { "" },
-      onApiErrorShowSnackbar = { SnackbarResult.Dismissed },
     )
   }
 }

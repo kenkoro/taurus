@@ -8,16 +8,13 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.PagingData
-import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.login.data.mappers.toUserDto
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrderDto
@@ -30,6 +27,7 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handle
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.LoginState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
@@ -61,34 +59,15 @@ fun OrderScreen(
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
   val internetSnackbarHostState = remember { SnackbarHostState() }
-
-  val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
-  val orderWasDeletedMessage = stringResource(id = R.string.order_was_deleted)
-  val paginatedOrdersErrorMessage = stringResource(id = R.string.paginated_orders_error)
-  val loginErrorMessage = stringResource(id = R.string.login_fail)
-  val notImplementedYetMessage = stringResource(id = R.string.not_implemented_yet)
-  val orderAccessErrorMessage = stringResource(id = R.string.orders_access_error)
-  val apiRequestErrorMessage = stringResource(id = R.string.request_error)
-
-  val cancelOrderDeletionLabel = stringResource(id = R.string.cancel)
-  val okActionLabel = stringResource(id = R.string.ok)
-
+  val snackbarsHolder =
+    remember {
+      SnackbarsHolder(
+        snackbarHostState = snackbarHostState,
+        errorSnackbarHostState = errorSnackbarHostState,
+        internetErrorSnackbarHostState = internetSnackbarHostState,
+      )
+    }
   val lazyOrdersState = rememberLazyListState()
-
-  val onShowNotImplementedSnackbar =
-    suspend {
-      snackbarHostState.showSnackbar(
-        message = notImplementedYetMessage,
-        actionLabel = okActionLabel,
-      )
-    }
-  val onInternetConnectionShowSnackbar =
-    suspend {
-      internetSnackbarHostState.showSnackbar(
-        message = internetConnectionErrorMessage,
-        duration = SnackbarDuration.Indefinite,
-      )
-    }
 
   AppTheme {
     Scaffold(
@@ -122,8 +101,7 @@ fun OrderScreen(
           networkStatus = networkStatus,
           isScrollingInProgress = lazyOrdersState.isScrollInProgress,
           userName = user?.firstName,
-          onSortOrdersShowSnackbar = onShowNotImplementedSnackbar,
-          onFilterOrdersShowSnackbar = onShowNotImplementedSnackbar,
+          snackbarsHolder = snackbarsHolder,
           onNavigateToProfileScreen = onNavigateToProfileScreen,
         )
       },
@@ -132,12 +110,7 @@ fun OrderScreen(
           OrderBottomBar(
             networkStatus = networkStatus,
             isScrollingInProgress = lazyOrdersState.isScrollInProgress,
-            onAddNewOrderShowSnackbar = {
-              snackbarHostState.showSnackbar(
-                message = notImplementedYetMessage,
-                actionLabel = okActionLabel,
-              )
-            },
+            snackbarsHolder = snackbarsHolder,
           )
         }
       },
@@ -162,31 +135,7 @@ fun OrderScreen(
             onLoginState = onLoginState,
             localHandler = localHandler,
             remoteHandler = remoteHandler,
-            onInternetConnectionErrorShowSnackbar = onInternetConnectionShowSnackbar,
-            onLoginErrorShowSnackbar = {
-              errorSnackbarHostState.showSnackbar(
-                message = loginErrorMessage,
-                actionLabel = okActionLabel,
-              )
-            },
-            onAppendNewOrdersErrorShowSnackbar = {
-              errorSnackbarHostState.showSnackbar(
-                message = paginatedOrdersErrorMessage,
-                actionLabel = okActionLabel,
-              )
-            },
-            onApiErrorShowSnackbar = {
-              errorSnackbarHostState.showSnackbar(
-                message = apiRequestErrorMessage,
-                actionLabel = okActionLabel,
-              )
-            },
-            onOrderAccessErrorShowSnackbar = {
-              errorSnackbarHostState.showSnackbar(
-                message = orderAccessErrorMessage,
-                actionLabel = okActionLabel,
-              )
-            },
+            snackbarsHolder = snackbarsHolder,
             onEncryptToken = onEncryptToken,
             onDecryptSubjectAndPassword = onDecryptSubjectAndPassword,
             onDecryptToken = onDecryptToken,

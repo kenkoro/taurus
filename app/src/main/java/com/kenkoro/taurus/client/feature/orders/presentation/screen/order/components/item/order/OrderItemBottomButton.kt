@@ -1,6 +1,5 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order
 
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
@@ -14,6 +13,7 @@ import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Cut
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
@@ -31,11 +31,23 @@ fun OrderItemBottomButton(
   userSubject: String? = null,
   localHandler: LocalHandler = LocalHandler(),
   remoteHandler: RemoteHandler,
+  snackbarsHolder: SnackbarsHolder,
   onHide: () -> Unit = {},
   onDecryptToken: () -> String,
   onRefresh: () -> Unit = {},
-  onApiErrorShowSnackbar: suspend () -> SnackbarResult,
 ) {
+  val apiRequestErrorMessage = stringResource(id = R.string.request_error)
+
+  val okActionLabel = stringResource(id = R.string.ok)
+
+  val onApiErrorShowSnackbar =
+    suspend {
+      snackbarsHolder.errorSnackbarHostState.showSnackbar(
+        message = apiRequestErrorMessage,
+        actionLabel = okActionLabel,
+      )
+    }
+
   val scope = rememberCoroutineScope()
   val onHideWithDelay =
     suspend {

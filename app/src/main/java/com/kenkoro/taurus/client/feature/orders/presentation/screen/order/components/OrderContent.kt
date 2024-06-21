@@ -2,11 +2,13 @@ package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.compo
 
 import android.util.Log
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.res.stringResource
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.login.data.mappers.toUser
 import com.kenkoro.taurus.client.feature.orders.domain.Order
@@ -17,6 +19,7 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.C
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.InspectorOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.ManagerOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
@@ -40,17 +43,31 @@ fun OrderContent(
   onLoginState: (LoginState) -> Unit,
   localHandler: LocalHandler = LocalHandler(),
   remoteHandler: RemoteHandler,
-  onInternetConnectionErrorShowSnackbar: suspend () -> SnackbarResult,
-  onLoginErrorShowSnackbar: suspend () -> SnackbarResult,
-  onAppendNewOrdersErrorShowSnackbar: suspend () -> SnackbarResult,
-  onOrderAccessErrorShowSnackbar: suspend () -> SnackbarResult,
-  onApiErrorShowSnackbar: suspend () -> SnackbarResult,
+  snackbarsHolder: SnackbarsHolder,
   onEncryptToken: (String) -> Unit,
   onDecryptToken: () -> String,
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
 ) {
+  val loginErrorMessage = stringResource(id = R.string.login_fail)
+  val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
+
+  val okActionLabel = stringResource(id = R.string.ok)
+
+  val onLoginErrorShowSnackbar =
+    suspend {
+      snackbarsHolder.errorSnackbarHostState.showSnackbar(
+        message = loginErrorMessage,
+        actionLabel = okActionLabel,
+      )
+    }
+
   if (networkStatus != NetworkStatus.Available) {
-    LaunchedEffect(networkStatus) { onInternetConnectionErrorShowSnackbar() }
+    LaunchedEffect(networkStatus) {
+      snackbarsHolder.internetErrorSnackbarHostState.showSnackbar(
+        message = internetConnectionErrorMessage,
+        duration = SnackbarDuration.Indefinite,
+      )
+    }
   }
 
   if (loginState == LoginState.NotLoggedYet) {
@@ -106,9 +123,7 @@ fun OrderContent(
       onLoginState = onLoginState,
       localHandler = localHandler,
       remoteHandler = remoteHandler,
-      onAppendNewOrdersErrorShowSnackbar = onAppendNewOrdersErrorShowSnackbar,
-      onOrderAccessErrorShowSnackbar = onOrderAccessErrorShowSnackbar,
-      onApiErrorShowSnackbar = onApiErrorShowSnackbar,
+      snackbarsHolder = snackbarsHolder,
       onDecryptToken = onDecryptToken,
     )
   }

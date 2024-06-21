@@ -69,9 +69,9 @@ fun AppNavHost(
         onSetErrorMessages = loginViewModel::setErrorMessages,
         onLogin = loginViewModel::login,
         onEncryptAll = loginViewModel::encryptAll,
-        onNavigateToOrderScreen = { navController.navigate(Screen.OrderScreen.route) },
         onExit = onExit,
         onShowErrorTitle = loginViewModel::showErrorTitle,
+        onNavigateToOrderScreen = { navController.navigate(Screen.OrderScreen.route) },
       )
     }
 
@@ -98,9 +98,9 @@ fun AppNavHost(
     composable(route = Screen.ProfileScreen.route) {
       ProfileScreen(
         onDeleteAllCredentials = userViewModel::deleteAllCredentials,
-        onNavigateToLoginScreen = { navController.navigate(Screen.LoginScreen.route) },
         onResetLoginState = { loginViewModel.loginState(LoginState.NotLoggedYet) },
         onRestart = onRestart,
+        onNavigateToLoginScreen = { navController.navigate(Screen.LoginScreen.route) },
       )
     }
   }

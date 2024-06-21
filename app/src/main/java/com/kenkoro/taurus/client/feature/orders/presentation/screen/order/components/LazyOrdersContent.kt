@@ -8,13 +8,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalSize
@@ -25,6 +26,7 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handle
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.LoginState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
@@ -47,21 +49,34 @@ fun LazyOrdersContent(
   onLoginState: (LoginState) -> Unit,
   localHandler: LocalHandler,
   remoteHandler: RemoteHandler,
-  onAppendNewOrdersErrorShowSnackbar: suspend () -> SnackbarResult,
-  onOrderAccessErrorShowSnackbar: suspend () -> SnackbarResult,
-  onApiErrorShowSnackbar: suspend () -> SnackbarResult,
+  snackbarsHolder: SnackbarsHolder,
   onDecryptToken: () -> String,
 ) {
+  val paginatedOrdersErrorMessage = stringResource(id = R.string.paginated_orders_error)
+  val orderAccessErrorMessage = stringResource(id = R.string.orders_access_error)
+
+  val okActionLabel = stringResource(id = R.string.ok)
+
   val size = LocalSize.current
   val strokeWidth = LocalStrokeWidth.current
   val contentHeight = LocalContentHeight.current
 
   if (orders.loadState.append is LoadState.Error) {
-    LaunchedEffect(Unit) { onAppendNewOrdersErrorShowSnackbar() }
+    LaunchedEffect(Unit) {
+      snackbarsHolder.errorSnackbarHostState.showSnackbar(
+        message = paginatedOrdersErrorMessage,
+        actionLabel = okActionLabel,
+      )
+    }
   }
 
   if (user.profile == Tailor || user.profile == Other) {
-    LaunchedEffect(Unit, Dispatchers.Main) { onOrderAccessErrorShowSnackbar() }
+    LaunchedEffect(Unit, Dispatchers.Main) {
+      snackbarsHolder.errorSnackbarHostState.showSnackbar(
+        message = orderAccessErrorMessage,
+        actionLabel = okActionLabel,
+      )
+    }
   }
 
   if (allowedToSeeOrders(user.profile)) {
@@ -88,9 +103,9 @@ fun LazyOrdersContent(
             onSelectOrder = onSelectOrder,
             localHandler = localHandler,
             remoteHandler = remoteHandler,
+            snackbarsHolder = snackbarsHolder,
             onDecryptToken = onDecryptToken,
             onRefresh = orders::refresh,
-            onApiErrorShowSnackbar = onApiErrorShowSnackbar,
           )
         }
       }

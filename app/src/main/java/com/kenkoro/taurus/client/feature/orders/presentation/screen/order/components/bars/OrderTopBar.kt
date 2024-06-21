@@ -20,9 +20,10 @@ import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +36,7 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,10 +47,21 @@ fun OrderTopBar(
   networkStatus: NetworkStatus,
   isScrollingInProgress: Boolean = false,
   userName: String? = null,
-  onFilterOrdersShowSnackbar: suspend () -> SnackbarResult,
-  onSortOrdersShowSnackbar: suspend () -> SnackbarResult,
+  snackbarsHolder: SnackbarsHolder,
   onNavigateToProfileScreen: () -> Unit,
 ) {
+  val notImplementedYetMessage = stringResource(id = R.string.not_implemented_yet)
+
+  val okActionLabel = stringResource(id = R.string.ok)
+
+  val onClickNotImplementedShowSnackbar =
+    suspend {
+      snackbarsHolder.snackbarHostState.showSnackbar(
+        message = notImplementedYetMessage,
+        actionLabel = okActionLabel,
+      )
+    }
+
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
   val scope = rememberCoroutineScope()
@@ -95,7 +108,7 @@ fun OrderTopBar(
           .fillMaxWidth(.8F)
           .clickable {
             scope.launch(Dispatchers.Main) {
-              onFilterOrdersShowSnackbar()
+              onClickNotImplementedShowSnackbar()
             }
           },
       verticalAlignment = Alignment.CenterVertically,
@@ -114,7 +127,7 @@ fun OrderTopBar(
           .size(contentHeight.topBar)
           .clickable {
             scope.launch(Dispatchers.Main) {
-              onSortOrdersShowSnackbar()
+              onClickNotImplementedShowSnackbar()
             }
           },
     ) {
@@ -138,12 +151,18 @@ fun OrderTopBar(
 @Composable
 private fun OrderTopBarPrev() {
   AppTheme {
+    val snackbarHostState = remember { SnackbarHostState() }
+
     OrderTopBar(
-      onSortOrdersShowSnackbar = { SnackbarResult.ActionPerformed },
-      onFilterOrdersShowSnackbar = { SnackbarResult.ActionPerformed },
-      onNavigateToProfileScreen = {},
       networkStatus = NetworkStatus.Available,
       userName = "Peter",
+      snackbarsHolder =
+        SnackbarsHolder(
+          snackbarHostState = snackbarHostState,
+          errorSnackbarHostState = snackbarHostState,
+          internetErrorSnackbarHostState = snackbarHostState,
+        ),
+      onNavigateToProfileScreen = {},
     )
   }
 }
