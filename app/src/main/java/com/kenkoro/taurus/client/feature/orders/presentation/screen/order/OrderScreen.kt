@@ -71,6 +71,10 @@ fun OrderScreen(
 
   AppTheme {
     Scaffold(
+      modifier =
+        Modifier
+          .statusBarsPadding()
+          .navigationBarsPadding(),
       snackbarHost = {
         TaurusSnackbar(
           snackbarHostState = snackbarHostState,
@@ -92,10 +96,6 @@ fun OrderScreen(
           centeredContent = true,
         )
       },
-      modifier =
-        Modifier
-          .statusBarsPadding()
-          .navigationBarsPadding(),
       topBar = {
         OrderTopBar(
           networkStatus = networkStatus,
