@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.orders.presentation.screen.order_editor.composables.bars
+package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,13 +30,12 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 @Composable
 fun OrderEditorTopBar(
   modifier: Modifier = Modifier,
+  label: String,
   onNavUp: () -> Unit = {},
-  orderId: Int = 0,
+  onSaveChanges: () -> Unit = {},
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
-
-  val label = "${stringResource(id = R.string.order_editor_top_bar)} #$orderId"
 
   Row(
     modifier =
@@ -68,6 +68,18 @@ fun OrderEditorTopBar(
       Spacer(modifier = Modifier.width(contentWidth.medium))
       Text(text = label)
     }
+    Box(
+      modifier =
+        Modifier
+          .size(contentHeight.topBar)
+          .clickable { onSaveChanges() },
+      contentAlignment = Alignment.Center,
+    ) {
+      Icon(
+        imageVector = Icons.Default.Check,
+        contentDescription = "SaveOrderDetailsChanges",
+      )
+    }
   }
 }
 
@@ -75,6 +87,8 @@ fun OrderEditorTopBar(
 @Composable
 private fun OrderEditorTopBarPrev() {
   AppTheme {
-    OrderEditorTopBar()
+    OrderEditorTopBar(
+      label = stringResource(id = R.string.edit_order_label),
+    )
   }
 }

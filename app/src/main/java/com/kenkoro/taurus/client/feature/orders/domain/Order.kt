@@ -1,8 +1,5 @@
 package com.kenkoro.taurus.client.feature.orders.domain
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class Order(
   val recordId: Int,
   val orderId: Int,

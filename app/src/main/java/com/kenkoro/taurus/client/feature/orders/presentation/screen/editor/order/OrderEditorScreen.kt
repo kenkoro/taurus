@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.orders.presentation.screen.order_editor
+package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,20 +9,31 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.kenkoro.taurus.client.feature.orders.domain.Order
-import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order_editor.composables.OrderEditorContent
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order_editor.composables.bars.OrderEditorTopBar
+import com.kenkoro.taurus.client.R
+import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.OrderEditorContent
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.OrderEditorTopBar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderEditorScreen(
   modifier: Modifier = Modifier,
-  order: Order,
+  // TODO: OrderState
+  networkStatus: NetworkStatus,
+  isNewOrder: Boolean = false,
   onNavUp: () -> Unit = {},
+  onSaveChanges: () -> Unit = {},
 ) {
+  LaunchedEffect(Unit) {
+    if (!isNewOrder) {
+      // TODO: Fill viewModel's states w/ existing data
+    }
+  }
+
   AppTheme {
     Scaffold(
       modifier =
@@ -31,8 +42,14 @@ fun OrderEditorScreen(
           .navigationBarsPadding(),
       topBar = {
         OrderEditorTopBar(
+          label =
+            if (isNewOrder) {
+              stringResource(id = R.string.create_order_label)
+            } else {
+              stringResource(id = R.string.edit_order_label)
+            },
           onNavUp = onNavUp,
-          orderId = order.orderId,
+          onSaveChanges = onSaveChanges,
         )
       },
       content = { paddingValues ->
@@ -43,7 +60,7 @@ fun OrderEditorScreen(
               .background(MaterialTheme.colorScheme.background)
               .padding(paddingValues),
         ) {
-          OrderEditorContent()
+          OrderEditorContent(networkStatus = networkStatus)
         }
       },
     )
@@ -53,23 +70,9 @@ fun OrderEditorScreen(
 @Preview
 @Composable
 private fun OrderEditorScreenPrev() {
-  val order =
-    Order(
-      recordId = 0,
-      orderId = 0,
-      customer = "Customer",
-      date = 0L,
-      title = "Title",
-      model = "Model",
-      size = "Size",
-      color = "Color",
-      category = "Category",
-      quantity = 0,
-      status = OrderStatus.Idle,
-      creatorId = 0,
-    )
-
   AppTheme {
-    OrderEditorScreen(order = order)
+    OrderEditorScreen(
+      networkStatus = NetworkStatus.Available,
+    )
   }
 }
