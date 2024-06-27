@@ -21,6 +21,7 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.feature.orders.domain.Order
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order.OrderItem
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
@@ -41,6 +42,7 @@ fun LazyOrdersContent(
   user: User,
   networkStatus: NetworkStatus,
   loginState: LoginState,
+  orderIdState: OrderIdState = OrderIdState(),
   selectedOrderRecordId: Int? = null,
   lazyOrdersState: LazyListState,
   onFilterStrategy: (OrderFilterStrategy?) -> Unit = {},
@@ -51,6 +53,7 @@ fun LazyOrdersContent(
   remoteHandler: RemoteHandler,
   snackbarsHolder: SnackbarsHolder,
   onDecryptToken: () -> String,
+  onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
 ) {
   val paginatedOrdersErrorMessage = stringResource(id = R.string.paginated_orders_error)
   val orderAccessErrorMessage = stringResource(id = R.string.orders_access_error)
@@ -100,12 +103,14 @@ fun LazyOrdersContent(
             networkStatus = networkStatus,
             user = user,
             selectedOrderRecordId = selectedOrderRecordId,
+            orderIdState = orderIdState,
             onSelectOrder = onSelectOrder,
             localHandler = localHandler,
             remoteHandler = remoteHandler,
             snackbarsHolder = snackbarsHolder,
             onDecryptToken = onDecryptToken,
             onRefresh = orders::refresh,
+            onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
           )
         }
       }

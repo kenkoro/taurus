@@ -9,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,23 +16,19 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.OrderEditorContent
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.OrderEditorTopBar
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderEditorScreen(
   modifier: Modifier = Modifier,
-  // TODO: OrderState
   networkStatus: NetworkStatus,
-  isNewOrder: Boolean = false,
+  // TODO: OrderHolder or something - holder of all states
+  orderIdState: OrderIdState = OrderIdState(),
+  editOrder: Boolean = false,
   onNavUp: () -> Unit = {},
   onSaveChanges: () -> Unit = {},
 ) {
-  LaunchedEffect(Unit) {
-    if (!isNewOrder) {
-      // TODO: Fill viewModel's states w/ existing data
-    }
-  }
-
   AppTheme {
     Scaffold(
       modifier =
@@ -43,10 +38,10 @@ fun OrderEditorScreen(
       topBar = {
         OrderEditorTopBar(
           label =
-            if (isNewOrder) {
-              stringResource(id = R.string.create_order_label)
-            } else {
+            if (editOrder) {
               stringResource(id = R.string.edit_order_label)
+            } else {
+              stringResource(id = R.string.create_order_label)
             },
           onNavUp = onNavUp,
           onSaveChanges = onSaveChanges,
@@ -60,7 +55,10 @@ fun OrderEditorScreen(
               .background(MaterialTheme.colorScheme.background)
               .padding(paddingValues),
         ) {
-          OrderEditorContent(networkStatus = networkStatus)
+          OrderEditorContent(
+            orderIdState = orderIdState,
+            networkStatus = networkStatus,
+          )
         }
       },
     )

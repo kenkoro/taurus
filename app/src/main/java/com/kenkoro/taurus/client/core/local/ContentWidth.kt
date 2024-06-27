@@ -13,6 +13,7 @@ data class ContentWidth(
   val large: Dp = 40.dp,
   val orderItem: Dp = 350.dp,
   val orderTitle: Dp = 100.dp,
+  val editOrderButton: Dp = 70.dp,
 )
 
 val LocalContentWidth = compositionLocalOf { ContentWidth() }

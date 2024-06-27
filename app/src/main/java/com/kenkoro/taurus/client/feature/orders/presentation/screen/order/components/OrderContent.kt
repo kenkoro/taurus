@@ -12,6 +12,7 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.login.data.mappers.toUser
 import com.kenkoro.taurus.client.feature.orders.domain.Order
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.LoginState
@@ -35,6 +36,7 @@ fun OrderContent(
   user: User?,
   networkStatus: NetworkStatus,
   loginState: LoginState,
+  orderIdState: OrderIdState = OrderIdState(),
   selectedOrderRecordId: Int? = null,
   lazyOrdersState: LazyListState,
   onFilterStrategy: (OrderFilterStrategy?) -> Unit = {},
@@ -47,6 +49,7 @@ fun OrderContent(
   onEncryptToken: (String) -> Unit,
   onDecryptToken: () -> String,
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
+  onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
 ) {
   val loginErrorMessage = stringResource(id = R.string.login_fail)
   val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
@@ -116,6 +119,7 @@ fun OrderContent(
       networkStatus = networkStatus,
       loginState = loginState,
       selectedOrderRecordId = selectedOrderRecordId,
+      orderIdState = orderIdState,
       lazyOrdersState = lazyOrdersState,
       onUser = onUser,
       onFilterStrategy = onFilterStrategy,
@@ -125,6 +129,7 @@ fun OrderContent(
       remoteHandler = remoteHandler,
       snackbarsHolder = snackbarsHolder,
       onDecryptToken = onDecryptToken,
+      onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
     )
   }
 }

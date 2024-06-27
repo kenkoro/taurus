@@ -24,5 +24,5 @@ private fun orderIdValidationError(
 }
 
 private fun isOrderIdValid(orderId: String): Boolean {
-  return orderId.isDigitsOnly()
+  return orderId.isDigitsOnly() && orderId.isNotBlank()
 }

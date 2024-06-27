@@ -18,13 +18,8 @@ class PasswordState(
 private fun passwordValidationError(
   password: String,
   errorMessage: String,
-  emptyTextFieldErrorMessage: String,
 ): String {
-  return if (password.isBlank()) {
-    emptyTextFieldErrorMessage
-  } else {
-    "$errorMessage!"
-  }
+  return "$errorMessage!"
 }
 
 private fun isPasswordValid(password: String): Boolean = password.length >= 4

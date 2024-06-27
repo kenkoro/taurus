@@ -38,5 +38,24 @@
     <string name="password_error">Пароль должен состоять минимум из 4 символов</string>
     <string name="exit_button">Выйти</string>
     <string name="orders_access_error">Вы не можете смотреть заказы!</string>
-    <string name="order_editor_top_bar">Заказ</string>
+    <string name="edit_order_label">Редактировать заказ</string>
+    <string name="create_order_label">Создать заказ</string>
+    <string name="order_id_error">некорректный номер заказ</string>
+    <string name="customer_error">некорректный заказчик</string>
+    <string name="category_error">некорректная категория</string>
+    <string name="color_error">некорректный цвет</string>
+    <string name="model_error">некорректная модель</string>
+    <string name="quantity_error">некорректное кол-во</string>
+    <string name="size_error">некорректный размер</string>
+    <string name="title_error">некорректное название</string>
+    <string name="order_editor_category">Категория</string>
+    <string name="order_editor_color">Цвет</string>
+    <string name="order_editor_customer">Заказчик</string>
+    <string name="order_editor_model">Модель</string>
+    <string name="order_editor_order_id">Номер заказа</string>
+    <string name="order_editor_quantity">Количество</string>
+    <string name="order_editor_size">Размер</string>
+    <string name="order_editor_title">Название</string>
+    <string name="order_id_supporting_text">Уникальный номер заказа</string>
+    <string name="full_order_id_supporting_text">Максимум 9 цифр</string>
 </resources>

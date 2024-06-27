@@ -7,9 +7,8 @@ import androidx.compose.runtime.setValue
 
 open class TaurusTextFieldState(
   private var errorMessage: String = "",
-  private var emptyTextFieldErrorMessage: String = "",
   private val validator: (String) -> Boolean = { true },
-  private val errorFor: (String, String, String) -> String = { _, _, _ -> "" },
+  private val errorFor: (String, String) -> String = { _, _ -> "" },
 ) {
   var text by mutableStateOf("")
   var isFocusedOnce by mutableStateOf(false)
@@ -24,12 +23,12 @@ open class TaurusTextFieldState(
     if (focused) isFocusedOnce = true
   }
 
-  fun setErrorMessages(
-    errorMessage: String,
-    emptyTextFieldErrorMessage: String,
-  ) {
+  fun setErrorMessage(errorMessage: String) {
     this.errorMessage = errorMessage
-    this.emptyTextFieldErrorMessage = emptyTextFieldErrorMessage
+  }
+
+  fun isBlank(): Boolean {
+    return text.isBlank()
   }
 
   fun enableShowErrors() {
@@ -40,7 +39,7 @@ open class TaurusTextFieldState(
 
   open fun getError(): String? {
     return if (showErrors()) {
-      errorFor(text, errorMessage, emptyTextFieldErrorMessage)
+      errorFor(text, errorMessage)
     } else {
       null
     }

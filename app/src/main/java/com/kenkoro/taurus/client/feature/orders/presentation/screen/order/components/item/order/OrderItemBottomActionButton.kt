@@ -2,6 +2,7 @@ package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.compo
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
@@ -24,7 +25,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun OrderItemBottomButton(
+fun OrderItemBottomActionButton(
+  modifier: Modifier = Modifier,
   order: Order,
   profile: UserProfile,
   networkStatus: NetworkStatus,
@@ -58,6 +60,7 @@ fun OrderItemBottomButton(
   when (profile) {
     Customer -> {
       OrderItemButton(
+        modifier = modifier,
         order = order,
         text = stringResource(id = R.string.delete_button),
         networkStatus = networkStatus,
@@ -86,6 +89,7 @@ fun OrderItemBottomButton(
     Cutter -> {
       if (order.status == Idle) {
         OrderItemButton(
+          modifier = modifier,
           order = order,
           text = stringResource(id = R.string.order_was_cut),
           networkStatus = networkStatus,
@@ -116,6 +120,7 @@ fun OrderItemBottomButton(
     Inspector -> {
       if (order.status == Cut) {
         OrderItemButton(
+          modifier = modifier,
           order = order,
           text = stringResource(id = R.string.order_was_checked),
           networkStatus = networkStatus,

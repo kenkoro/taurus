@@ -18,7 +18,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -29,8 +28,6 @@ import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun OrderBottomBar(
@@ -38,16 +35,13 @@ fun OrderBottomBar(
   networkStatus: NetworkStatus,
   isScrollingInProgress: Boolean = false,
   snackbarsHolder: SnackbarsHolder,
+  onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
+  onResetAllOrderFields: () -> Unit = {},
 ) {
-  val notImplementedYetMessage = stringResource(id = R.string.not_implemented_yet)
-
-  val okActionLabel = stringResource(id = R.string.ok)
-
   val offset = LocalOffset.current
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
-  val scope = rememberCoroutineScope()
 
   val animatedYOffset by animateDpAsState(
     targetValue =
@@ -92,12 +86,8 @@ fun OrderBottomBar(
           .width(contentWidth.orderItem)
           .height(animatedBottomBarButtonHeight),
       onClick = {
-        scope.launch(Dispatchers.Main) {
-          snackbarsHolder.snackbarHostState.showSnackbar(
-            message = notImplementedYetMessage,
-            actionLabel = okActionLabel,
-          )
-        }
+        onResetAllOrderFields()
+        onNavigateToOrderEditorScreen(false)
       },
       shape = RoundedCornerShape(shape.medium),
     ) {

@@ -23,7 +23,6 @@ import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.login.presentation.util.PasswordState
 import com.kenkoro.taurus.client.feature.login.presentation.util.SubjectState
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
-import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -34,7 +33,6 @@ fun LoginContent(
   networkStatus: NetworkStatus,
   subject: SubjectState,
   password: PasswordState,
-  onSetErrorMessages: (TaurusTextFieldState, String, String) -> Unit,
   onLogin: suspend (subject: String, password: String) -> Result<TokenDto>,
   onEncryptAll: (String, String, String) -> Unit,
   onNavigateToOrderScreen: () -> Unit,
@@ -77,7 +75,6 @@ fun LoginContent(
         subject = subject,
         password = password,
         isAuthenticating = isAuthenticating,
-        onSetErrorMessages = onSetErrorMessages,
         onLoginSubmitted = { subject, password ->
           scope.launch(Dispatchers.IO) {
             isAuthenticating = true

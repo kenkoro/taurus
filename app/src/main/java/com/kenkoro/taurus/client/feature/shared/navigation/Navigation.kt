@@ -6,14 +6,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.login.presentation.LoginScreen
 import com.kenkoro.taurus.client.feature.login.presentation.LoginViewModel
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorScreen
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorViewModel
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderViewModel
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
@@ -32,6 +36,7 @@ fun AppNavHost(
   val loginViewModel: LoginViewModel = hiltViewModel()
   val orderViewModel: OrderViewModel = hiltViewModel()
   val userViewModel: UserViewModel = hiltViewModel()
+  val orderEditorViewModel: OrderEditorViewModel = hiltViewModel()
 
   val context = LocalContext.current
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
@@ -66,7 +71,6 @@ fun AppNavHost(
         networkStatus = networkStatus,
         subject = loginViewModel.subject,
         password = loginViewModel.password,
-        onSetErrorMessages = loginViewModel::setErrorMessages,
         onLogin = loginViewModel::login,
         onEncryptAll = loginViewModel::encryptAll,
         onExit = onExit,
@@ -82,6 +86,7 @@ fun AppNavHost(
         loginState = loginViewModel.loginState,
         networkStatus = networkStatus,
         selectedOrderRecordId = orderViewModel.selectedOrderRecordId,
+        orderIdState = orderEditorViewModel.orderId,
         onUser = userViewModel::user,
         onFilterStrategy = orderViewModel::filterStrategy,
         onSelectOrder = orderViewModel::selectOrder,
@@ -91,7 +96,11 @@ fun AppNavHost(
         onEncryptToken = userViewModel::encryptToken,
         onDecryptSubjectAndPassword = loginViewModel::decryptSubjectAndPassword,
         onDecryptToken = userViewModel::decryptToken,
+        onResetAllOrderFields = orderEditorViewModel::resetAll,
         onNavigateToProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
+        onNavigateToOrderEditorScreen = { editOrder ->
+          navController.navigate(Screen.OrderEditorScreen.route + "?editOrder=$editOrder")
+        },
       )
     }
 
@@ -101,6 +110,28 @@ fun AppNavHost(
         onResetLoginState = { loginViewModel.loginState(LoginState.NotLoggedYet) },
         onRestart = onRestart,
         onNavigateToLoginScreen = { navController.navigate(Screen.LoginScreen.route) },
+      )
+    }
+
+    composable(
+      route =
+        Screen.OrderEditorScreen.route +
+          "?editOrder={editOrder}",
+      arguments =
+        listOf(
+          navArgument("editOrder") {
+            type = NavType.BoolType
+            defaultValue = false
+          },
+        ),
+    ) {
+      val editOrder = it.arguments?.getBoolean("editOrder") ?: false
+      OrderEditorScreen(
+        networkStatus = networkStatus,
+        orderIdState = orderEditorViewModel.orderId,
+        editOrder = editOrder,
+        onNavUp = navController::navigateUp,
+        onSaveChanges = {},
       )
     }
   }

@@ -21,15 +21,10 @@ class SubjectState(
 fun subjectValidationError(
   subject: String,
   errorMessage: String,
-  emptyTextFieldErrorMessage: String,
 ): String {
-  return if (subject.isBlank()) {
-    emptyTextFieldErrorMessage
-  } else {
-    "$subject $errorMessage!"
-  }
+  return "$subject $errorMessage!"
 }
 
 private fun isSubjectValid(subject: String): Boolean {
-  return Pattern.matches(SUBJECT_VALIDATION_REGEX, subject)
+  return Pattern.matches(SUBJECT_VALIDATION_REGEX, subject) && subject.isNotBlank()
 }

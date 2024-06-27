@@ -57,6 +57,10 @@ fun Subject(
     Unit
   }
 
+  val subjectErrorMessage = stringResource(id = R.string.subject_error)
+  val emptyTextFieldErrorMessage = stringResource(id = R.string.empty_text_field_error)
+  subjectState.setErrorMessage(subjectErrorMessage)
+
   OutlinedTextField(
     modifier =
       Modifier
@@ -86,7 +90,7 @@ fun Subject(
           IconButton(onClick = onClearSubject) {
             Icon(
               imageVector = Icons.Default.Close,
-              contentDescription = "SubjectTrailingIcon",
+              contentDescription = "ClearSubjectIcon",
             )
           }
           Spacer(modifier = Modifier.width(contentWidth.small))
@@ -108,8 +112,8 @@ fun Subject(
         onAny = { onImeAction() },
       ),
     supportingText = {
-      val error = subjectState.getError()
-      if (error == null) {
+      val errorMessage = subjectState.getError()
+      if (errorMessage == null) {
         if (!subjectState.isFocusedOnce) {
           Text(text = stringResource(id = R.string.subject_supporting_text))
         } else {
@@ -118,7 +122,11 @@ fun Subject(
           }
         }
       } else {
-        Text(text = error)
+        if (subjectState.isBlank()) {
+          Text(text = emptyTextFieldErrorMessage)
+        } else {
+          Text(text = errorMessage)
+        }
       }
     },
     shape = RoundedCornerShape(shape.medium),

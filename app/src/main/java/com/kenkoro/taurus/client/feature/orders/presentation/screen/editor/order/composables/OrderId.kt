@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.login.presentation.components
+package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables
 
 import android.os.Build
 import android.os.VibrationEffect
@@ -10,41 +10,34 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Rule
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Key
-import androidx.compose.material.icons.filled.KeyOff
+import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
-import com.kenkoro.taurus.client.feature.login.presentation.util.PasswordState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
 import com.kenkoro.taurus.client.feature.shared.components.TaurusIcon
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
 @Composable
-fun Password(
-  passwordState: TaurusTextFieldState = remember { PasswordState() },
-  imeAction: ImeAction = ImeAction.Done,
+fun OrderId(
+  modifier: Modifier = Modifier,
+  orderIdState: TaurusTextFieldState = remember { OrderIdState() },
+  imeAction: ImeAction = ImeAction.Next,
   onImeAction: () -> Unit = {},
-  modifier: Modifier,
 ) {
   val contentWidth = LocalContentWidth.current
   val shape = LocalShape.current
@@ -55,92 +48,82 @@ fun Password(
     } else {
       null
     }
-  val onClearPassword = {
-    passwordState.text = ""
+  val onClearOrderId = {
+    orderIdState.text = ""
 
     vibrationEffect?.let {
       view.performHapticFeedback(it)
     }
     Unit
   }
-  var isHidden by remember {
-    mutableStateOf(true)
-  }
 
-  val passwordErrorMessage = stringResource(id = R.string.password_error)
+  val orderIdErrorMessage = stringResource(id = R.string.order_id_error)
   val emptyTextFieldErrorMessage = stringResource(id = R.string.empty_text_field_error)
-  passwordState.setErrorMessage(passwordErrorMessage)
+  orderIdState.setErrorMessage(orderIdErrorMessage)
 
   OutlinedTextField(
     modifier =
-      modifier
+      Modifier
         .fillMaxWidth()
         .onFocusChanged { focusState ->
-          passwordState.onFocusChange(focusState.isFocused)
-          if (!passwordState.isFocused) {
-            passwordState.enableShowErrors()
+          orderIdState.onFocusChange(focusState.isFocused)
+          if (!orderIdState.isFocused) {
+            orderIdState.enableShowErrors()
           }
         },
-    value = passwordState.text,
+    value = orderIdState.text,
     onValueChange = {
-      if (it.length <= 20) {
-        passwordState.text = it
+      if (it.length <= 9) {
+        orderIdState.text = it
       }
     },
     leadingIcon = {
       TaurusIcon(
-        imageVector = Icons.AutoMirrored.Outlined.Rule,
-        contentDescription = "PasswordLeadingIcon",
-        isError = passwordState.showErrors(),
+        imageVector = Icons.Default.Numbers,
+        contentDescription = "OrderIdLeadingIcon",
+        isError = orderIdState.showErrors(),
       )
     },
     trailingIcon = {
       Row {
-        IconButton(onClick = { isHidden = !isHidden }) {
-          val imageVector =
-            if (isHidden) {
-              Icons.Default.KeyOff
-            } else {
-              Icons.Default.Key
-            }
-          Icon(
-            imageVector = imageVector,
-            contentDescription = "ShowPasswordIcon",
-          )
-        }
-        if (passwordState.text.isNotEmpty()) {
-          IconButton(onClick = onClearPassword) {
+        if (orderIdState.text.isNotEmpty()) {
+          IconButton(onClick = onClearOrderId) {
             Icon(
               imageVector = Icons.Default.Close,
-              contentDescription = "ClearPasswordIcon",
+              contentDescription = "ClearOrderIdIcon",
             )
           }
+          Spacer(modifier = Modifier.width(contentWidth.small))
         }
-        Spacer(modifier = Modifier.width(contentWidth.small))
       }
     },
     placeholder = {
-      Text(text = stringResource(id = R.string.login_password))
+      Text(text = stringResource(id = R.string.order_editor_order_id))
     },
     textStyle = MaterialTheme.typography.bodyMedium,
-    isError = passwordState.showErrors(),
+    isError = orderIdState.showErrors(),
     keyboardOptions =
       KeyboardOptions.Default.copy(
         imeAction = imeAction,
-        keyboardType = KeyboardType.Password,
+        keyboardType = KeyboardType.Number,
       ),
     keyboardActions =
       KeyboardActions(
         onAny = { onImeAction() },
       ),
     supportingText = {
-      val errorMessage = passwordState.getError()
+      // TODO: Track if the order is unique
+      val errorMessage = orderIdState.getError()
       if (errorMessage == null) {
-        if (passwordState.text.length == 20) {
-          Text(text = stringResource(id = R.string.full_subject_supporting_text))
+        if (!orderIdState.isFocusedOnce) {
+          Text(text = stringResource(id = R.string.order_id_supporting_text))
+        } else {
+          if (orderIdState.text.length == 9) {
+            Text(text = stringResource(id = R.string.full_order_id_supporting_text))
+          }
         }
       } else {
-        if (passwordState.isBlank()) {
+        if (orderIdState.isBlank()) {
           Text(text = emptyTextFieldErrorMessage)
         } else {
           Text(text = errorMessage)
@@ -149,11 +132,5 @@ fun Password(
     },
     shape = RoundedCornerShape(shape.medium),
     singleLine = true,
-    visualTransformation =
-      if (isHidden) {
-        PasswordVisualTransformation()
-      } else {
-        VisualTransformation.None
-      },
   )
 }

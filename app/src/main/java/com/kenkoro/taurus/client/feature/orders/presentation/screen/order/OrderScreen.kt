@@ -20,6 +20,7 @@ import com.kenkoro.taurus.client.feature.login.data.mappers.toUserDto
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrderDto
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderBottomBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderTopBar
@@ -43,6 +44,7 @@ fun OrderScreen(
   ordersPagingFlow: Flow<PagingData<Order>>,
   user: User? = null,
   loginState: LoginState,
+  orderIdState: OrderIdState = OrderIdState(),
   networkStatus: NetworkStatus,
   selectedOrderRecordId: Int? = null,
   onUser: (User) -> Unit = {},
@@ -54,7 +56,9 @@ fun OrderScreen(
   onEncryptToken: (String) -> Unit = {},
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
   onDecryptToken: () -> String,
+  onResetAllOrderFields: () -> Unit = {},
   onNavigateToProfileScreen: () -> Unit = {},
+  onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
@@ -111,6 +115,8 @@ fun OrderScreen(
             networkStatus = networkStatus,
             isScrollingInProgress = lazyOrdersState.isScrollInProgress,
             snackbarsHolder = snackbarsHolder,
+            onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
+            onResetAllOrderFields = onResetAllOrderFields,
           )
         }
       },
@@ -130,6 +136,7 @@ fun OrderScreen(
             loginState = loginState,
             lazyOrdersState = lazyOrdersState,
             selectedOrderRecordId = selectedOrderRecordId,
+            orderIdState = orderIdState,
             onFilterStrategy = onFilterStrategy,
             onSelectOrder = onSelectOrder,
             onLoginState = onLoginState,
@@ -139,6 +146,7 @@ fun OrderScreen(
             onEncryptToken = onEncryptToken,
             onDecryptSubjectAndPassword = onDecryptSubjectAndPassword,
             onDecryptToken = onDecryptToken,
+            onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
           )
         }
       },

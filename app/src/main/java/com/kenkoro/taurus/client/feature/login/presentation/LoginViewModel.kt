@@ -12,7 +12,6 @@ import com.kenkoro.taurus.client.feature.login.presentation.util.PasswordState
 import com.kenkoro.taurus.client.feature.login.presentation.util.SubjectState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.LoginState
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
-import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -32,14 +31,6 @@ class LoginViewModel
 
     var loginState by mutableStateOf(LoginState.NotLoggedYet)
       private set
-
-    fun setErrorMessages(
-      state: TaurusTextFieldState,
-      errorMessage: String,
-      emptyTextFieldErrorMessage: String,
-    ) {
-      state.setErrorMessages(errorMessage, emptyTextFieldErrorMessage)
-    }
 
     fun loginState(loginState: LoginState) {
       this.loginState = loginState

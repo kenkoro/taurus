@@ -25,7 +25,6 @@ import com.kenkoro.taurus.client.feature.login.presentation.util.PasswordState
 import com.kenkoro.taurus.client.feature.login.presentation.util.SubjectState
 import com.kenkoro.taurus.client.feature.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
-import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 
@@ -35,7 +34,6 @@ fun LoginScreen(
   subject: SubjectState,
   password: PasswordState,
   networkStatus: NetworkStatus,
-  onSetErrorMessages: (TaurusTextFieldState, String, String) -> Unit,
   onLogin: suspend (subject: String, password: String) -> Result<TokenDto>,
   onEncryptAll: (String, String, String) -> Unit,
   onExit: () -> Unit = {},
@@ -95,7 +93,6 @@ fun LoginScreen(
               networkStatus = networkStatus,
               subject = subject,
               password = password,
-              onSetErrorMessages = onSetErrorMessages,
               onLogin = onLogin,
               onEncryptAll = onEncryptAll,
               onNavigateToOrderScreen = onNavigateToOrderScreen,
@@ -129,7 +126,6 @@ private fun LoginScreenPrev() {
       networkStatus = NetworkStatus.Available,
       subject = SubjectState(),
       password = PasswordState(),
-      onSetErrorMessages = { _, _, _ -> },
       onLogin = { _, _ -> Result.success(TokenDto("")) },
       onEncryptAll = { _, _, _ -> },
       onNavigateToOrderScreen = {},

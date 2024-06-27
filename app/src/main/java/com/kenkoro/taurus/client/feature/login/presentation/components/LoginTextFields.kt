@@ -25,7 +25,6 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.feature.login.presentation.util.PasswordState
 import com.kenkoro.taurus.client.feature.login.presentation.util.SubjectState
-import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
 @Composable
 fun LoginTextFields(
@@ -34,7 +33,6 @@ fun LoginTextFields(
   subject: SubjectState,
   password: PasswordState,
   isAuthenticating: Boolean,
-  onSetErrorMessages: (TaurusTextFieldState, String, String) -> Unit,
   onLoginSubmitted: (subject: String, password: String) -> Unit,
   onExit: () -> Unit = {},
   onShowErrorTitle: () -> Boolean = { false },
@@ -43,14 +41,7 @@ fun LoginTextFields(
   val focusManager = LocalFocusManager.current
   val contentHeight = LocalContentHeight.current
 
-  val subjectErrorMessage = stringResource(id = R.string.subject_error)
-  val passwordErrorMessage = stringResource(id = R.string.password_error)
-  val emptyTextFieldErrorMessage = stringResource(id = R.string.empty_text_field_error)
-
   val focusRequester = remember { FocusRequester() }
-
-  onSetErrorMessages(subject, subjectErrorMessage, emptyTextFieldErrorMessage)
-  onSetErrorMessages(password, passwordErrorMessage, emptyTextFieldErrorMessage)
 
   val isSubjectInvalidWhilePasswordIsFocused = { !subject.isValid && password.isFocused }
   val isSubjectInvalidWhilePasswordIsNotFocused = { !subject.isValid && !password.isFocused }

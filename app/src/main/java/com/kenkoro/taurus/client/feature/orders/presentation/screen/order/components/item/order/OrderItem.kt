@@ -1,5 +1,7 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order
 
+import android.os.Build
+import android.os.VibrationEffect
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -7,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +17,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -25,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
@@ -36,6 +44,7 @@ import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Cut
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.allowedToSeeOrders
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
@@ -44,6 +53,7 @@ import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Admin
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Ceo
+import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Manager
@@ -57,16 +67,30 @@ fun OrderItem(
   order: Order,
   networkStatus: NetworkStatus,
   selectedOrderRecordId: Int? = null,
+  orderIdState: OrderIdState = OrderIdState(),
   onSelectOrder: (Int?) -> Unit = {},
   localHandler: LocalHandler = LocalHandler(),
   remoteHandler: RemoteHandler,
   snackbarsHolder: SnackbarsHolder,
   onDecryptToken: () -> String,
   onRefresh: () -> Unit = {},
+  onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
 ) {
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
+  val view = LocalView.current
+  val vibrationEffect =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      VibrationEffect.EFFECT_CLICK
+    } else {
+      null
+    }
+  val onEditOrder = {
+    orderIdState.text = order.orderId.toString()
+
+    onNavigateToOrderEditorScreen(true)
+  }
 
   var visible by rememberSaveable {
     mutableStateOf(true)
@@ -131,18 +155,40 @@ fun OrderItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom,
           ) {
-            OrderItemBottomButton(
-              order = order,
-              profile = user.profile,
-              networkStatus = networkStatus,
-              userSubject = user.subject,
-              localHandler = localHandler,
-              remoteHandler = remoteHandler,
-              snackbarsHolder = snackbarsHolder,
-              onHide = { visible = false },
-              onDecryptToken = onDecryptToken,
-              onRefresh = onRefresh,
-            )
+            Row(
+              modifier = Modifier.width(contentWidth.standard),
+              horizontalArrangement = Arrangement.Center,
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              OrderItemBottomActionButton(
+                modifier = Modifier.weight(1F),
+                order = order,
+                profile = user.profile,
+                networkStatus = networkStatus,
+                userSubject = user.subject,
+                localHandler = localHandler,
+                remoteHandler = remoteHandler,
+                snackbarsHolder = snackbarsHolder,
+                onHide = { visible = false },
+                onDecryptToken = onDecryptToken,
+                onRefresh = onRefresh,
+              )
+
+              if (allowedToEditOrder(user.profile)) {
+                Spacer(modifier = Modifier.width(contentWidth.small))
+                Button(
+                  modifier = Modifier.width(contentWidth.editOrderButton),
+                  onClick = {
+                    vibrationEffect?.let {
+                      view.performHapticFeedback(it)
+                    }
+                    onEditOrder()
+                  },
+                ) {
+                  Icon(imageVector = Icons.Default.Edit, contentDescription = "EditOrder")
+                }
+              }
+            }
             Spacer(modifier = Modifier.height(contentHeight.large))
           }
         }
@@ -156,6 +202,10 @@ private fun allowedToUpdateOrderStatus(profile: UserProfile): Boolean {
     profile != Admin &&
     profile != Ceo &&
     profile != Manager
+}
+
+private fun allowedToEditOrder(profile: UserProfile): Boolean {
+  return profile == Customer
 }
 
 private fun orderStatusCorrespondsToUserProfile(
@@ -184,7 +234,7 @@ private fun OrderItemPrev() {
       color = "Black",
       category = "Жилеты",
       quantity = 4,
-      status = OrderStatus.Checked,
+      status = OrderStatus.Idle,
       creatorId = 0,
     )
   val user =
@@ -196,7 +246,7 @@ private fun OrderItemPrev() {
       firstName = "FirstName",
       lastName = "LastName",
       email = "Email",
-      profile = UserProfile.Other,
+      profile = UserProfile.Customer,
       salt = "Salt",
     )
   val remoteHandler =
