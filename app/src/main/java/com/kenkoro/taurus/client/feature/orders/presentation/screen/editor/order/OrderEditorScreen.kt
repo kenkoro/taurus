@@ -16,15 +16,14 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.OrderEditorContent
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.OrderEditorTopBar
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderEditorScreen(
   modifier: Modifier = Modifier,
   networkStatus: NetworkStatus,
-  // TODO: OrderHolder or something - holder of all states
-  orderIdState: OrderIdState = OrderIdState(),
+  orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
   editOrder: Boolean = false,
   onNavUp: () -> Unit = {},
   onSaveChanges: () -> Unit = {},
@@ -56,8 +55,8 @@ fun OrderEditorScreen(
               .padding(paddingValues),
         ) {
           OrderEditorContent(
-            orderIdState = orderIdState,
             networkStatus = networkStatus,
+            orderStatesHolder = orderStatesHolder,
           )
         }
       },

@@ -21,7 +21,7 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.feature.orders.domain.Order
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order.OrderItem
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
@@ -42,9 +42,9 @@ fun LazyOrdersContent(
   user: User,
   networkStatus: NetworkStatus,
   loginState: LoginState,
-  orderIdState: OrderIdState = OrderIdState(),
   selectedOrderRecordId: Int? = null,
   lazyOrdersState: LazyListState,
+  orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
   onFilterStrategy: (OrderFilterStrategy?) -> Unit = {},
   onUser: (User) -> Unit,
   onSelectOrder: (Int?) -> Unit = {},
@@ -103,7 +103,7 @@ fun LazyOrdersContent(
             networkStatus = networkStatus,
             user = user,
             selectedOrderRecordId = selectedOrderRecordId,
-            orderIdState = orderIdState,
+            orderStatesHolder = orderStatesHolder,
             onSelectOrder = onSelectOrder,
             localHandler = localHandler,
             remoteHandler = remoteHandler,

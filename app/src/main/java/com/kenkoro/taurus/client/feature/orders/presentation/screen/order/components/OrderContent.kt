@@ -12,7 +12,7 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.login.data.mappers.toUser
 import com.kenkoro.taurus.client.feature.orders.domain.Order
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.LoginState
@@ -36,9 +36,9 @@ fun OrderContent(
   user: User?,
   networkStatus: NetworkStatus,
   loginState: LoginState,
-  orderIdState: OrderIdState = OrderIdState(),
   selectedOrderRecordId: Int? = null,
   lazyOrdersState: LazyListState,
+  orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
   onFilterStrategy: (OrderFilterStrategy?) -> Unit = {},
   onUser: (User) -> Unit,
   onSelectOrder: (Int?) -> Unit = {},
@@ -119,8 +119,8 @@ fun OrderContent(
       networkStatus = networkStatus,
       loginState = loginState,
       selectedOrderRecordId = selectedOrderRecordId,
-      orderIdState = orderIdState,
       lazyOrdersState = lazyOrdersState,
+      orderStatesHolder = orderStatesHolder,
       onUser = onUser,
       onFilterStrategy = onFilterStrategy,
       onSelectOrder = onSelectOrder,

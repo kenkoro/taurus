@@ -20,7 +20,7 @@ import com.kenkoro.taurus.client.feature.login.data.mappers.toUserDto
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrderDto
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderBottomBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderTopBar
@@ -44,9 +44,9 @@ fun OrderScreen(
   ordersPagingFlow: Flow<PagingData<Order>>,
   user: User? = null,
   loginState: LoginState,
-  orderIdState: OrderIdState = OrderIdState(),
   networkStatus: NetworkStatus,
   selectedOrderRecordId: Int? = null,
+  orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
   onUser: (User) -> Unit = {},
   onFilterStrategy: (OrderFilterStrategy?) -> Unit = {},
   onSelectOrder: (Int?) -> Unit = {},
@@ -136,7 +136,7 @@ fun OrderScreen(
             loginState = loginState,
             lazyOrdersState = lazyOrdersState,
             selectedOrderRecordId = selectedOrderRecordId,
-            orderIdState = orderIdState,
+            orderStatesHolder = orderStatesHolder,
             onFilterStrategy = onFilterStrategy,
             onSelectOrder = onSelectOrder,
             onLoginState = onLoginState,

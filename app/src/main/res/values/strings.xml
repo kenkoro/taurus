@@ -58,4 +58,5 @@
     <string name="order_editor_title">Название</string>
     <string name="order_id_supporting_text">Уникальный номер заказа</string>
     <string name="full_order_id_supporting_text">Максимум 9 цифр</string>
+    <string name="full_category_supporting_text">Максимум 24 символа</string>
 </resources>

@@ -44,7 +44,7 @@ import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Cut
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.allowedToSeeOrders
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
@@ -67,7 +67,7 @@ fun OrderItem(
   order: Order,
   networkStatus: NetworkStatus,
   selectedOrderRecordId: Int? = null,
-  orderIdState: OrderIdState = OrderIdState(),
+  orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
   onSelectOrder: (Int?) -> Unit = {},
   localHandler: LocalHandler = LocalHandler(),
   remoteHandler: RemoteHandler,
@@ -87,7 +87,7 @@ fun OrderItem(
       null
     }
   val onEditOrder = {
-    orderIdState.text = order.orderId.toString()
+    orderStatesHolder.orderIdState.text = order.orderId.toString()
 
     onNavigateToOrderEditorScreen(true)
   }

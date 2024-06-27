@@ -13,14 +13,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderEditorContent(
   modifier: Modifier = Modifier,
   networkStatus: NetworkStatus,
-  orderIdState: OrderIdState = OrderIdState(),
+  orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
@@ -30,10 +30,10 @@ fun OrderEditorContent(
     verticalArrangement = Arrangement.Top,
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
-    Spacer(modifier = Modifier.height(contentHeight.large))
+    Spacer(modifier = Modifier.height(contentHeight.extraLarge))
     OrderEditorTextFields(
       modifier = Modifier.width(contentWidth.standard),
-      orderIdState = orderIdState,
+      orderStatesHolder = orderStatesHolder,
     )
   }
 }

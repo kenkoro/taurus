@@ -18,6 +18,7 @@ import com.kenkoro.taurus.client.feature.login.presentation.LoginScreen
 import com.kenkoro.taurus.client.feature.login.presentation.LoginViewModel
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorViewModel
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderViewModel
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
@@ -61,6 +62,17 @@ fun AppNavHost(
       deleteOrder = orderViewModel::deleteOrderRemotely,
       editOrder = orderViewModel::editOrderRemotely,
     )
+  val orderStatesHolder =
+    OrderStatesHolder(
+      categoryState = orderEditorViewModel.category,
+      colorState = orderEditorViewModel.color,
+      customerState = orderEditorViewModel.customer,
+      modelState = orderEditorViewModel.model,
+      orderIdState = orderEditorViewModel.orderId,
+      quantityState = orderEditorViewModel.quantity,
+      sizeState = orderEditorViewModel.size,
+      titleState = orderEditorViewModel.title,
+    )
 
   NavHost(
     navController = navController,
@@ -86,7 +98,7 @@ fun AppNavHost(
         loginState = loginViewModel.loginState,
         networkStatus = networkStatus,
         selectedOrderRecordId = orderViewModel.selectedOrderRecordId,
-        orderIdState = orderEditorViewModel.orderId,
+        orderStatesHolder = orderStatesHolder,
         onUser = userViewModel::user,
         onFilterStrategy = orderViewModel::filterStrategy,
         onSelectOrder = orderViewModel::selectOrder,
@@ -126,9 +138,10 @@ fun AppNavHost(
         ),
     ) {
       val editOrder = it.arguments?.getBoolean("editOrder") ?: false
+
       OrderEditorScreen(
         networkStatus = networkStatus,
-        orderIdState = orderEditorViewModel.orderId,
+        orderStatesHolder = orderStatesHolder,
         editOrder = editOrder,
         onNavUp = navController::navigateUp,
         onSaveChanges = {},
