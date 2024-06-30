@@ -7,8 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Numbers
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,14 +22,14 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.util.SupportingTextOnError
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.util.TaurusTextFieldTrailingIcon
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.TitleState
 import com.kenkoro.taurus.client.feature.shared.components.TaurusIcon
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
 @Composable
-fun OrderId(
+fun OrderTitle(
   modifier: Modifier = Modifier,
-  orderIdState: TaurusTextFieldState = remember { OrderIdState() },
+  titleState: TaurusTextFieldState = remember { TitleState() },
   imeAction: ImeAction = ImeAction.Next,
   onImeAction: () -> Unit = {},
   keyboardActions: KeyboardActions = KeyboardActions(onAny = { onImeAction() }),
@@ -44,7 +43,7 @@ fun OrderId(
       null
     }
   val onClear = {
-    orderIdState.text = ""
+    titleState.text = ""
 
     vibrationEffect?.let {
       view.performHapticFeedback(it)
@@ -52,62 +51,55 @@ fun OrderId(
     Unit
   }
 
-  val orderIdErrorMessage = stringResource(id = R.string.order_id_error)
-  orderIdState.setErrorMessage(orderIdErrorMessage)
+  val categoryErrorMessage = stringResource(id = R.string.title_error)
+  titleState.setErrorMessage(categoryErrorMessage)
 
   OutlinedTextField(
     modifier =
       Modifier
         .fillMaxWidth()
         .onFocusChanged { focusState ->
-          orderIdState.onFocusChange(focusState.isFocused)
-          if (!orderIdState.isFocused) {
-            orderIdState.enableShowErrors()
+          titleState.onFocusChange(focusState.isFocused)
+          if (!titleState.isFocused) {
+            titleState.enableShowErrors()
           }
         },
-    value = orderIdState.text,
+    value = titleState.text,
     onValueChange = {
-      if (it.length <= 9) {
-        orderIdState.text = it
+      if (it.length <= 96) {
+        titleState.text = it
       }
     },
     leadingIcon = {
       TaurusIcon(
-        imageVector = Icons.Default.Numbers,
-        contentDescription = "OrderIdLeadingIcon",
-        isError = orderIdState.showErrors(),
+        imageVector = Icons.Default.Title,
+        contentDescription = "TitleLeadingIcon",
+        isError = titleState.showErrors(),
       )
     },
     trailingIcon = {
       TaurusTextFieldTrailingIcon(
-        state = orderIdState,
+        state = titleState,
         onClear = onClear,
       )
     },
     placeholder = {
-      Text(text = stringResource(id = R.string.order_editor_order_id))
+      Text(text = stringResource(id = R.string.order_editor_title))
     },
-    textStyle = MaterialTheme.typography.bodyMedium,
-    isError = orderIdState.showErrors(),
     keyboardOptions =
       KeyboardOptions.Default.copy(
         imeAction = imeAction,
-        keyboardType = KeyboardType.Number,
+        keyboardType = KeyboardType.Text,
       ),
     keyboardActions = keyboardActions,
     supportingText = {
-      // TODO: Track if the order is unique
-      val errorMessage = orderIdState.getError()
+      val errorMessage = titleState.getError()
       if (errorMessage == null) {
-        if (!orderIdState.isFocusedOnce) {
-          Text(text = stringResource(id = R.string.order_id_supporting_text))
-        } else {
-          if (orderIdState.text.length == 9) {
-            Text(text = stringResource(id = R.string.max_9_supporting_text))
-          }
+        if (titleState.isFocusedOnce && titleState.text.length == 96) {
+          Text(text = stringResource(id = R.string.max_96_supporting_text))
         }
       } else {
-        SupportingTextOnError(state = orderIdState, errorMessage = errorMessage)
+        SupportingTextOnError(state = titleState, errorMessage = errorMessage)
       }
     },
     shape = RoundedCornerShape(shape.medium),

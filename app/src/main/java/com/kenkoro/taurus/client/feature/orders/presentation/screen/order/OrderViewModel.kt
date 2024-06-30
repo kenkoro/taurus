@@ -15,7 +15,6 @@ import com.kenkoro.taurus.client.feature.orders.data.local.OrderEntity
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toNewOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrder
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrderEntity
-import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.OrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
@@ -99,21 +98,4 @@ class OrderViewModel
         dto = newOrder.toNewOrderDto(),
         token = decryptedCredentialService.storedToken(),
       )
-
-    suspend fun editOrderRemotely(
-      dto: NewOrderDto,
-      orderId: Int,
-      editorSubject: String,
-      token: String,
-    ): Boolean {
-      val result =
-        orderRepository.editOrder(
-          dto = dto,
-          orderId = orderId,
-          editorSubject = editorSubject,
-          token = token,
-        )
-
-      return result.isSuccess
-    }
   }

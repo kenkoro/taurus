@@ -22,6 +22,10 @@ fun OrderEditorTextFields(
 
   val focusRequester = remember { FocusRequester() }
 
+  val onSubmit = {
+    // TODO: Check all states and then send a request to edit an order
+  }
+
   Column(
     modifier = modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -32,9 +36,39 @@ fun OrderEditorTextFields(
       onImeAction = { focusRequester.requestFocus() },
     )
     Spacer(modifier = Modifier.height(contentHeight.medium))
-    Category(
+    OrderCustomer(
+      customerState = orderStatesHolder.customerState,
+      modifier = Modifier.focusRequester(focusRequester),
+    )
+    OrderTitle(
+      titleState = orderStatesHolder.titleState,
+      modifier = Modifier.focusRequester(focusRequester),
+    )
+    Spacer(modifier = Modifier.height(contentHeight.medium))
+    OrderModel(
+      modelState = orderStatesHolder.modelState,
+      modifier = Modifier.focusRequester(focusRequester),
+    )
+    Spacer(modifier = Modifier.height(contentHeight.medium))
+    OrderSize(
+      sizeState = orderStatesHolder.sizeState,
+      modifier = Modifier.focusRequester(focusRequester),
+    )
+    Spacer(modifier = Modifier.height(contentHeight.medium))
+    OrderColor(
+      colorState = orderStatesHolder.colorState,
+      modifier = Modifier.focusRequester(focusRequester),
+    )
+    Spacer(modifier = Modifier.height(contentHeight.medium))
+    OrderCategory(
       categoryState = orderStatesHolder.categoryState,
       modifier = Modifier.focusRequester(focusRequester),
+    )
+    Spacer(modifier = Modifier.height(contentHeight.medium))
+    OrderQuantity(
+      quantityState = orderStatesHolder.quantityState,
+      modifier = Modifier.focusRequester(focusRequester),
+      onImeAction = { onSubmit() },
     )
   }
 }

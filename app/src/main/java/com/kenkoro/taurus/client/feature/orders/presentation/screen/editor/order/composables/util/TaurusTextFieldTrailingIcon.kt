@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables
+package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.util
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

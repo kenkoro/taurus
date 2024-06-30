@@ -7,7 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,14 +20,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalShape
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CategoryState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.util.SupportingTextOnError
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.util.TaurusTextFieldTrailingIcon
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.ModelState
 import com.kenkoro.taurus.client.feature.shared.components.TaurusIcon
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
 @Composable
-fun Category(
+fun OrderModel(
   modifier: Modifier = Modifier,
-  categoryState: TaurusTextFieldState = remember { CategoryState() },
+  modelState: TaurusTextFieldState = remember { ModelState() },
   imeAction: ImeAction = ImeAction.Next,
   onImeAction: () -> Unit = {},
   keyboardActions: KeyboardActions = KeyboardActions(onAny = { onImeAction() }),
@@ -41,7 +43,7 @@ fun Category(
       null
     }
   val onClear = {
-    categoryState.text = ""
+    modelState.text = ""
 
     vibrationEffect?.let {
       view.performHapticFeedback(it)
@@ -49,40 +51,40 @@ fun Category(
     Unit
   }
 
-  val categoryErrorMessage = stringResource(id = R.string.category_error)
-  categoryState.setErrorMessage(categoryErrorMessage)
+  val categoryErrorMessage = stringResource(id = R.string.model_error)
+  modelState.setErrorMessage(categoryErrorMessage)
 
   OutlinedTextField(
     modifier =
       Modifier
         .fillMaxWidth()
         .onFocusChanged { focusState ->
-          categoryState.onFocusChange(focusState.isFocused)
-          if (!categoryState.isFocused) {
-            categoryState.enableShowErrors()
+          modelState.onFocusChange(focusState.isFocused)
+          if (!modelState.isFocused) {
+            modelState.enableShowErrors()
           }
         },
-    value = categoryState.text,
+    value = modelState.text,
     onValueChange = {
       if (it.length <= 24) {
-        categoryState.text = it
+        modelState.text = it
       }
     },
     leadingIcon = {
       TaurusIcon(
-        imageVector = Icons.Default.Category,
-        contentDescription = "CategoryLeadingIcon",
-        isError = categoryState.showErrors(),
+        imageVector = Icons.Default.Group,
+        contentDescription = "ModelLeadingIcon",
+        isError = modelState.showErrors(),
       )
     },
     trailingIcon = {
       TaurusTextFieldTrailingIcon(
-        state = categoryState,
+        state = modelState,
         onClear = onClear,
       )
     },
     placeholder = {
-      Text(text = stringResource(id = R.string.order_editor_category))
+      Text(text = stringResource(id = R.string.order_editor_model))
     },
     keyboardOptions =
       KeyboardOptions.Default.copy(
@@ -91,13 +93,13 @@ fun Category(
       ),
     keyboardActions = keyboardActions,
     supportingText = {
-      val errorMessage = categoryState.getError()
+      val errorMessage = modelState.getError()
       if (errorMessage == null) {
-        if (categoryState.isFocusedOnce && categoryState.text.length == 24) {
-          Text(text = stringResource(id = R.string.full_category_supporting_text))
+        if (modelState.isFocusedOnce && modelState.text.length == 24) {
+          Text(text = stringResource(id = R.string.max_24_supporting_text))
         }
       } else {
-        SupportingTextOnError(state = categoryState, errorMessage = errorMessage)
+        SupportingTextOnError(state = modelState, errorMessage = errorMessage)
       }
     },
     shape = RoundedCornerShape(shape.medium),

@@ -4,6 +4,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
+import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CategoryState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.ColorState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CustomerState
@@ -19,7 +21,7 @@ import javax.inject.Inject
 class OrderEditorViewModel
   @Inject
   constructor(
-    // TODO: Deps
+    private val orderRepository: OrderRepositoryImpl,
   ) : ViewModel() {
     var orderId by mutableStateOf(OrderIdState(orderId = null))
       private set
@@ -54,5 +56,22 @@ class OrderEditorViewModel
       color.text = ""
       category.text = ""
       quantity.text = ""
+    }
+
+    suspend fun editOrderRemotely(
+      dto: NewOrderDto,
+      orderId: Int,
+      editorSubject: String,
+      token: String,
+    ): Boolean {
+      val result =
+        orderRepository.editOrder(
+          dto = dto,
+          orderId = orderId,
+          editorSubject = editorSubject,
+          token = token,
+        )
+
+      return result.isSuccess
     }
   }

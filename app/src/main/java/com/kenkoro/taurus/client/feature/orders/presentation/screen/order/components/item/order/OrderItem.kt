@@ -19,8 +19,8 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -86,9 +86,18 @@ fun OrderItem(
     } else {
       null
     }
-  val onEditOrder = {
+  val saveStates = {
     orderStatesHolder.orderIdState.text = order.orderId.toString()
-
+    orderStatesHolder.customerState.text = order.customer
+    orderStatesHolder.titleState.text = order.title
+    orderStatesHolder.modelState.text = order.model
+    orderStatesHolder.sizeState.text = order.size
+    orderStatesHolder.colorState.text = order.color
+    orderStatesHolder.categoryState.text = order.category
+    orderStatesHolder.quantityState.text = order.quantity.toString()
+  }
+  val onEditOrder = {
+    saveStates()
     onNavigateToOrderEditorScreen(true)
   }
 
@@ -176,8 +185,7 @@ fun OrderItem(
 
               if (allowedToEditOrder(user.profile)) {
                 Spacer(modifier = Modifier.width(contentWidth.small))
-                Button(
-                  modifier = Modifier.width(contentWidth.editOrderButton),
+                IconButton(
                   onClick = {
                     vibrationEffect?.let {
                       view.performHapticFeedback(it)

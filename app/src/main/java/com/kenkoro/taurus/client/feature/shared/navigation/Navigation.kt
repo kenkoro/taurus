@@ -60,7 +60,7 @@ fun AppNavHost(
       getUser = userViewModel::getUser,
       addNewOrder = orderViewModel::addNewOrderRemotely,
       deleteOrder = orderViewModel::deleteOrderRemotely,
-      editOrder = orderViewModel::editOrderRemotely,
+      editOrder = orderEditorViewModel::editOrderRemotely,
     )
   val orderStatesHolder =
     OrderStatesHolder(
