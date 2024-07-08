@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 
@@ -18,23 +19,18 @@ fun OrderEditorTextFields(
   modifier: Modifier = Modifier,
   orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
 ) {
+  val focusManager = LocalFocusManager.current
   val contentHeight = LocalContentHeight.current
 
   val focusRequester = remember { FocusRequester() }
 
-  val onSubmit = {
-    // TODO: Check all states and then send a request to edit an order
-  }
+  val onSubmit = { focusManager.clearFocus() }
 
   Column(
     modifier = modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top,
   ) {
-    OrderId(
-      orderIdState = orderStatesHolder.orderIdState,
-      onImeAction = { focusRequester.requestFocus() },
-    )
     Spacer(modifier = Modifier.height(contentHeight.medium))
     OrderCustomer(
       customerState = orderStatesHolder.customerState,

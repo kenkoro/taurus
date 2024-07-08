@@ -4,8 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
+import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
+import com.kenkoro.taurus.client.feature.orders.data.mappers.toNewOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepositoryImpl
+import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
+import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CategoryState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.ColorState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CustomerState
@@ -22,6 +25,7 @@ class OrderEditorViewModel
   @Inject
   constructor(
     private val orderRepository: OrderRepositoryImpl,
+    private val decryptedCredentialService: DecryptedCredentialService,
   ) : ViewModel() {
     var orderId by mutableStateOf(OrderIdState(orderId = null))
       private set
@@ -47,6 +51,9 @@ class OrderEditorViewModel
     var quantity by mutableStateOf(QuantityState(quantity = null))
       private set
 
+    var status by mutableStateOf(OrderStatus.Idle)
+      private set
+
     fun resetAll() {
       orderId.text = ""
       customer.text = ""
@@ -58,18 +65,21 @@ class OrderEditorViewModel
       quantity.text = ""
     }
 
+    fun status(status: OrderStatus) {
+      this.status = status
+    }
+
     suspend fun editOrderRemotely(
-      dto: NewOrderDto,
+      dto: NewOrder,
       orderId: Int,
       editorSubject: String,
-      token: String,
     ): Boolean {
       val result =
         orderRepository.editOrder(
-          dto = dto,
+          dto = dto.toNewOrderDto(),
           orderId = orderId,
           editorSubject = editorSubject,
-          token = token,
+          token = decryptedCredentialService.storedToken(),
         )
 
       return result.isSuccess

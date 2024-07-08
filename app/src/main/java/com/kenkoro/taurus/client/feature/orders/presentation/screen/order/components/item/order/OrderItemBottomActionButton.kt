@@ -8,7 +8,6 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toCheckedOrder
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toCutOrder
-import com.kenkoro.taurus.client.feature.orders.data.mappers.toNewOrderDto
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Cut
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
@@ -101,10 +100,9 @@ fun OrderItemBottomActionButton(
               localHandler.editOrder(cutOrder)
               val wasAcknowledged =
                 remoteHandler.editOrder(
-                  cutOrder.toNewOrderDto(),
+                  cutOrder,
                   order.orderId,
                   userSubject ?: "",
-                  onDecryptToken(),
                 )
               if (wasAcknowledged) {
                 onRefresh()
@@ -132,10 +130,9 @@ fun OrderItemBottomActionButton(
               localHandler.editOrder(checkedOrder)
               val wasAcknowledged =
                 remoteHandler.editOrder(
-                  checkedOrder.toNewOrderDto(),
+                  checkedOrder,
                   order.orderId,
                   userSubject ?: "",
-                  onDecryptToken(),
                 )
               if (wasAcknowledged) {
                 onRefresh()

@@ -12,6 +12,7 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.login.data.mappers.toUser
 import com.kenkoro.taurus.client.feature.orders.domain.Order
+import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
@@ -49,6 +50,7 @@ fun OrderContent(
   onEncryptToken: (String) -> Unit,
   onDecryptToken: () -> String,
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
+  onOrderStatus: (OrderStatus) -> Unit = {},
   onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
 ) {
   val loginErrorMessage = stringResource(id = R.string.login_fail)
@@ -129,6 +131,7 @@ fun OrderContent(
       remoteHandler = remoteHandler,
       snackbarsHolder = snackbarsHolder,
       onDecryptToken = onDecryptToken,
+      onOrderStatus = onOrderStatus,
       onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
     )
   }

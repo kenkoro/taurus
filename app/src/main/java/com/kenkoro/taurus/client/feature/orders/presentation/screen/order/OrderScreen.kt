@@ -57,6 +57,7 @@ fun OrderScreen(
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
   onDecryptToken: () -> String,
   onResetAllOrderFields: () -> Unit = {},
+  onOrderStatus: (OrderStatus) -> Unit = {},
   onNavigateToProfileScreen: () -> Unit = {},
   onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
 ) {
@@ -146,6 +147,7 @@ fun OrderScreen(
             onEncryptToken = onEncryptToken,
             onDecryptSubjectAndPassword = onDecryptSubjectAndPassword,
             onDecryptToken = onDecryptToken,
+            onOrderStatus = onOrderStatus,
             onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
           )
         }

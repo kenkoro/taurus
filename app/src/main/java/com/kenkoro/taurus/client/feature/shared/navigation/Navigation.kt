@@ -109,6 +109,7 @@ fun AppNavHost(
         onDecryptSubjectAndPassword = loginViewModel::decryptSubjectAndPassword,
         onDecryptToken = userViewModel::decryptToken,
         onResetAllOrderFields = orderEditorViewModel::resetAll,
+        onOrderStatus = orderEditorViewModel::status,
         onNavigateToProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
         onNavigateToOrderEditorScreen = { editOrder ->
           navController.navigate(Screen.OrderEditorScreen.route + "?editOrder=$editOrder")
@@ -140,11 +141,15 @@ fun AppNavHost(
       val editOrder = it.arguments?.getBoolean("editOrder") ?: false
 
       OrderEditorScreen(
+        userId = userViewModel.user?.userId ?: 0,
+        userSubject = userViewModel.user?.subject ?: "",
+        orderStatus = orderEditorViewModel.status,
         networkStatus = networkStatus,
         orderStatesHolder = orderStatesHolder,
         editOrder = editOrder,
         onNavUp = navController::navigateUp,
-        onSaveChanges = {},
+        onAddNewOrderRemotely = orderViewModel::addNewOrderRemotely,
+        onEditOrderRemotely = orderEditorViewModel::editOrderRemotely,
       )
     }
   }
