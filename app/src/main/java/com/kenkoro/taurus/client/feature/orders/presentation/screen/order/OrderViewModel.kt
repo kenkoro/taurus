@@ -67,15 +67,21 @@ class OrderViewModel
       }
     }
 
-    suspend fun addNewOrderLocally(newOrder: NewOrder) {
+    suspend fun addNewOrderLocally(
+      newOrder: NewOrder,
+      orderId: Int,
+    ) {
       localDb.withTransaction {
-        localDb.orderDao.upsert(newOrder.toOrderEntity())
+        localDb.orderDao.upsert(newOrder.toOrderEntity(orderId))
       }
     }
 
-    suspend fun editOrderLocally(newOrder: NewOrder) {
+    suspend fun editOrderLocally(
+      newOrder: NewOrder,
+      orderId: Int,
+    ) {
       localDb.withTransaction {
-        localDb.orderDao.upsert(newOrder.toOrderEntity())
+        localDb.orderDao.upsert(newOrder.toOrderEntity(orderId))
       }
     }
 

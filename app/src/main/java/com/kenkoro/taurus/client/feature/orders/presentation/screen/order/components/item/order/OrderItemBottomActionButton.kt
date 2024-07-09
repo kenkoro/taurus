@@ -97,7 +97,7 @@ fun OrderItemBottomActionButton(
               onHideWithDelay()
 
               val cutOrder = order.toCutOrder()
-              localHandler.editOrder(cutOrder)
+              localHandler.editOrder(cutOrder, order.orderId)
               val wasAcknowledged =
                 remoteHandler.editOrder(
                   cutOrder,
@@ -127,7 +127,7 @@ fun OrderItemBottomActionButton(
               onHideWithDelay()
 
               val checkedOrder = order.toCheckedOrder()
-              localHandler.editOrder(checkedOrder)
+              localHandler.editOrder(checkedOrder, order.orderId)
               val wasAcknowledged =
                 remoteHandler.editOrder(
                   checkedOrder,

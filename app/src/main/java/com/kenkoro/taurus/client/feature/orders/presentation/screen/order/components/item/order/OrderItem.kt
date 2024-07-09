@@ -75,6 +75,7 @@ fun OrderItem(
   onDecryptToken: () -> String,
   onRefresh: () -> Unit = {},
   onOrderStatus: (OrderStatus) -> Unit = {},
+  onOrderId: (Int) -> Unit = {},
   onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
 ) {
   val shape = LocalShape.current
@@ -88,7 +89,6 @@ fun OrderItem(
       null
     }
   val saveStates = {
-    orderStatesHolder.orderIdState.text = order.orderId.toString()
     orderStatesHolder.customerState.text = order.customer
     orderStatesHolder.titleState.text = order.title
     orderStatesHolder.modelState.text = order.model
@@ -96,6 +96,8 @@ fun OrderItem(
     orderStatesHolder.colorState.text = order.color
     orderStatesHolder.categoryState.text = order.category
     orderStatesHolder.quantityState.text = order.quantity.toString()
+
+    onOrderId(order.orderId)
     onOrderStatus(order.status)
   }
   val onEditOrder = {

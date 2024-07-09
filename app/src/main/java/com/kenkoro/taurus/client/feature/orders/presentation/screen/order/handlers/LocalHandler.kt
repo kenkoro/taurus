@@ -6,7 +6,7 @@ import com.kenkoro.taurus.client.feature.profile.domain.User
 
 data class LocalHandler(
   val addNewUser: suspend (User) -> Unit = {},
-  val addNewOrder: suspend (NewOrder) -> Unit = {},
+  val addNewOrder: suspend (NewOrder, Int) -> Unit = { _, _ -> },
   val deleteOrder: suspend (Order) -> Unit = {},
-  val editOrder: suspend (NewOrder) -> Unit = {},
+  val editOrder: suspend (NewOrder, Int) -> Unit = { _, _ -> },
 )

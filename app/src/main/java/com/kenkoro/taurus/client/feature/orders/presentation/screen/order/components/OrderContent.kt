@@ -51,6 +51,7 @@ fun OrderContent(
   onDecryptToken: () -> String,
   onDecryptSubjectAndPassword: () -> Pair<String, String>,
   onOrderStatus: (OrderStatus) -> Unit = {},
+  onOrderId: (Int) -> Unit = {},
   onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
 ) {
   val loginErrorMessage = stringResource(id = R.string.login_fail)
@@ -132,6 +133,7 @@ fun OrderContent(
       snackbarsHolder = snackbarsHolder,
       onDecryptToken = onDecryptToken,
       onOrderStatus = onOrderStatus,
+      onOrderId = onOrderId,
       onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
     )
   }

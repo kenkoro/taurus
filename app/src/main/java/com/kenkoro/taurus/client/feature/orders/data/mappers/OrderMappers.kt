@@ -71,7 +71,7 @@ fun Order.toOrderEntity(): OrderEntity =
     creatorId = creatorId,
   )
 
-fun NewOrder.toOrderEntity(): OrderEntity =
+fun NewOrder.toOrderEntity(orderId: Int): OrderEntity =
   OrderEntity(
     orderId = orderId,
     customer = customer,
@@ -88,7 +88,6 @@ fun NewOrder.toOrderEntity(): OrderEntity =
 
 fun NewOrder.toNewOrderDto(): NewOrderDto =
   NewOrderDto(
-    orderId = orderId,
     customer = customer,
     title = title,
     model = model,
@@ -102,7 +101,6 @@ fun NewOrder.toNewOrderDto(): NewOrderDto =
 
 fun Order.toNewOrder(): NewOrder =
   NewOrder(
-    orderId = orderId,
     customer = customer,
     date = date,
     title = title,
@@ -117,7 +115,6 @@ fun Order.toNewOrder(): NewOrder =
 
 fun Order.toCutOrder(): NewOrder =
   NewOrder(
-    orderId = orderId,
     customer = customer,
     date = date,
     title = title,
@@ -132,7 +129,6 @@ fun Order.toCutOrder(): NewOrder =
 
 fun Order.toCheckedOrder(): NewOrder =
   NewOrder(
-    orderId = orderId,
     customer = customer,
     date = date,
     title = title,

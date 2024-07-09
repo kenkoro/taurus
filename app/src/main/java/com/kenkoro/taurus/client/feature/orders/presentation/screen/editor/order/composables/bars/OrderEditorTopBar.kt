@@ -55,7 +55,6 @@ fun OrderEditorTopBar(
     suspend {
       val newOrder =
         NewOrder(
-          orderId = orderStatesHolder.orderIdState.text.toIntOrNull() ?: 0,
           customer = orderStatesHolder.customerState.text,
           date = System.currentTimeMillis(),
           title = orderStatesHolder.titleState.text,
@@ -74,7 +73,7 @@ fun OrderEditorTopBar(
         )
 
       if (editOrder) {
-        onEditOrderRemotely(newOrder, orderStatesHolder.orderIdState.text.toInt(), userSubject)
+        onEditOrderRemotely(newOrder, orderStatesHolder.orderIdState, userSubject)
       } else {
         onAddNewOrderRemotely(newOrder).isSuccess
       }

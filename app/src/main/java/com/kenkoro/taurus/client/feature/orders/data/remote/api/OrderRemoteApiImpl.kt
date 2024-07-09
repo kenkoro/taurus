@@ -78,7 +78,7 @@ class OrderRemoteApiImpl(
       }.status
 
     if (status != HttpStatusCode.OK) {
-      throw OrderRemoteApiException("The editing of order ${dto.orderId} was unsuccessful")
+      throw OrderRemoteApiException("The editing of order $orderId was unsuccessful")
     }
     return status
   }

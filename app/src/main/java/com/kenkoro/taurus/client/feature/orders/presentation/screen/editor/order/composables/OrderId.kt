@@ -28,6 +28,7 @@ import com.kenkoro.taurus.client.feature.shared.components.TaurusIcon
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
 @Composable
+@Deprecated("Due to auto-inc order id")
 fun OrderId(
   modifier: Modifier = Modifier,
   orderIdState: TaurusTextFieldState = remember { OrderIdState() },

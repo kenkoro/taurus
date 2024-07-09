@@ -110,6 +110,7 @@ fun AppNavHost(
         onDecryptToken = userViewModel::decryptToken,
         onResetAllOrderFields = orderEditorViewModel::resetAll,
         onOrderStatus = orderEditorViewModel::status,
+        onOrderId = orderEditorViewModel::orderId,
         onNavigateToProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
         onNavigateToOrderEditorScreen = { editOrder ->
           navController.navigate(Screen.OrderEditorScreen.route + "?editOrder=$editOrder")

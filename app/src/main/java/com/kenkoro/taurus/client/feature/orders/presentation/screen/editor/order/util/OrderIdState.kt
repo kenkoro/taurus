@@ -3,6 +3,7 @@ package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.orde
 import androidx.core.text.isDigitsOnly
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
+@Deprecated("Due to auto-inc order id")
 class OrderIdState(
   orderId: Int? = null,
 ) : TaurusTextFieldState(

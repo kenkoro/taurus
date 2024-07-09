@@ -7,7 +7,7 @@ data class OrderStatesHolder(
   val colorState: TaurusTextFieldState = ColorState(),
   val customerState: TaurusTextFieldState = CustomerState(),
   val modelState: TaurusTextFieldState = ModelState(),
-  val orderIdState: TaurusTextFieldState = OrderIdState(),
+  val orderIdState: Int = 0,
   val quantityState: TaurusTextFieldState = QuantityState(),
   val sizeState: TaurusTextFieldState = SizeState(),
   val titleState: TaurusTextFieldState = TitleState(),

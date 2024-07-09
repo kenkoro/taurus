@@ -55,6 +55,7 @@ fun LazyOrdersContent(
   snackbarsHolder: SnackbarsHolder,
   onDecryptToken: () -> String,
   onOrderStatus: (OrderStatus) -> Unit = {},
+  onOrderId: (Int) -> Unit = {},
   onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
 ) {
   val paginatedOrdersErrorMessage = stringResource(id = R.string.paginated_orders_error)
@@ -113,6 +114,7 @@ fun LazyOrdersContent(
             onDecryptToken = onDecryptToken,
             onRefresh = orders::refresh,
             onOrderStatus = onOrderStatus,
+            onOrderId = onOrderId,
             onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
           )
         }

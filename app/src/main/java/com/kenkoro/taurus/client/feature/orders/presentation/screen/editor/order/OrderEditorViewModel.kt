@@ -1,6 +1,7 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -13,7 +14,6 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.ColorState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CustomerState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.ModelState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderIdState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.QuantityState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.SizeState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.TitleState
@@ -27,7 +27,7 @@ class OrderEditorViewModel
     private val orderRepository: OrderRepositoryImpl,
     private val decryptedCredentialService: DecryptedCredentialService,
   ) : ViewModel() {
-    var orderId by mutableStateOf(OrderIdState(orderId = null))
+    var orderId by mutableIntStateOf(1)
       private set
 
     var customer by mutableStateOf(CustomerState(customer = ""))
@@ -55,7 +55,6 @@ class OrderEditorViewModel
       private set
 
     fun resetAll() {
-      orderId.text = ""
       customer.text = ""
       title.text = ""
       model.text = ""
@@ -67,6 +66,10 @@ class OrderEditorViewModel
 
     fun status(status: OrderStatus) {
       this.status = status
+    }
+
+    fun orderId(orderId: Int) {
+      this.orderId = orderId
     }
 
     suspend fun editOrderRemotely(
