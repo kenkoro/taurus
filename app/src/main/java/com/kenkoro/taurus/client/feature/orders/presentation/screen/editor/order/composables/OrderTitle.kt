@@ -56,7 +56,7 @@ fun OrderTitle(
 
   OutlinedTextField(
     modifier =
-      Modifier
+      modifier
         .fillMaxWidth()
         .onFocusChanged { focusState ->
           titleState.onFocusChange(focusState.isFocused)
@@ -70,6 +70,7 @@ fun OrderTitle(
         titleState.text = it
       }
     },
+    isError = titleState.showErrors(),
     leadingIcon = {
       TaurusIcon(
         imageVector = Icons.Default.Title,
@@ -97,6 +98,10 @@ fun OrderTitle(
       if (errorMessage == null) {
         if (titleState.isFocusedOnce && titleState.text.length == 96) {
           Text(text = stringResource(id = R.string.max_96_supporting_text))
+        }
+
+        if (!titleState.isFocusedOnce) {
+          Text(text = stringResource(id = R.string.order_title_supporting_text))
         }
       } else {
         SupportingTextOnError(state = titleState, errorMessage = errorMessage)

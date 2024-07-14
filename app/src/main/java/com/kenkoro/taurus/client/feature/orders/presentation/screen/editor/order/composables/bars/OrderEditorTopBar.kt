@@ -27,9 +27,9 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.OrderDto
-import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.TextFieldValidationService
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,46 +38,15 @@ import kotlinx.coroutines.withContext
 @Composable
 fun OrderEditorTopBar(
   modifier: Modifier = Modifier,
-  userId: Int = 0,
-  userSubject: String = "",
-  orderStatus: OrderStatus = OrderStatus.Idle,
   editOrder: Boolean = false,
   orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
   onNavUp: () -> Unit = {},
-  onAddNewOrderRemotely: suspend (NewOrder) -> Result<OrderDto>,
-  onEditOrderRemotely: suspend (NewOrder, Int, String) -> Boolean = { _, _, _ -> false },
+  saveChanges: suspend () -> Boolean = { false },
+  validateChanges: () -> Boolean = { false },
 ) {
   val scope = rememberCoroutineScope()
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
-
-  val onSaveChanges =
-    suspend {
-      val newOrder =
-        NewOrder(
-          customer = orderStatesHolder.customerState.text,
-          date = System.currentTimeMillis(),
-          title = orderStatesHolder.titleState.text,
-          model = orderStatesHolder.modelState.text,
-          size = orderStatesHolder.sizeState.text,
-          color = orderStatesHolder.colorState.text,
-          category = orderStatesHolder.categoryState.text,
-          quantity = orderStatesHolder.quantityState.text.toIntOrNull() ?: 0,
-          status =
-            if (!editOrder) {
-              OrderStatus.Idle
-            } else {
-              orderStatus
-            },
-          creatorId = userId,
-        )
-
-      if (editOrder) {
-        onEditOrderRemotely(newOrder, orderStatesHolder.orderIdState, userSubject)
-      } else {
-        onAddNewOrderRemotely(newOrder).isSuccess
-      }
-    }
 
   Row(
     modifier =
@@ -123,9 +92,13 @@ fun OrderEditorTopBar(
           .size(contentHeight.topBar)
           .clickable {
             scope.launch(Dispatchers.IO) {
-              val result = onSaveChanges()
-              if (result) {
-                withContext(Dispatchers.Main) { onNavUp() }
+              if (validateChanges()) {
+                val result = saveChanges()
+                if (result) {
+                  withContext(Dispatchers.Main) { onNavUp() }
+                }
+              } else {
+                TextFieldValidationService.checkAll(orderStatesHolder)
               }
             }
           },
@@ -159,8 +132,6 @@ private fun OrderEditorTopBarPrev() {
     )
 
   AppTheme {
-    OrderEditorTopBar(
-      onAddNewOrderRemotely = { Result.success(orderDto) },
-    )
+    OrderEditorTopBar()
   }
 }

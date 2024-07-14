@@ -56,7 +56,7 @@ fun OrderCategory(
 
   OutlinedTextField(
     modifier =
-      Modifier
+      modifier
         .fillMaxWidth()
         .onFocusChanged { focusState ->
           categoryState.onFocusChange(focusState.isFocused)
@@ -70,6 +70,7 @@ fun OrderCategory(
         categoryState.text = it
       }
     },
+    isError = categoryState.showErrors(),
     leadingIcon = {
       TaurusIcon(
         imageVector = Icons.Default.Category,

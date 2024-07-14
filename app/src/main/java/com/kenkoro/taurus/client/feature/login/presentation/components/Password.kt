@@ -137,7 +137,7 @@ fun Password(
       val errorMessage = passwordState.getError()
       if (errorMessage == null) {
         if (passwordState.text.length == 20) {
-          Text(text = stringResource(id = R.string.full_subject_supporting_text))
+          Text(text = stringResource(id = R.string.max_20_supporting_text))
         }
       } else {
         if (passwordState.isBlank()) {

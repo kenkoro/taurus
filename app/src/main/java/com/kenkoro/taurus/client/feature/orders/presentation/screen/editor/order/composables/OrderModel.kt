@@ -56,7 +56,7 @@ fun OrderModel(
 
   OutlinedTextField(
     modifier =
-      Modifier
+      modifier
         .fillMaxWidth()
         .onFocusChanged { focusState ->
           modelState.onFocusChange(focusState.isFocused)
@@ -70,6 +70,7 @@ fun OrderModel(
         modelState.text = it
       }
     },
+    isError = modelState.showErrors(),
     leadingIcon = {
       TaurusIcon(
         imageVector = Icons.Default.Group,

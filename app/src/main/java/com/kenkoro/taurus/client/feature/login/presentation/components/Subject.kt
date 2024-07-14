@@ -118,7 +118,7 @@ fun Subject(
           Text(text = stringResource(id = R.string.subject_supporting_text))
         } else {
           if (subjectState.text.length == 20) {
-            Text(text = stringResource(id = R.string.full_subject_supporting_text))
+            Text(text = stringResource(id = R.string.max_20_supporting_text))
           }
         }
       } else {

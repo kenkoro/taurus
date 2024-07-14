@@ -56,7 +56,7 @@ fun OrderSize(
 
   OutlinedTextField(
     modifier =
-      Modifier
+      modifier
         .fillMaxWidth()
         .onFocusChanged { focusState ->
           sizeState.onFocusChange(focusState.isFocused)
@@ -70,6 +70,7 @@ fun OrderSize(
         sizeState.text = it
       }
     },
+    isError = sizeState.showErrors(),
     leadingIcon = {
       TaurusIcon(
         imageVector = Icons.Default.FormatSize,
@@ -97,6 +98,10 @@ fun OrderSize(
       if (errorMessage == null) {
         if (sizeState.isFocusedOnce && sizeState.text.length == 9) {
           Text(text = stringResource(id = R.string.max_9_supporting_text))
+        }
+
+        if (!sizeState.isFocusedOnce) {
+          Text(text = stringResource(id = R.string.order_size_supporting_text))
         }
       } else {
         SupportingTextOnError(state = sizeState, errorMessage = errorMessage)

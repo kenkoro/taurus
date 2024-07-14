@@ -5,7 +5,10 @@ import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
 class QuantityState(
   quantity: Int? = null,
-) : TaurusTextFieldState() {
+) : TaurusTextFieldState(
+    validator = ::isQuantityValid,
+    errorFor = ::quantityValidationError,
+  ) {
   init {
     quantity?.let {
       text = it.toString()

@@ -34,7 +34,7 @@
     <string name="subject_error">некорректный логин</string>
     <string name="empty_text_field_error">Не может быть пустым</string>
     <string name="subject_supporting_text">Логин должен состоять из английских букв и, возможно, цифр.</string>
-    <string name="full_subject_supporting_text">Максимум 20 символов.</string>
+    <string name="max_20_supporting_text">Максимум 20 символов.</string>
     <string name="password_error">Пароль должен состоять минимум из 4 символов</string>
     <string name="exit_button">Выйти</string>
     <string name="orders_access_error">Вы не можете смотреть заказы!</string>
@@ -61,4 +61,7 @@
     <string name="max_24_supporting_text">Максимум 24 символа</string>
     <string name="max_96_supporting_text">Максимум 96 символов</string>
     <string name="quantity_suffix">шт.</string>
+    <string name="order_customer_supporting_text">Имя заказчика/бренда</string>
+    <string name="order_title_supporting_text">Торговое название</string>
+    <string name="order_size_supporting_text">Укажите размер (S, XS, M и т.д.)</string>
 </resources>
