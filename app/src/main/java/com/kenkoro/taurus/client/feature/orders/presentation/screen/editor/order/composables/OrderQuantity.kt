@@ -56,7 +56,7 @@ fun OrderQuantity(
 
   OutlinedTextField(
     modifier =
-      Modifier
+      modifier
         .fillMaxWidth()
         .onFocusChanged { focusState ->
           quantityState.onFocusChange(focusState.isFocused)
@@ -70,6 +70,7 @@ fun OrderQuantity(
         quantityState.text = it
       }
     },
+    isError = quantityState.showErrors(),
     leadingIcon = {
       TaurusIcon(
         imageVector = Icons.Default.AccountBalance,

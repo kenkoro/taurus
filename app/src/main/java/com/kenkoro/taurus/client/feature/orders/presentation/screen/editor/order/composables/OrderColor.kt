@@ -56,7 +56,7 @@ fun OrderColor(
 
   OutlinedTextField(
     modifier =
-      Modifier
+      modifier
         .fillMaxWidth()
         .onFocusChanged { focusState ->
           colorState.onFocusChange(focusState.isFocused)
@@ -70,6 +70,7 @@ fun OrderColor(
         colorState.text = it
       }
     },
+    isError = colorState.showErrors(),
     leadingIcon = {
       TaurusIcon(
         imageVector = Icons.Default.Colorize,

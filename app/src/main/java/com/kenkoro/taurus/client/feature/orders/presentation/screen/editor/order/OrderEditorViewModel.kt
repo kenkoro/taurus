@@ -55,13 +55,13 @@ class OrderEditorViewModel
       private set
 
     fun resetAll() {
-      customer.text = ""
-      title.text = ""
-      model.text = ""
-      size.text = ""
-      color.text = ""
-      category.text = ""
-      quantity.text = ""
+      customer = CustomerState(customer = "")
+      title = TitleState(title = "")
+      model = ModelState(model = "")
+      size = SizeState(size = "")
+      color = ColorState(color = "")
+      category = CategoryState(category = "")
+      quantity = QuantityState(quantity = null)
     }
 
     fun status(status: OrderStatus) {

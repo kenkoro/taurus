@@ -33,6 +33,44 @@ fun OrderEditorScreen(
   onAddNewOrderRemotely: suspend (NewOrder) -> Result<OrderDto>,
   onEditOrderRemotely: suspend (NewOrder, Int, String) -> Boolean = { _, _, _ -> false },
 ) {
+  val validateChanges = {
+    orderStatesHolder.customerState.isValid &&
+      orderStatesHolder.titleState.isValid &&
+      orderStatesHolder.modelState.isValid &&
+      orderStatesHolder.sizeState.isValid &&
+      orderStatesHolder.colorState.isValid &&
+      orderStatesHolder.categoryState.isValid &&
+      orderStatesHolder.quantityState.isValid
+  }
+
+  val saveChanges =
+    suspend {
+      val newOrder =
+        NewOrder(
+          customer = orderStatesHolder.customerState.text,
+          date = System.currentTimeMillis(),
+          title = orderStatesHolder.titleState.text,
+          model = orderStatesHolder.modelState.text,
+          size = orderStatesHolder.sizeState.text,
+          color = orderStatesHolder.colorState.text,
+          category = orderStatesHolder.categoryState.text,
+          quantity = orderStatesHolder.quantityState.text.toIntOrNull() ?: 0,
+          status =
+            if (!editOrder) {
+              OrderStatus.Idle
+            } else {
+              orderStatus
+            },
+          creatorId = userId,
+        )
+
+      if (editOrder) {
+        onEditOrderRemotely(newOrder, orderStatesHolder.orderIdState, userSubject)
+      } else {
+        onAddNewOrderRemotely(newOrder).isSuccess
+      }
+    }
+
   AppTheme {
     Scaffold(
       modifier =
@@ -41,14 +79,11 @@ fun OrderEditorScreen(
           .navigationBarsPadding(),
       topBar = {
         OrderEditorTopBar(
-          userId = userId,
-          userSubject = userSubject,
-          orderStatus = orderStatus,
           editOrder = editOrder,
           orderStatesHolder = orderStatesHolder,
           onNavUp = onNavUp,
-          onAddNewOrderRemotely = onAddNewOrderRemotely,
-          onEditOrderRemotely = onEditOrderRemotely,
+          saveChanges = saveChanges,
+          validateChanges = validateChanges,
         )
       },
       content = { paddingValues ->
@@ -62,6 +97,9 @@ fun OrderEditorScreen(
           OrderEditorContent(
             networkStatus = networkStatus,
             orderStatesHolder = orderStatesHolder,
+            onNavUp = onNavUp,
+            saveChanges = saveChanges,
+            validateChanges = validateChanges,
           )
         }
       },

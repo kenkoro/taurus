@@ -25,6 +25,9 @@ fun OrderEditorContent(
   modifier: Modifier = Modifier,
   networkStatus: NetworkStatus,
   orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
+  onNavUp: () -> Unit = {},
+  saveChanges: suspend () -> Boolean = { false },
+  validateChanges: () -> Boolean = { false },
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
@@ -46,6 +49,9 @@ fun OrderEditorContent(
     OrderEditorTextFields(
       modifier = Modifier.width(contentWidth.standard),
       orderStatesHolder = orderStatesHolder,
+      saveChanges = saveChanges,
+      onNavUp = onNavUp,
+      validateChanges = validateChanges,
     )
   }
 }
