@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -29,6 +30,7 @@ import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Manager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -58,6 +60,8 @@ fun OrderContent(
   val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
 
   val okActionLabel = stringResource(id = R.string.ok)
+
+  val scope = rememberCoroutineScope()
 
   val onLoginErrorShowSnackbar =
     suspend {
@@ -122,6 +126,11 @@ fun OrderContent(
       networkStatus = networkStatus,
       loginState = loginState,
       selectedOrderRecordId = selectedOrderRecordId,
+      onRefreshOrders = {
+        scope.launch(Dispatchers.IO) {
+          orders.refresh()
+        }
+      },
       lazyOrdersState = lazyOrdersState,
       orderStatesHolder = orderStatesHolder,
       onUser = onUser,

@@ -1,23 +1,33 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
+import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.feature.orders.domain.Order
@@ -44,6 +54,7 @@ fun LazyOrdersContent(
   networkStatus: NetworkStatus,
   loginState: LoginState,
   selectedOrderRecordId: Int? = null,
+  onRefreshOrders: () -> Unit,
   lazyOrdersState: LazyListState,
   orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
   onFilterStrategy: (OrderFilterStrategy?) -> Unit = {},
@@ -64,8 +75,11 @@ fun LazyOrdersContent(
   val okActionLabel = stringResource(id = R.string.ok)
 
   val size = LocalSize.current
+  val offset = LocalOffset.current
   val strokeWidth = LocalStrokeWidth.current
   val contentHeight = LocalContentHeight.current
+
+  val pullToRefreshState = rememberPullToRefreshState()
 
   if (orders.loadState.append is LoadState.Error) {
     LaunchedEffect(Unit) {
@@ -86,53 +100,78 @@ fun LazyOrdersContent(
   }
 
   if (allowedToSeeOrders(user.profile)) {
-    LazyColumn(
-      state = lazyOrdersState,
-      modifier = modifier.fillMaxSize(),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Top,
-    ) {
-      item {
-        Spacer(modifier = Modifier.height(contentHeight.large))
-      }
-      items(
-        count = orders.itemCount,
-        key = { index -> orders[index]?.recordId ?: UUID.randomUUID().toString() },
-      ) { index ->
-        val order = orders[index]
-        if (order != null) {
-          OrderItem(
-            order = order,
-            networkStatus = networkStatus,
-            user = user,
-            selectedOrderRecordId = selectedOrderRecordId,
-            orderStatesHolder = orderStatesHolder,
-            onSelectOrder = onSelectOrder,
-            localHandler = localHandler,
-            remoteHandler = remoteHandler,
-            snackbarsHolder = snackbarsHolder,
-            onDecryptToken = onDecryptToken,
-            onRefresh = orders::refresh,
-            onOrderStatus = onOrderStatus,
-            onOrderId = onOrderId,
-            onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
-          )
+    Box(modifier = modifier.nestedScroll(pullToRefreshState.nestedScrollConnection)) {
+      LazyColumn(
+        state = lazyOrdersState,
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top,
+      ) {
+        item {
+          Spacer(modifier = Modifier.height(contentHeight.large))
+        }
+        items(
+          count = orders.itemCount,
+          key = { index -> orders[index]?.recordId ?: UUID.randomUUID().toString() },
+        ) { index ->
+          val order = orders[index]
+          if (order != null) {
+            OrderItem(
+              order = order,
+              networkStatus = networkStatus,
+              user = user,
+              selectedOrderRecordId = selectedOrderRecordId,
+              orderStatesHolder = orderStatesHolder,
+              onSelectOrder = onSelectOrder,
+              localHandler = localHandler,
+              remoteHandler = remoteHandler,
+              snackbarsHolder = snackbarsHolder,
+              onDecryptToken = onDecryptToken,
+              onRefresh = orders::refresh,
+              onOrderStatus = onOrderStatus,
+              onOrderId = onOrderId,
+              onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
+            )
+          }
+        }
+        item {
+          Spacer(modifier = Modifier.height(contentHeight.large))
+        }
+        item {
+          if (orders.loadState.append is LoadState.Loading) {
+            CircularProgressIndicator(
+              modifier = Modifier.size(size.medium),
+              strokeWidth = strokeWidth.standard,
+            )
+          }
+        }
+        item {
+          Spacer(modifier = Modifier.height(contentHeight.bottomBar))
         }
       }
-      item {
-        Spacer(modifier = Modifier.height(contentHeight.large))
-      }
-      item {
-        if (orders.loadState.append is LoadState.Loading) {
-          CircularProgressIndicator(
-            modifier = Modifier.size(size.medium),
-            strokeWidth = strokeWidth.standard,
-          )
+
+      if (pullToRefreshState.isRefreshing) {
+        LaunchedEffect(Unit) {
+          onRefreshOrders()
         }
       }
-      item {
-        Spacer(modifier = Modifier.height(contentHeight.bottomBar))
+
+      LaunchedEffect(orders.loadState.refresh) {
+        if (orders.loadState.refresh is LoadState.Loading) {
+          pullToRefreshState.startRefresh()
+        } else {
+          pullToRefreshState.endRefresh()
+        }
       }
+
+      PullToRefreshContainer(
+        modifier =
+          Modifier
+            .align(Alignment.TopCenter)
+            .offset(y = offset.pullToRefreshIndicator),
+        state = pullToRefreshState,
+        contentColor = MaterialTheme.colorScheme.primary,
+      )
     }
   }
 }
