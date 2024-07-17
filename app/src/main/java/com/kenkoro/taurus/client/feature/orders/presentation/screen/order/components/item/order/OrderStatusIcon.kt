@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ContentCut
+import androidx.compose.material.icons.filled.WorkOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -43,6 +44,15 @@ fun OrderStatusIcon(
       Icon(
         imageVector = Icons.Default.Check,
         contentDescription = "CheckedOrder",
+        modifier = modifier,
+        tint = MaterialTheme.colorScheme.primary,
+      )
+    }
+
+    OrderStatus.InWork -> {
+      Icon(
+        imageVector = Icons.Default.WorkOutline,
+        contentDescription = "OrderInWork",
         modifier = modifier,
         tint = MaterialTheme.colorScheme.primary,
       )

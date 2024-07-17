@@ -4,4 +4,5 @@ enum class OrderStatus {
   Idle,
   Cut,
   Checked,
+  InWork,
 }

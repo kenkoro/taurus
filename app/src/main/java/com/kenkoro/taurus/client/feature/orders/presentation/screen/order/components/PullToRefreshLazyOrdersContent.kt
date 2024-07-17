@@ -36,8 +36,6 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order.OrderItem
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.LoginState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
@@ -52,15 +50,11 @@ fun PullToRefreshLazyOrdersContent(
   orders: LazyPagingItems<Order>,
   user: User,
   networkStatus: NetworkStatus,
-  loginState: LoginState,
   selectedOrderRecordId: Int? = null,
   onRefreshOrders: () -> Unit,
   lazyOrdersState: LazyListState,
   orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
-  onFilterStrategy: (OrderFilterStrategy?) -> Unit = {},
-  onUser: (User) -> Unit,
   onSelectOrder: (Int?) -> Unit = {},
-  onLoginState: (LoginState) -> Unit,
   localHandler: LocalHandler,
   remoteHandler: RemoteHandler,
   snackbarsHolder: SnackbarsHolder,

@@ -124,7 +124,6 @@ fun OrderContent(
       orders = orders,
       user = user,
       networkStatus = networkStatus,
-      loginState = loginState,
       selectedOrderRecordId = selectedOrderRecordId,
       onRefreshOrders = {
         scope.launch(Dispatchers.IO) {
@@ -133,10 +132,7 @@ fun OrderContent(
       },
       lazyOrdersState = lazyOrdersState,
       orderStatesHolder = orderStatesHolder,
-      onUser = onUser,
-      onFilterStrategy = onFilterStrategy,
       onSelectOrder = onSelectOrder,
-      onLoginState = onLoginState,
       localHandler = localHandler,
       remoteHandler = remoteHandler,
       snackbarsHolder = snackbarsHolder,
