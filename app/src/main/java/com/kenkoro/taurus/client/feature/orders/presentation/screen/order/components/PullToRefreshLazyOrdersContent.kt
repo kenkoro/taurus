@@ -47,7 +47,7 @@ import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 
 @Composable
-fun LazyOrdersContent(
+fun PullToRefreshLazyOrdersContent(
   modifier: Modifier = Modifier,
   orders: LazyPagingItems<Order>,
   user: User,

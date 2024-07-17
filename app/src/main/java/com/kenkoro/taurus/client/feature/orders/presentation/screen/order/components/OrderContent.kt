@@ -120,7 +120,7 @@ fun OrderContent(
   if (loginState.isSuccess() && user != null) {
     val orders = ordersPagingFlow.collectAsLazyPagingItems()
 
-    LazyOrdersContent(
+    PullToRefreshLazyOrdersContent(
       orders = orders,
       user = user,
       networkStatus = networkStatus,
