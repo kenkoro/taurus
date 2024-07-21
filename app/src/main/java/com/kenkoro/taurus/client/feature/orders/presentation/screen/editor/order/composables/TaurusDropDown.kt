@@ -96,7 +96,7 @@ fun TaurusDropDown(
     }
 
   var searchedText by remember {
-    mutableStateOf("")
+    mutableStateOf(state.text)
   }
   var showChoices by remember {
     mutableStateOf(false)

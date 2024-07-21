@@ -1,11 +1,17 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Colorize
+import androidx.compose.material.icons.filled.FormatSize
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Title
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
@@ -15,6 +21,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
+import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.TextFieldValidationService
@@ -59,68 +67,151 @@ fun OrderEditorTextFields(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top,
   ) {
-    Spacer(modifier = Modifier.height(contentHeight.large))
-    val choices =
-      remember {
-        mutableStateListOf(
-          "0",
-          "1",
-          "2",
-          "3",
-          "4",
-          "5",
-          "6",
-          "7",
-          "8",
-          "9",
-        )
-      }
+    Spacer(modifier = Modifier.height(contentHeight.medium))
     TaurusDropDown(
-      state = orderStatesHolder.quantityState,
-      choices = choices,
+      state = orderStatesHolder.customerState,
+      choices = customers(),
       leadingIcon = {
         TaurusIcon(
-          imageVector = Icons.Default.AccountBalance,
-          contentDescription = "QuantityLeadingIcon",
-          isError = orderStatesHolder.quantityState.showErrors(),
+          imageVector = Icons.Default.Person,
+          contentDescription = "CustomerLeadingIcon",
+          isError = orderStatesHolder.customerState.showErrors(),
         )
       },
-      supportingText = { Text(text = "Some supporting text") },
-    )
-    Spacer(modifier = Modifier.height(contentHeight.medium))
-    OrderCustomer(
-      customerState = orderStatesHolder.customerState,
+      supportingText = {
+        Text(
+          text = stringResource(id = R.string.order_customer_supporting_text),
+        )
+      },
       onImeAction = goToNext,
     )
     Spacer(modifier = Modifier.height(contentHeight.large))
-    OrderTitle(
-      titleState = orderStatesHolder.titleState,
+    TaurusDropDown(
+      state = orderStatesHolder.titleState,
+      choices = titles(),
+      leadingIcon = {
+        TaurusIcon(
+          imageVector = Icons.Default.Title,
+          contentDescription = "TitleLeadingIcon",
+          isError = orderStatesHolder.titleState.showErrors(),
+        )
+      },
+      supportingText = { Text(text = stringResource(id = R.string.order_title_supporting_text)) },
       onImeAction = goToNext,
     )
     Spacer(modifier = Modifier.height(contentHeight.large))
-    OrderModel(
-      modelState = orderStatesHolder.modelState,
+    TaurusDropDown(
+      state = orderStatesHolder.modelState,
+      choices = emptyList(),
+      leadingIcon = {
+        TaurusIcon(
+          imageVector = Icons.Default.Group,
+          contentDescription = "ModelLeadingIcon",
+          isError = orderStatesHolder.modelState.showErrors(),
+        )
+      },
+      supportingText = { Text(text = stringResource(id = R.string.order_model_supporting_text)) },
       onImeAction = goToNext,
     )
     Spacer(modifier = Modifier.height(contentHeight.large))
-    OrderSize(
-      sizeState = orderStatesHolder.sizeState,
+    TaurusDropDown(
+      state = orderStatesHolder.sizeState,
+      choices = sizes(),
+      leadingIcon = {
+        TaurusIcon(
+          imageVector = Icons.Default.FormatSize,
+          contentDescription = "SizeLeadingIcon",
+          isError = orderStatesHolder.sizeState.showErrors(),
+        )
+      },
+      supportingText = { Text(text = stringResource(id = R.string.order_size_supporting_text)) },
       onImeAction = goToNext,
     )
     Spacer(modifier = Modifier.height(contentHeight.large))
-    OrderColor(
-      colorState = orderStatesHolder.colorState,
+    TaurusDropDown(
+      state = orderStatesHolder.colorState,
+      choices = emptyList(),
+      leadingIcon = {
+        TaurusIcon(
+          imageVector = Icons.Default.Colorize,
+          contentDescription = "ColorLeadingIcon",
+          isError = orderStatesHolder.colorState.showErrors(),
+        )
+      },
+      supportingText = { Text(text = stringResource(id = R.string.order_color_supporting_text)) },
       onImeAction = goToNext,
     )
     Spacer(modifier = Modifier.height(contentHeight.large))
-    OrderCategory(
-      categoryState = orderStatesHolder.categoryState,
+    TaurusDropDown(
+      state = orderStatesHolder.colorState,
+      choices = emptyList(),
+      leadingIcon = {
+        TaurusIcon(
+          imageVector = Icons.Default.Category,
+          contentDescription = "CategoryLeadingIcon",
+          isError = orderStatesHolder.categoryState.showErrors(),
+        )
+      },
+      supportingText = {
+        Text(
+          text = stringResource(id = R.string.order_category_supporting_text),
+        )
+      },
       onImeAction = goToNext,
     )
-//    Spacer(modifier = Modifier.height(contentHeight.large))
-//    OrderQuantity(
-//      quantityState = orderStatesHolder.quantityState,
-//      onImeAction = { onSubmit() },
-//    )
+    Spacer(modifier = Modifier.height(contentHeight.large))
+    OrderQuantity(
+      quantityState = orderStatesHolder.quantityState,
+      onImeAction = { onSubmit() },
+    )
   }
+}
+
+@SuppressLint("ComposableNaming")
+@Composable
+fun customers(modifier: Modifier = Modifier): List<String> {
+  val customers =
+    remember {
+      mutableStateListOf(
+        "Suborbia",
+      )
+    }
+
+  return customers
+}
+
+@SuppressLint("ComposableNaming")
+@Composable
+fun titles(modifier: Modifier = Modifier): List<String> {
+  val titles =
+    remember {
+      mutableStateListOf(
+        "Футболка Terminals",
+        "Джоггеры Terminals",
+        "Палаццо Terminals",
+        "Свитшот Terminals",
+        "Футболка Cities",
+      )
+    }
+
+  return titles
+}
+
+@SuppressLint("ComposableNaming")
+@Composable
+fun sizes(modifier: Modifier = Modifier): List<String> {
+  val sizes =
+    remember {
+      mutableStateListOf(
+        "S",
+        "M",
+        "L",
+        "X/S",
+        "S/M",
+        "M/L",
+        "O/S",
+      )
+    }
+
+  return sizes
 }
