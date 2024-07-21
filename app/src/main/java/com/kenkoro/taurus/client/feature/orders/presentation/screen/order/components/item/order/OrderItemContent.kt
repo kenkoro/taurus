@@ -51,13 +51,13 @@ fun OrderItemContent(
       verticalAlignment = Alignment.CenterVertically,
     ) {
       OrderItemDateAndTitleRow(
+        modifier = Modifier.weight(1F),
         orderDate = order.date,
         orderTitle = order.title,
         orderStatus = order.status,
       )
       OrderItemKeyboardArrowIconRow(selected = selected)
     }
-
     Spacer(modifier = Modifier.height(contentHeight.large))
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
       items(orderInfo) { keyValuePair ->

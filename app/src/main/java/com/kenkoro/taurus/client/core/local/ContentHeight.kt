@@ -19,7 +19,8 @@ data class ContentHeight(
   val orderItemExpandedWithoutActionButton: Dp = 260.dp,
   val orderItemNotExpanded: Dp = 70.dp,
   val bottomBar: Dp = loginButton,
-  val taurusDropDownItemContent: Dp = 40.dp,
+  val taurusDropDownItemContent: Dp = 56.dp,
+  val taurusDropDownMaxHeight: Dp = 285.dp,
 )
 
 val LocalContentHeight = compositionLocalOf { ContentHeight() }

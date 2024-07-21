@@ -6,9 +6,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalSize
 
@@ -27,6 +28,8 @@ import com.kenkoro.taurus.client.core.local.LocalSize
 fun OrderItemKeyboardArrowIconRow(
   modifier: Modifier = Modifier,
   selected: Boolean,
+  contentColor: Color = MaterialTheme.colorScheme.onPrimary,
+  containerColor: Color = MaterialTheme.colorScheme.primary,
 ) {
   val size = LocalSize.current
   val contentWidth = LocalContentWidth.current
@@ -42,7 +45,7 @@ fun OrderItemKeyboardArrowIconRow(
   )
 
   Row(
-    modifier = Modifier.fillMaxWidth(),
+    modifier = Modifier.wrapContentWidth(),
     horizontalArrangement = Arrangement.End,
   ) {
     Box(
@@ -50,13 +53,13 @@ fun OrderItemKeyboardArrowIconRow(
         Modifier
           .size(size.large)
           .clip(CircleShape)
-          .background(MaterialTheme.colorScheme.primary),
+          .background(containerColor),
       contentAlignment = Alignment.Center,
     ) {
       Icon(
         imageVector = Icons.Default.KeyboardArrowDown,
         contentDescription = "ExpandOrderItemIcon",
-        tint = MaterialTheme.colorScheme.onPrimary,
+        tint = contentColor,
         modifier = Modifier.rotate(animatedRotationOfKeyboardArrow),
       )
     }

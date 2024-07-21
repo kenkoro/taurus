@@ -64,4 +64,5 @@
     <string name="order_customer_supporting_text">Имя заказчика/бренда</string>
     <string name="order_title_supporting_text">Торговое название</string>
     <string name="order_size_supporting_text">Укажите размер (S, XS, M и т.д.)</string>
+    <string name="taurus_drop_down_unselected">Не выбрано</string>
 </resources>
