@@ -68,4 +68,5 @@
     <string name="order_model_supporting_text">Укажите модель</string>
     <string name="order_color_supporting_text">Цвет</string>
     <string name="order_category_supporting_text">Категория заказа</string>
+    <string name="order_title">Торговое название</string>
 </resources>

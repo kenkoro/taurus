@@ -246,7 +246,7 @@ private fun OrderItemPrev() {
       color = "Black",
       category = "Жилеты",
       quantity = 4,
-      status = OrderStatus.Idle,
+      status = Idle,
       creatorId = 0,
     )
   val user =
@@ -258,7 +258,7 @@ private fun OrderItemPrev() {
       firstName = "FirstName",
       lastName = "LastName",
       email = "Email",
-      profile = UserProfile.Customer,
+      profile = Customer,
       salt = "Salt",
     )
   val remoteHandler =

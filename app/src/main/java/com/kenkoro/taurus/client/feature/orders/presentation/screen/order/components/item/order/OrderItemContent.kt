@@ -36,7 +36,7 @@ fun OrderItemContent(
   val contentHeight = LocalContentHeight.current
   val orderInfo =
     listOf(
-      Pair(stringResource(id = R.string.order_id), order.orderId.toString()),
+      Pair(stringResource(id = R.string.order_title), order.title),
       Pair(stringResource(id = R.string.order_size), order.size),
       Pair(stringResource(id = R.string.order_model), order.model),
       Pair(stringResource(id = R.string.order_category), order.category),
@@ -50,10 +50,10 @@ fun OrderItemContent(
       modifier = Modifier.fillMaxWidth(),
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      OrderItemDateAndTitleRow(
+      OrderItemDateAndMainInfoRow(
         modifier = Modifier.weight(1F),
         orderDate = order.date,
-        orderTitle = order.title,
+        orderId = order.orderId,
         orderStatus = order.status,
       )
       OrderItemKeyboardArrowIconRow(selected = selected)

@@ -18,10 +18,10 @@ import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 
 @Composable
-fun OrderItemDateAndTitleRow(
+fun OrderItemDateAndMainInfoRow(
   modifier: Modifier = Modifier,
   orderDate: Long,
-  orderTitle: String,
+  orderId: Int,
   orderStatus: OrderStatus? = null,
 ) {
   val contentWidth = LocalContentWidth.current
@@ -50,7 +50,7 @@ fun OrderItemDateAndTitleRow(
         Spacer(modifier = Modifier.width(contentWidth.large))
         Text(
           modifier = Modifier.width(contentWidth.orderTitle),
-          text = orderTitle,
+          text = orderId.toString(),
           color = MaterialTheme.colorScheme.onPrimaryContainer,
           style = MaterialTheme.typography.bodyMedium,
           maxLines = 1,
