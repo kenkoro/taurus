@@ -101,7 +101,6 @@ fun OrderItemBottomActionButton(
               val wasAcknowledged =
                 remoteHandler.editOrder(
                   cutOrder,
-                  order.orderId,
                   userSubject ?: "",
                 )
               if (wasAcknowledged) {
@@ -131,7 +130,6 @@ fun OrderItemBottomActionButton(
               val wasAcknowledged =
                 remoteHandler.editOrder(
                   checkedOrder,
-                  order.orderId,
                   userSubject ?: "",
                 )
               if (wasAcknowledged) {

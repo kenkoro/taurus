@@ -74,13 +74,11 @@ class OrderEditorViewModel
 
     suspend fun editOrderRemotely(
       dto: NewOrder,
-      orderId: Int,
       editorSubject: String,
     ): Boolean {
       val result =
         orderRepository.editOrder(
           dto = dto.toNewOrderDto(),
-          orderId = orderId,
           editorSubject = editorSubject,
           token = decryptedCredentialService.storedToken(),
         )

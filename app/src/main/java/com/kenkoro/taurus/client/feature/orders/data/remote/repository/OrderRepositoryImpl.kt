@@ -34,12 +34,11 @@ class OrderRepositoryImpl(
 
   override suspend fun editOrder(
     dto: NewOrderDto,
-    orderId: Int,
     editorSubject: String,
     token: String,
   ): Result<HttpStatusCode> =
     runCatching {
-      api.editOrder(dto, orderId, editorSubject, token)
+      api.editOrder(dto, editorSubject, token)
     }
 
   override suspend fun deleteOrder(

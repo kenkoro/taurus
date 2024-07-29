@@ -31,7 +31,7 @@ fun OrderEditorScreen(
   editOrder: Boolean = false,
   onNavUp: () -> Unit = {},
   onAddNewOrderRemotely: suspend (NewOrder) -> Result<OrderDto>,
-  onEditOrderRemotely: suspend (NewOrder, Int, String) -> Boolean = { _, _, _ -> false },
+  onEditOrderRemotely: suspend (NewOrder, String) -> Boolean = { _, _ -> false },
 ) {
   val validateChanges = {
     orderStatesHolder.customerState.isValid &&
@@ -47,6 +47,7 @@ fun OrderEditorScreen(
     suspend {
       val newOrder =
         NewOrder(
+          orderId = orderStatesHolder.orderIdState,
           customer = orderStatesHolder.customerState.text,
           date = System.currentTimeMillis(),
           title = orderStatesHolder.titleState.text,
@@ -65,7 +66,7 @@ fun OrderEditorScreen(
         )
 
       if (editOrder) {
-        onEditOrderRemotely(newOrder, orderStatesHolder.orderIdState, userSubject)
+        onEditOrderRemotely(newOrder, userSubject)
       } else {
         onAddNewOrderRemotely(newOrder).isSuccess
       }

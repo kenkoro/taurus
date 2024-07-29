@@ -63,13 +63,12 @@ class OrderRemoteApiImpl(
 
   override suspend fun editOrder(
     dto: NewOrderDto,
-    orderId: Int,
     editorSubject: String,
     token: String,
   ): HttpStatusCode {
     val status =
       client.put {
-        url(Urls.EDIT_ORDER + "?order_id=$orderId&editor_subject=$editorSubject")
+        url(Urls.EDIT_ORDER + "?editor_subject=$editorSubject")
         contentType(ContentType.Application.Json)
         setBody(dto)
         headers {
@@ -78,7 +77,7 @@ class OrderRemoteApiImpl(
       }.status
 
     if (status != HttpStatusCode.OK) {
-      throw OrderRemoteApiException("The editing of order $orderId was unsuccessful")
+      throw OrderRemoteApiException("The editing of order ${dto.orderId} was unsuccessful")
     }
     return status
   }

@@ -10,5 +10,5 @@ data class RemoteHandler(
   val getUser: suspend (subject: String, token: String) -> Result<UserDto>,
   val addNewOrder: suspend (newOrder: NewOrder) -> Result<OrderDto>,
   val deleteOrder: suspend (orderId: Int, deleterSubject: String) -> Boolean = { _, _ -> false },
-  val editOrder: suspend (NewOrder, Int, String) -> Boolean = { _, _, _ -> false },
+  val editOrder: suspend (NewOrder, String) -> Boolean = { _, _ -> false },
 )

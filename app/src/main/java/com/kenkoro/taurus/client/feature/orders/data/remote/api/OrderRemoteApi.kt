@@ -25,7 +25,6 @@ interface OrderRemoteApi {
 
   suspend fun editOrder(
     dto: NewOrderDto,
-    orderId: Int,
     editorSubject: String,
     token: String,
   ): HttpStatusCode

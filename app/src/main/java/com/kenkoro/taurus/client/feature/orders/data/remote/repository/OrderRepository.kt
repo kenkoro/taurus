@@ -30,7 +30,6 @@ interface OrderRepository {
 
   suspend fun editOrder(
     dto: NewOrderDto,
-    orderId: Int,
     editorSubject: String,
     token: String,
   ): Result<HttpStatusCode>
