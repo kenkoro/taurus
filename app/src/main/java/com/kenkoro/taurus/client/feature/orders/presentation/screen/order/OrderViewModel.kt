@@ -12,11 +12,16 @@ import androidx.paging.map
 import androidx.room.withTransaction
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 import com.kenkoro.taurus.client.feature.orders.data.local.OrderEntity
+import com.kenkoro.taurus.client.feature.orders.data.mappers.toNewCutOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toNewOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrder
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrderEntity
+import com.kenkoro.taurus.client.feature.orders.data.remote.dto.ActualCutOrdersQuantityDto
+import com.kenkoro.taurus.client.feature.orders.data.remote.dto.CutOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.OrderDto
+import com.kenkoro.taurus.client.feature.orders.data.remote.repository.CutOrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepositoryImpl
+import com.kenkoro.taurus.client.feature.orders.domain.NewCutOrder
 import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterContext
@@ -36,6 +41,7 @@ class OrderViewModel
     pager: Pager<Int, OrderEntity>,
     private val localDb: LocalDatabase,
     private val orderRepository: OrderRepositoryImpl,
+    private val cutOrderRepository: CutOrderRepositoryImpl,
     private val decryptedCredentialService: DecryptedCredentialService,
   ) : ViewModel() {
     private val orderFilterContext = OrderFilterContext()
@@ -102,6 +108,18 @@ class OrderViewModel
     suspend fun addNewOrderRemotely(newOrder: NewOrder): Result<OrderDto> =
       orderRepository.addNewOrder(
         dto = newOrder.toNewOrderDto(),
+        token = decryptedCredentialService.storedToken(),
+      )
+
+    suspend fun addNewCutOrderRemotely(newCutOrder: NewCutOrder): Result<CutOrderDto> =
+      cutOrderRepository.addNewCutOrder(
+        dto = newCutOrder.toNewCutOrderDto(),
+        token = decryptedCredentialService.storedToken(),
+      )
+
+    suspend fun getActualCutOrdersQuantity(orderId: Int): Result<ActualCutOrdersQuantityDto> =
+      cutOrderRepository.getActualCutOrdersQuantity(
+        orderId = orderId,
         token = decryptedCredentialService.storedToken(),
       )
   }

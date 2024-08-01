@@ -12,7 +12,10 @@ import com.kenkoro.taurus.client.feature.login.data.remote.repository.LoginRepos
 import com.kenkoro.taurus.client.feature.login.data.remote.repository.LoginRepositoryImpl
 import com.kenkoro.taurus.client.feature.orders.data.local.OrderEntity
 import com.kenkoro.taurus.client.feature.orders.data.remote.OrderRemoteMediator
+import com.kenkoro.taurus.client.feature.orders.data.remote.api.CutOrderRemoteApiImpl
 import com.kenkoro.taurus.client.feature.orders.data.remote.api.OrderRemoteApiImpl
+import com.kenkoro.taurus.client.feature.orders.data.remote.repository.CutOrderRepository
+import com.kenkoro.taurus.client.feature.orders.data.remote.repository.CutOrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepository
 import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.profile.data.remote.api.UserRemoteApiImpl
@@ -71,6 +74,12 @@ object AppModule {
   @Singleton
   fun provideOrderRepository(): OrderRepositoryImpl {
     return OrderRepository.create(OrderRemoteApiImpl(client))
+  }
+
+  @Provides
+  @Singleton
+  fun provideCutOrderRepository(): CutOrderRepositoryImpl {
+    return CutOrderRepository.create(CutOrderRemoteApiImpl(client))
   }
 
   @Provides

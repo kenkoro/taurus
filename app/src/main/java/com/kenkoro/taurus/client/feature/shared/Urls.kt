@@ -9,11 +9,16 @@ object Urls {
 
   const val LOGIN = "$URL/login"
 
-  const val ADD_NEW_ORDER = "$URL/add-new/order"
+  private const val ADD_NEW_TEMPLATE = "$URL/add-new"
+
+  const val ADD_NEW_ORDER = "$ADD_NEW_TEMPLATE/order"
   const val GET_ORDER = "$URL/order"
   const val GET_PAGINATED_ORDERS = "$URL/orders"
   const val EDIT_ORDER = "$URL/edit/order"
   const val DELETE_ORDER = "$URL/delete/order"
+
+  const val ADD_NEW_CUT_ORDER = "$ADD_NEW_TEMPLATE/cut-order"
+  const val GET_ACTUAL_CUT_ORDERS_QUANTITY = "$GET_ORDER//actual-quantity"
 
   const val ADD_NEW_USER = "$URL/add-new/user"
   const val GET_USER = "$URL/user"

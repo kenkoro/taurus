@@ -1,8 +1,10 @@
 package com.kenkoro.taurus.client.feature.orders.data.mappers
 
 import com.kenkoro.taurus.client.feature.orders.data.local.OrderEntity
+import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewCutOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.OrderDto
+import com.kenkoro.taurus.client.feature.orders.domain.NewCutOrder
 import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
@@ -143,4 +145,13 @@ fun Order.toCheckedOrder(): NewOrder =
     quantity = quantity,
     status = OrderStatus.Checked,
     creatorId = creatorId,
+  )
+
+fun NewCutOrder.toNewCutOrderDto(): NewCutOrderDto =
+  NewCutOrderDto(
+    orderId = orderId,
+    date = date,
+    quantity = quantity,
+    cutterId = cutterId,
+    comment = comment,
   )
