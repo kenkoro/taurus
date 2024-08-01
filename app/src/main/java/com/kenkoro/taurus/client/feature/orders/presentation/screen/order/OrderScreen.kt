@@ -17,7 +17,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.PagingData
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.login.data.mappers.toUserDto
+import com.kenkoro.taurus.client.feature.orders.data.mappers.toCutOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrderDto
+import com.kenkoro.taurus.client.feature.orders.data.remote.dto.ActualCutOrdersQuantityDto
+import com.kenkoro.taurus.client.feature.orders.domain.CutOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
@@ -161,6 +164,15 @@ fun OrderScreen(
 @Preview
 @Composable
 private fun OrderScreenPrev() {
+  val cutOrder =
+    CutOrder(
+      cutOrderId = 0,
+      orderId = 419,
+      date = 0L,
+      quantity = 3,
+      cutterId = 0,
+      comment = "",
+    )
   val order =
     Order(
       recordId = 0,
@@ -206,6 +218,11 @@ private fun OrderScreenPrev() {
       login = { _, _ -> Result.success(TokenDto("")) },
       getUser = { _, _ -> Result.success(user.toUserDto()) },
       addNewOrder = { _ -> Result.success(orderDto) },
+      addNewCutOrder = { _ -> Result.success(cutOrder.toCutOrderDto()) },
+      getActualCutOrdersQuantity = {
+          _ ->
+        Result.success(ActualCutOrdersQuantityDto(cutOrder.quantity))
+      },
     )
 
   AppTheme {

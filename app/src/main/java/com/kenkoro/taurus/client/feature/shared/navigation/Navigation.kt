@@ -61,6 +61,8 @@ fun AppNavHost(
       addNewOrder = orderViewModel::addNewOrderRemotely,
       deleteOrder = orderViewModel::deleteOrderRemotely,
       editOrder = orderEditorViewModel::editOrderRemotely,
+      addNewCutOrder = orderViewModel::addNewCutOrderRemotely,
+      getActualCutOrdersQuantity = orderViewModel::getActualCutOrdersQuantity,
     )
   val orderStatesHolder =
     OrderStatesHolder(
