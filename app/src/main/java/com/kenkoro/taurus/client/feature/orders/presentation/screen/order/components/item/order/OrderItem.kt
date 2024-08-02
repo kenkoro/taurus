@@ -179,8 +179,9 @@ fun OrderItem(
               OrderItemBottomActionButton(
                 modifier = Modifier.weight(1F),
                 order = order,
-                profile = user.profile,
                 networkStatus = networkStatus,
+                userId = user.userId,
+                userProfile = user.profile,
                 userSubject = user.subject,
                 localHandler = localHandler,
                 remoteHandler = remoteHandler,
@@ -270,7 +271,7 @@ private fun OrderItemPrev() {
       firstName = "FirstName",
       lastName = "LastName",
       email = "Email",
-      profile = Customer,
+      profile = Cutter,
       salt = "Salt",
     )
   val remoteHandler =
@@ -279,8 +280,7 @@ private fun OrderItemPrev() {
       getUser = { _, _ -> Result.success(user.toUserDto()) },
       addNewOrder = { _ -> Result.success(order.toOrderDto()) },
       addNewCutOrder = { _ -> Result.success(cutOrder.toCutOrderDto()) },
-      getActualCutOrdersQuantity = {
-          _ ->
+      getActualCutOrdersQuantity = { _ ->
         Result.success(ActualCutOrdersQuantityDto(cutOrder.quantity))
       },
     )

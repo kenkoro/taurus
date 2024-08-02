@@ -21,6 +21,8 @@ data class ContentHeight(
   val bottomBar: Dp = loginButton,
   val taurusDropDownItemContent: Dp = 56.dp,
   val taurusDropDownMaxHeight: Dp = 285.dp,
+  val actualCutOrdersQuantityDialog: Dp = 128.dp,
+  val actualCutOrdersQuantityTextField: Dp = 52.dp,
 )
 
 val LocalContentHeight = compositionLocalOf { ContentHeight() }
