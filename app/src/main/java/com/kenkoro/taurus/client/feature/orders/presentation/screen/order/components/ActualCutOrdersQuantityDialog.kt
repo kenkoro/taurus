@@ -14,7 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardDoubleArrowRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -90,13 +90,20 @@ fun ActualCutOrdersQuantityDialog(
   var isLoading by remember {
     mutableStateOf(false)
   }
+  val actualCutOrdersQuantityToInt = {
+    if (actualCutOrdersQuantity.isNotEmpty()) {
+      actualCutOrdersQuantity.toInt()
+    } else {
+      0
+    }
+  }
   val onAddNewCutOrder =
     suspend {
       remoteHandler.addNewCutOrder(
         NewCutOrder(
           orderId = order.orderId,
           date = System.currentTimeMillis(),
-          quantity = actualCutOrdersQuantity.toInt(),
+          quantity = actualCutOrdersQuantityToInt(),
           cutterId = cutterId,
           comment = "",
         ),
@@ -187,7 +194,7 @@ fun ActualCutOrdersQuantityDialog(
             )
           } else {
             Icon(
-              imageVector = Icons.Default.KeyboardDoubleArrowRight,
+              imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
               contentDescription = "ActualCutOrdersQuantityButton",
             )
           }

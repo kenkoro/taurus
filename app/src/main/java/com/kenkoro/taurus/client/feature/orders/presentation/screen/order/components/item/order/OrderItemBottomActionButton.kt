@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -99,6 +100,8 @@ fun OrderItemBottomActionButton(
                   order.orderId,
                   userSubject ?: "",
                 )
+              Log.d("kenkoro", wasAcknowledged.toString())
+
               if (wasAcknowledged) {
                 onRefresh()
               } else {

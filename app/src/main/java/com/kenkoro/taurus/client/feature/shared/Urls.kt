@@ -18,7 +18,7 @@ object Urls {
   const val DELETE_ORDER = "$URL/delete/order"
 
   const val ADD_NEW_CUT_ORDER = "$ADD_NEW_TEMPLATE/cut-order"
-  const val GET_ACTUAL_CUT_ORDERS_QUANTITY = "$GET_ORDER//actual-quantity"
+  const val GET_ACTUAL_CUT_ORDERS_QUANTITY = "$GET_ORDER/actual-quantity"
 
   const val ADD_NEW_USER = "$URL/add-new/user"
   const val GET_USER = "$URL/user"

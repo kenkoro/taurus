@@ -162,6 +162,10 @@ fun OrderItem(
           OrderItemContent(
             order = order,
             selected = selected(),
+            isCutter = user.profile == Cutter,
+            onGetActualCutOrdersQuantity = {
+              remoteHandler.getActualCutOrdersQuantity(it)
+            },
           )
         }
 

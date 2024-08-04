@@ -70,5 +70,6 @@
     <string name="order_category_supporting_text">Категория заказа</string>
     <string name="order_title">Торговое название</string>
     <string name="actual_cut_orders_quantity_dialog_label">Фактически раскроено</string>
-    <string name="empty_text_field">Не выбрано</string>
+    <string name="empty_text_field">-</string>
+    <string name="order_actual_quantity">Фактическое кол-во</string>
 </resources>

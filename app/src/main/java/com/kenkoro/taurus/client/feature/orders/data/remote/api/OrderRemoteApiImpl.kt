@@ -87,16 +87,17 @@ class OrderRemoteApiImpl(
     orderId: Int,
     token: String,
   ): HttpStatusCode {
-    val status =
+    val response =
       client.delete {
-        url("${Urls.DELETE_ORDER}/$orderId")
+        url(Urls.DELETE_ORDER + "/$orderId")
         contentType(ContentType.Application.Json)
         setBody(dto)
         headers {
           append("Authorization", "Bearer $token")
         }
-      }.status
+      }
 
+    val status = response.status
     if (status != HttpStatusCode.OK) {
       throw OrderRemoteApiException("The deleting of order $orderId was unsuccessful")
     }
