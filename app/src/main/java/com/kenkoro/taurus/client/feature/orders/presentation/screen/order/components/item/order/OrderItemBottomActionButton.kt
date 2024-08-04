@@ -48,10 +48,12 @@ fun OrderItemBottomActionButton(
 
   val onApiErrorShowSnackbar =
     suspend {
-      snackbarsHolder.errorSnackbarHostState.showSnackbar(
-        message = apiRequestErrorMessage,
-        actionLabel = okActionLabel,
-      )
+      withContext(Dispatchers.Main) {
+        snackbarsHolder.errorSnackbarHostState.showSnackbar(
+          message = apiRequestErrorMessage,
+          actionLabel = okActionLabel,
+        )
+      }
     }
   val onHideWithDelay =
     suspend {
@@ -63,6 +65,7 @@ fun OrderItemBottomActionButton(
   var showCutterDialog by remember {
     mutableStateOf(false)
   }
+  val openCutterDialog = { showCutterDialog = true }
 
   if (showCutterDialog) {
     ActualCutOrdersQuantityDialog(
@@ -71,7 +74,7 @@ fun OrderItemBottomActionButton(
       userSubject = userSubject,
       localHandler = localHandler,
       remoteHandler = remoteHandler,
-      onClose = { showCutterDialog = false },
+      closeCutterDialog = { showCutterDialog = false },
       onHideWithDelay = onHideWithDelay,
       onRefresh = onRefresh,
       onApiErrorShowSnackbar = onApiErrorShowSnackbar,
@@ -99,7 +102,7 @@ fun OrderItemBottomActionButton(
               if (wasAcknowledged) {
                 onRefresh()
               } else {
-                withContext(Dispatchers.Main) { onApiErrorShowSnackbar() }
+                onApiErrorShowSnackbar()
               }
             }
           }
@@ -114,9 +117,7 @@ fun OrderItemBottomActionButton(
           order = order,
           text = stringResource(id = R.string.order_was_cut),
           networkStatus = networkStatus,
-          onClick = {
-            showCutterDialog = true
-          },
+          onClick = openCutterDialog,
         )
       }
     }
@@ -142,7 +143,7 @@ fun OrderItemBottomActionButton(
               if (wasAcknowledged) {
                 onRefresh()
               } else {
-                withContext(Dispatchers.Main) { onApiErrorShowSnackbar() }
+                onApiErrorShowSnackbar()
               }
             }
           },

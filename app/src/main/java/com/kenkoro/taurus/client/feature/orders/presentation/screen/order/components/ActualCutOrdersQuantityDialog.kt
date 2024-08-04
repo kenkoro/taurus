@@ -61,7 +61,6 @@ import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun ActualCutOrdersQuantityDialog(
@@ -71,7 +70,7 @@ fun ActualCutOrdersQuantityDialog(
   userSubject: String? = null,
   localHandler: LocalHandler = LocalHandler(),
   remoteHandler: RemoteHandler,
-  onClose: () -> Unit = {},
+  closeCutterDialog: () -> Unit = {},
   onHideWithDelay: suspend () -> Unit = {},
   onRefresh: () -> Unit = {},
   onApiErrorShowSnackbar: suspend () -> SnackbarResult,
@@ -91,52 +90,53 @@ fun ActualCutOrdersQuantityDialog(
   var isLoading by remember {
     mutableStateOf(false)
   }
+  val onAddNewCutOrder =
+    suspend {
+      remoteHandler.addNewCutOrder(
+        NewCutOrder(
+          orderId = order.orderId,
+          date = System.currentTimeMillis(),
+          quantity = actualCutOrdersQuantity.toInt(),
+          cutterId = cutterId,
+          comment = "",
+        ),
+      )
+    }
+  val onChangeOrderStateToCut =
+    suspend {
+      onHideWithDelay()
+
+      val cutOrder = order.toCutOrder()
+      localHandler.editOrder(cutOrder, order.orderId)
+      val wasAcknowledged =
+        remoteHandler.editOrder(
+          cutOrder,
+          userSubject ?: "",
+        )
+      if (wasAcknowledged) {
+        onRefresh()
+      } else {
+        onApiErrorShowSnackbar()
+      }
+    }
+  val onSubmit = {
+    if (actualCutOrdersQuantity.isNotBlank()) {
+      scope.launch(Dispatchers.IO) {
+        isLoading = true
+        onAddNewCutOrder()
+        isLoading = false
+        closeCutterDialog()
+        onChangeOrderStateToCut()
+      }
+    }
+  }
 
   val preConfiguredModifier =
     Modifier
       .width(contentWidth.actualCutOrdersQuantityTextField)
       .height(contentHeight.actualCutOrdersQuantityTextField)
 
-  val onSubmit = {
-    if (actualCutOrdersQuantity.isNotBlank()) {
-      scope.launch(Dispatchers.IO) {
-        isLoading = true
-
-        val isSuccess =
-          remoteHandler.addNewCutOrder(
-            NewCutOrder(
-              orderId = order.orderId,
-              date = System.currentTimeMillis(),
-              quantity = actualCutOrdersQuantity.toInt(),
-              cutterId = cutterId,
-              comment = "",
-            ),
-          ).isSuccess
-
-        if (isSuccess) {
-          onHideWithDelay()
-
-          val cutOrder = order.toCutOrder()
-          localHandler.editOrder(cutOrder, order.orderId)
-          val wasAcknowledged =
-            remoteHandler.editOrder(
-              cutOrder,
-              userSubject ?: "",
-            )
-          if (wasAcknowledged) {
-            onRefresh()
-          } else {
-            withContext(Dispatchers.Main) { onApiErrorShowSnackbar() }
-          }
-        }
-
-        isLoading = false
-        onClose()
-      }
-    }
-  }
-
-  Dialog(onDismissRequest = onClose) {
+  Dialog(onDismissRequest = closeCutterDialog) {
     Column(
       modifier =
         modifier
