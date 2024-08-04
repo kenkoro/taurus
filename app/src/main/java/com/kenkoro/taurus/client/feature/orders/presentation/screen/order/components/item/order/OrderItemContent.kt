@@ -28,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -136,14 +135,13 @@ fun OrderItemContent(
               Modifier
                 .fillMaxWidth()
                 .height(contentHeight.orderItemField)
-                .background(MaterialTheme.colorScheme.primaryContainer),
+                .background(MaterialTheme.colorScheme.inversePrimary),
             verticalAlignment = Alignment.CenterVertically,
           ) {
             Spacer(modifier = Modifier.width(contentWidth.large))
             Text(
               modifier = Modifier.weight(8F),
               text = stringResource(id = R.string.order_actual_quantity),
-              fontStyle = FontStyle.Italic,
               color = MaterialTheme.colorScheme.onPrimaryContainer,
               style = MaterialTheme.typography.bodyMedium,
               maxLines = 1,
@@ -155,12 +153,12 @@ fun OrderItemContent(
                   modifier = Modifier.size(size.medium),
                   imageVector = Icons.Default.Error,
                   contentDescription = "AdditionalInfoError",
+                  tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
               } else {
                 Text(
                   modifier = Modifier.weight(2F),
                   text = actualQuantity.toString(),
-                  fontStyle = FontStyle.Italic,
                   color = MaterialTheme.colorScheme.onPrimaryContainer,
                   style = MaterialTheme.typography.bodyMedium,
                   maxLines = 1,
@@ -172,7 +170,7 @@ fun OrderItemContent(
               CircularProgressIndicator(
                 strokeWidth = strokeWidth.small,
                 modifier = Modifier.size(size.small),
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
               )
             }
             Spacer(modifier = Modifier.width(contentWidth.large))

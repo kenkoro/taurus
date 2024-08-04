@@ -275,7 +275,7 @@ private fun OrderItemPrev() {
       firstName = "FirstName",
       lastName = "LastName",
       email = "Email",
-      profile = Cutter,
+      profile = Customer,
       salt = "Salt",
     )
   val remoteHandler =
