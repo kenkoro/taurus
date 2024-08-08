@@ -5,6 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -117,6 +118,7 @@ fun AppNavHost(
         onNavigateToOrderEditorScreen = { editOrder ->
           navController.navigate(Screen.OrderEditorScreen.route + "?editOrder=$editOrder")
         },
+        viewModelScope = orderViewModel.viewModelScope,
       )
     }
 

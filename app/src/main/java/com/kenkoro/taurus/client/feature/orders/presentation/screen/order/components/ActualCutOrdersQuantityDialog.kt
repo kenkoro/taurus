@@ -59,6 +59,7 @@ import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 import com.kenkoro.taurus.client.ui.theme.AppTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -74,6 +75,7 @@ fun ActualCutOrdersQuantityDialog(
   onHideWithDelay: suspend () -> Unit = {},
   onRefresh: () -> Unit = {},
   onApiErrorShowSnackbar: suspend () -> SnackbarResult,
+  viewModelScope: CoroutineScope,
 ) {
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
@@ -86,7 +88,6 @@ fun ActualCutOrdersQuantityDialog(
     mutableStateOf("")
   }
   val interactionSource = remember { MutableInteractionSource() }
-  val scope = rememberCoroutineScope()
   var isLoading by remember {
     mutableStateOf(false)
   }
@@ -128,7 +129,7 @@ fun ActualCutOrdersQuantityDialog(
     }
   val onSubmit = {
     if (actualCutOrdersQuantity.isNotBlank()) {
-      scope.launch(Dispatchers.IO) {
+      viewModelScope.launch(Dispatchers.IO) {
         isLoading = true
         onAddNewCutOrder()
         isLoading = false
@@ -259,6 +260,7 @@ private fun ActualCutOrdersQuantityDialogPrev() {
       remoteHandler = remoteHandler,
       order = order,
       onApiErrorShowSnackbar = { SnackbarResult.Dismissed },
+      viewModelScope = rememberCoroutineScope(),
     )
   }
 }

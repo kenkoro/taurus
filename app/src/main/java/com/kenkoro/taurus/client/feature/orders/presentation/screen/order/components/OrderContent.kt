@@ -28,6 +28,7 @@ import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Manager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -55,6 +56,7 @@ fun OrderContent(
   onOrderStatus: (OrderStatus) -> Unit = {},
   onOrderId: (Int) -> Unit = {},
   onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
+  viewModelScope: CoroutineScope,
 ) {
   val loginErrorMessage = stringResource(id = R.string.login_fail)
   val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
@@ -140,6 +142,7 @@ fun OrderContent(
       onOrderStatus = onOrderStatus,
       onOrderId = onOrderId,
       onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
+      viewModelScope = viewModelScope,
     )
   }
 }

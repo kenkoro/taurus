@@ -41,6 +41,7 @@ import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Tailor
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 
@@ -62,6 +63,7 @@ fun PullToRefreshLazyOrdersContent(
   onOrderStatus: (OrderStatus) -> Unit = {},
   onOrderId: (Int) -> Unit = {},
   onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
+  viewModelScope: CoroutineScope,
 ) {
   val paginatedOrdersErrorMessage = stringResource(id = R.string.paginated_orders_error)
   val orderAccessErrorMessage = stringResource(id = R.string.orders_access_error)
@@ -125,6 +127,7 @@ fun PullToRefreshLazyOrdersContent(
               onOrderStatus = onOrderStatus,
               onOrderId = onOrderId,
               onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
+              viewModelScope = viewModelScope,
             )
           }
         }

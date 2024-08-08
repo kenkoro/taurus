@@ -12,6 +12,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.paging.PagingData
@@ -38,6 +39,7 @@ import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
 import com.kenkoro.taurus.client.feature.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 import com.kenkoro.taurus.client.ui.theme.AppTheme
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -64,6 +66,7 @@ fun OrderScreen(
   onOrderId: (Int) -> Unit = {},
   onNavigateToProfileScreen: () -> Unit = {},
   onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
+  viewModelScope: CoroutineScope,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
@@ -154,6 +157,7 @@ fun OrderScreen(
             onOrderStatus = onOrderStatus,
             onOrderId = onOrderId,
             onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
+            viewModelScope = viewModelScope,
           )
         }
       },
@@ -235,6 +239,7 @@ private fun OrderScreenPrev() {
       remoteHandler = remoteHandler,
       onDecryptSubjectAndPassword = { Pair("", "") },
       onDecryptToken = { "" },
+      viewModelScope = rememberCoroutineScope(),
     )
   }
 }

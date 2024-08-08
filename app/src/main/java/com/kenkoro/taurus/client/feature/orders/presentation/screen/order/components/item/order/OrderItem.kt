@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -62,6 +63,7 @@ import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Manager
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 import com.kenkoro.taurus.client.ui.theme.AppTheme
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun OrderItem(
@@ -80,6 +82,7 @@ fun OrderItem(
   onOrderStatus: (OrderStatus) -> Unit = {},
   onOrderId: (Int) -> Unit = {},
   onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
+  viewModelScope: CoroutineScope,
 ) {
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
@@ -193,6 +196,7 @@ fun OrderItem(
                 onHide = { visible = false },
                 onDecryptToken = onDecryptToken,
                 onRefresh = onRefresh,
+                viewModelScope = viewModelScope,
               )
 
               if (allowedToEditOrder(user.profile)) {
@@ -304,6 +308,7 @@ private fun OrderItemPrev() {
         ),
       networkStatus = NetworkStatus.Available,
       onDecryptToken = { "" },
+      viewModelScope = rememberCoroutineScope(),
     )
   }
 }
