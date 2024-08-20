@@ -6,5 +6,3 @@ As a bonus, new integrations w/ other apps can be added, such as Tinkoff API for
 ### License
 
 This app is distributed under the term of the Apache License (Version 2.0). See the [license](LICENSE) for more information.
-
-[kitty]: https://github.com/user-attachments/assets/b95c9c5c-b193-4614-b5a2-ed5adf17314b
