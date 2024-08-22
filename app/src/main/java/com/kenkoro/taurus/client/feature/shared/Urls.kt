@@ -1,10 +1,10 @@
 package com.kenkoro.taurus.client.feature.shared
 
 object Urls {
-  private const val HOST = "192.168.0.112"
+  private const val HOST = "176.117.234.243"
 
   private const val PROTOCOL = "http"
-  private const val PORT = 8080
+  private const val PORT = 8445
   private const val URL = "$PROTOCOL://$HOST:$PORT"
 
   const val LOGIN = "$URL/login"

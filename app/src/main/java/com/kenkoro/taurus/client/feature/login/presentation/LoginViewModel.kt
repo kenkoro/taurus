@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client.feature.login.presentation
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -39,13 +40,18 @@ class LoginViewModel
     suspend fun login(
       subject: String = this.subject.text,
       password: String = this.password.text,
-    ): Result<TokenDto> =
-      loginRepository.login(
-        LoginDto(
-          subject = subject,
-          password = password,
-        ),
-      )
+    ): Result<TokenDto> {
+      val result =
+        loginRepository.login(
+          LoginDto(
+            subject = subject,
+            password = password,
+          ),
+        )
+      Log.d("kenkoro", result.toString())
+
+      return result
+    }
 
     fun encryptAll(
       subject: String,
