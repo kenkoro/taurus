@@ -13,10 +13,10 @@ val materialIconsExtended: String by project
 plugins {
   id("com.android.application")
   id("org.jetbrains.kotlin.android")
-  id("com.google.devtools.ksp")
   id("com.google.dagger.hilt.android")
   id("org.jlleitschuh.gradle.ktlint")
   id("org.jetbrains.kotlin.plugin.serialization")
+  id("com.google.devtools.ksp")
 }
 
 subprojects {
