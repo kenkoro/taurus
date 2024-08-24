@@ -9,9 +9,12 @@ import io.ktor.http.HttpStatusCode
 class UserRepositoryImpl(
   private val api: UserRemoteApi,
 ) : UserRepository {
-  override suspend fun addNewUser(dto: NewUserDto): Result<UserDto> =
+  override suspend fun addNewUser(
+    dto: NewUserDto,
+    token: String,
+  ): Result<UserDto> =
     runCatching {
-      api.addNewUser(dto)
+      api.addNewUser(dto, token)
     }
 
   override suspend fun getUser(

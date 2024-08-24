@@ -23,17 +23,17 @@ class UserRemoteApiException(message: String) : Exception(message)
 class UserRemoteApiImpl(
   private val client: HttpClient,
 ) : UserRemoteApi {
-  override suspend fun addNewUser(dto: NewUserDto): UserDto =
+  override suspend fun addNewUser(
+    dto: NewUserDto,
+    token: String,
+  ): UserDto =
     client.post {
       url(Urls.ADD_NEW_USER)
       contentType(ContentType.Application.Json)
       setBody(dto)
-      /**
-       * For later, turn this on
-       * headers {
-       *   append("Authorization", "Bearer $token")
-       * }
-       */
+      headers {
+        append("Authorization", "Bearer $token")
+      }
     }.body<UserDto>()
 
   override suspend fun getUser(

@@ -73,4 +73,8 @@ class LoginViewModel
     fun showErrorTitle(): Boolean {
       return subject.showErrors() || password.showErrors()
     }
+
+    fun resetLoginState() {
+      loginState = LoginState.NotLoggedYet
+    }
   }

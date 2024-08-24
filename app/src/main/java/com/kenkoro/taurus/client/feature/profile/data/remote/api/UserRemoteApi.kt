@@ -8,7 +8,7 @@ import io.ktor.http.HttpStatusCode
 interface UserRemoteApi {
   suspend fun addNewUser(
     dto: NewUserDto,
-    // Later add here a token
+    token: String,
   ): UserDto
 
   suspend fun getUser(

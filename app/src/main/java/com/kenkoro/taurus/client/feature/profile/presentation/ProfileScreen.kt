@@ -11,19 +11,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.kenkoro.taurus.client.R
+import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenNavigator
+import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenUtils
 
 @Composable
 fun ProfileScreen(
-  onDeleteAllCredentials: () -> Boolean = { false },
-  onNavigateToLoginScreen: () -> Unit = {},
-  onResetLoginState: () -> Unit = {},
-  onRestart: () -> Unit = {},
+  navigator: ProfileScreenNavigator,
+  utils: ProfileScreenUtils,
 ) {
   val onClick = {
-    onDeleteAllCredentials()
-    onResetLoginState()
-    onNavigateToLoginScreen()
-    onRestart()
+    utils.deleteAllStoredUserCredentials()
+    utils.resetLoginState()
+    navigator.toLoginScreen()
+    utils.restart()
   }
 
   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

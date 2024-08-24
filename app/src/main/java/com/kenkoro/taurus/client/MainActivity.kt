@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.kenkoro.taurus.client.feature.shared.navigation.AppNavHost
 import com.kenkoro.taurus.client.feature.shared.navigation.Screen
+import com.kenkoro.taurus.client.feature.shared.navigation.util.AppNavHostUtils
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -46,21 +47,24 @@ class MainActivity : ComponentActivity() {
           modifier = Modifier.fillMaxSize(),
           color = MaterialTheme.colorScheme.background,
         ) {
-          AppNavHost(
-            onLoginChooseDestination = { subject, password ->
-              if (subject.isNotBlank() && password.isNotBlank()) {
-                Screen.OrderScreen
-              } else {
-                Screen.LoginScreen
-              }
-            },
-            onExit = { finish() },
-            onRestart = {
-              val intent = Intent(this, MainActivity::class.java)
-              startActivity(intent)
-              finishAffinity()
-            },
-          )
+          val utils =
+            AppNavHostUtils(
+              startDestination = { subject, password ->
+                if (subject.isNotBlank() && password.isNotBlank()) {
+                  Screen.OrderScreen
+                } else {
+                  Screen.LoginScreen
+                }
+              },
+              exit = { finish() },
+              restart = {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finishAffinity()
+              },
+            )
+
+          AppNavHost(utils = utils)
         }
       }
     }

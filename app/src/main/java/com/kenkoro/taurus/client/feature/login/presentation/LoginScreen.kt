@@ -21,6 +21,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.login.presentation.components.LoginContent
+import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenNavigator
+import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenRemoteHandler
+import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenSnackbarsHolder
+import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenUtils
 import com.kenkoro.taurus.client.feature.login.presentation.util.PasswordState
 import com.kenkoro.taurus.client.feature.login.presentation.util.SubjectState
 import com.kenkoro.taurus.client.feature.shared.components.TaurusSnackbar
@@ -31,14 +35,9 @@ import kotlinx.coroutines.delay
 @Composable
 fun LoginScreen(
   modifier: Modifier = Modifier,
-  subject: SubjectState,
-  password: PasswordState,
-  networkStatus: NetworkStatus,
-  onLogin: suspend (subject: String, password: String) -> Result<TokenDto>,
-  onEncryptAll: (String, String, String) -> Unit,
-  onExit: () -> Unit = {},
-  onShowErrorTitle: () -> Boolean = { false },
-  onNavigateToOrderScreen: () -> Unit,
+  utils: LoginScreenUtils,
+  remoteHandler: LoginScreenRemoteHandler,
+  navigator: LoginScreenNavigator,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
@@ -52,6 +51,22 @@ fun LoginScreen(
   var visible by rememberSaveable {
     mutableStateOf(false)
   }
+
+  val snackbarsHolder =
+    LoginScreenSnackbarsHolder(
+      internetConnectionError = {
+        internetSnackbarHostState.showSnackbar(
+          message = internetConnectionErrorMessage,
+          duration = SnackbarDuration.Indefinite,
+        )
+      },
+      loginError = {
+        errorSnackbarHostState.showSnackbar(
+          message = requestErrorMessage,
+          actionLabel = okActionLabel,
+        )
+      },
+    )
 
   LaunchedEffect(Unit) {
     delay(100L)
@@ -90,26 +105,10 @@ fun LoginScreen(
         ) {
           AnimatedVisibility(visible = visible) {
             LoginContent(
-              networkStatus = networkStatus,
-              subject = subject,
-              password = password,
-              onLogin = onLogin,
-              onEncryptAll = onEncryptAll,
-              onNavigateToOrderScreen = onNavigateToOrderScreen,
-              onExit = onExit,
-              onInternetConnectionErrorShowSnackbar = {
-                internetSnackbarHostState.showSnackbar(
-                  message = internetConnectionErrorMessage,
-                  duration = SnackbarDuration.Indefinite,
-                )
-              },
-              onLoginErrorShowSnackbar = {
-                errorSnackbarHostState.showSnackbar(
-                  message = requestErrorMessage,
-                  actionLabel = okActionLabel,
-                )
-              },
-              onShowErrorTitle = onShowErrorTitle,
+              utils = utils,
+              remoteHandler = remoteHandler,
+              navigator = navigator,
+              snackbarsHolder = snackbarsHolder,
             )
           }
         }
@@ -121,14 +120,26 @@ fun LoginScreen(
 @Preview
 @Composable
 private fun LoginScreenPrev() {
-  AppTheme {
-    LoginScreen(
-      networkStatus = NetworkStatus.Available,
+  val utils =
+    LoginScreenUtils(
       subject = SubjectState(),
       password = PasswordState(),
-      onLogin = { _, _ -> Result.success(TokenDto("")) },
-      onEncryptAll = { _, _, _ -> },
-      onNavigateToOrderScreen = {},
+      network = NetworkStatus.Available,
+      encryptAllUserCredentials = { _, _, _ -> },
+      exit = {},
+      showErrorTitle = { false },
+    )
+  val remoteHandler =
+    LoginScreenRemoteHandler { _, _ ->
+      Result.success(TokenDto(""))
+    }
+  val navigator = LoginScreenNavigator {}
+
+  AppTheme {
+    LoginScreen(
+      utils = utils,
+      remoteHandler = remoteHandler,
+      navigator = navigator,
     )
   }
 }

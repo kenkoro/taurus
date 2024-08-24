@@ -13,7 +13,7 @@ interface UserRepository {
 
   suspend fun addNewUser(
     dto: NewUserDto,
-    // TODO: Add here a jwt token
+    token: String,
   ): Result<UserDto>
 
   suspend fun getUser(
