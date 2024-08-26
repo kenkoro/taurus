@@ -8,78 +8,95 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.paging.PagingData
-import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.feature.login.data.mappers.toUserDto
-import com.kenkoro.taurus.client.feature.orders.data.mappers.toCutOrderDto
-import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrderDto
-import com.kenkoro.taurus.client.feature.orders.data.remote.dto.ActualCutOrdersQuantityDto
-import com.kenkoro.taurus.client.feature.orders.domain.CutOrder
-import com.kenkoro.taurus.client.feature.orders.domain.Order
-import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
+import androidx.compose.ui.res.stringResource
+import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderBottomBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderTopBar
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.LoginState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
-import com.kenkoro.taurus.client.feature.profile.domain.User
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.util.OrderScreenExtras
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
-import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
 import com.kenkoro.taurus.client.feature.shared.components.TaurusSnackbar
-import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 import com.kenkoro.taurus.client.ui.theme.AppTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
 @Composable
 fun OrderScreen(
   modifier: Modifier = Modifier,
-  ordersPagingFlow: Flow<PagingData<Order>>,
-  user: User? = null,
-  loginState: LoginState,
-  networkStatus: NetworkStatus,
-  selectedOrderRecordId: Int? = null,
-  orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
-  onUser: (User) -> Unit = {},
-  onFilterStrategy: (OrderFilterStrategy?) -> Unit = {},
-  onSelectOrder: (Int?) -> Unit = {},
-  onLoginState: (LoginState) -> Unit = {},
-  localHandler: LocalHandler = LocalHandler(),
-  remoteHandler: RemoteHandler,
-  onEncryptToken: (String) -> Unit = {},
-  onDecryptSubjectAndPassword: () -> Pair<String, String>,
-  onDecryptToken: () -> String,
-  onResetAllOrderFields: () -> Unit = {},
-  onOrderStatus: (OrderStatus) -> Unit = {},
-  onOrderId: (Int) -> Unit = {},
-  onNavigateToProfileScreen: () -> Unit = {},
-  onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
-  viewModelScope: CoroutineScope,
+  localHandler: OrderScreenLocalHandler = OrderScreenLocalHandler(),
+  remoteHandler: OrderScreenRemoteHandler,
+  navigator: OrderScreenNavigator,
+  utils: OrderScreenUtils,
+  states: OrderStatesHolder,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
-  val internetSnackbarHostState = remember { SnackbarHostState() }
-  val snackbarsHolder =
-    remember {
-      SnackbarsHolder(
-        snackbarHostState = snackbarHostState,
-        errorSnackbarHostState = errorSnackbarHostState,
-        internetErrorSnackbarHostState = internetSnackbarHostState,
-      )
-    }
+  val internetErrorSnackbarHostState = remember { SnackbarHostState() }
   val lazyOrdersState = rememberLazyListState()
+
+  val notImplementedYetMessage = stringResource(id = R.string.not_implemented_yet)
+  val loginErrorMessage = stringResource(id = R.string.login_fail)
+  val internetConnectionErrorMessage = stringResource(id = R.string.check_internet_connection)
+  val paginatedOrdersErrorMessage = stringResource(id = R.string.paginated_orders_error)
+  val orderAccessErrorMessage = stringResource(id = R.string.orders_access_error)
+  val apiRequestErrorMessage = stringResource(id = R.string.request_error)
+
+  val okActionLabel = stringResource(id = R.string.ok)
+
+  val snackbarsHolder =
+    OrderScreenSnackbarsHolder(
+      notImplementedError = {
+        snackbarHostState.showSnackbar(
+          message = notImplementedYetMessage,
+          actionLabel = okActionLabel,
+        )
+      },
+      loginError = {
+        errorSnackbarHostState.showSnackbar(
+          message = loginErrorMessage,
+          actionLabel = okActionLabel,
+        )
+      },
+      internetConnectionError = {
+        internetErrorSnackbarHostState.showSnackbar(
+          message = internetConnectionErrorMessage,
+          duration = SnackbarDuration.Indefinite,
+        )
+      },
+      getPaginatedOrdersError = {
+        errorSnackbarHostState.showSnackbar(
+          message = paginatedOrdersErrorMessage,
+          actionLabel = okActionLabel,
+        )
+      },
+      accessToOrdersError = {
+        errorSnackbarHostState.showSnackbar(
+          message = orderAccessErrorMessage,
+          actionLabel = okActionLabel,
+        )
+      },
+      apiError = {
+        errorSnackbarHostState.showSnackbar(
+          message = apiRequestErrorMessage,
+          actionLabel = okActionLabel,
+        )
+      },
+    )
+  val orderScreenExtras =
+    OrderScreenExtras(
+      isScrolling = lazyOrdersState.isScrollInProgress,
+      username = utils.user?.firstName,
+    )
 
   AppTheme {
     Scaffold(
@@ -101,8 +118,8 @@ fun OrderScreen(
         )
 
         TaurusSnackbar(
-          snackbarHostState = internetSnackbarHostState,
-          onDismiss = { internetSnackbarHostState.currentSnackbarData?.dismiss() },
+          snackbarHostState = internetErrorSnackbarHostState,
+          onDismiss = { internetErrorSnackbarHostState.currentSnackbarData?.dismiss() },
           containerColor = MaterialTheme.colorScheme.errorContainer,
           contentColor = MaterialTheme.colorScheme.onErrorContainer,
           centeredContent = true,
@@ -110,21 +127,18 @@ fun OrderScreen(
       },
       topBar = {
         OrderTopBar(
-          networkStatus = networkStatus,
-          isScrollingInProgress = lazyOrdersState.isScrollInProgress,
-          userName = user?.firstName,
+          utils = utils,
           snackbarsHolder = snackbarsHolder,
-          onNavigateToProfileScreen = onNavigateToProfileScreen,
+          navigator = navigator,
+          extras = orderScreenExtras,
         )
       },
       bottomBar = {
-        if (user != null && user.profile == Customer) {
+        if (utils.user != null && utils.user.profile == Customer) {
           OrderBottomBar(
-            networkStatus = networkStatus,
-            isScrollingInProgress = lazyOrdersState.isScrollInProgress,
-            snackbarsHolder = snackbarsHolder,
-            onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
-            onResetAllOrderFields = onResetAllOrderFields,
+            utils = utils,
+            navigator = navigator,
+            extras = orderScreenExtras,
           )
         }
       },
@@ -137,109 +151,15 @@ fun OrderScreen(
               .padding(paddingValues),
         ) {
           OrderContent(
-            ordersPagingFlow = ordersPagingFlow,
-            networkStatus = networkStatus,
-            user = user,
-            onUser = onUser,
-            loginState = loginState,
-            lazyOrdersState = lazyOrdersState,
-            selectedOrderRecordId = selectedOrderRecordId,
-            orderStatesHolder = orderStatesHolder,
-            onFilterStrategy = onFilterStrategy,
-            onSelectOrder = onSelectOrder,
-            onLoginState = onLoginState,
             localHandler = localHandler,
             remoteHandler = remoteHandler,
+            navigator = navigator,
+            utils = utils,
+            statesHolder = states,
             snackbarsHolder = snackbarsHolder,
-            onEncryptToken = onEncryptToken,
-            onDecryptSubjectAndPassword = onDecryptSubjectAndPassword,
-            onDecryptToken = onDecryptToken,
-            onOrderStatus = onOrderStatus,
-            onOrderId = onOrderId,
-            onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
-            viewModelScope = viewModelScope,
           )
         }
       },
-    )
-  }
-}
-
-@Preview
-@Composable
-private fun OrderScreenPrev() {
-  val cutOrder =
-    CutOrder(
-      cutOrderId = 0,
-      orderId = 419,
-      date = 0L,
-      quantity = 3,
-      cutterId = 0,
-      comment = "",
-    )
-  val order =
-    Order(
-      recordId = 0,
-      orderId = 0,
-      customer = "Customer",
-      date = 0L,
-      title = "Title",
-      model = "Model",
-      size = "Size",
-      color = "Color",
-      category = "Category",
-      quantity = 0,
-      status = OrderStatus.Idle,
-      creatorId = 0,
-    )
-  val ordersFlow =
-    flow {
-      emit(
-        PagingData.from(
-          listOf(
-            order,
-            order,
-            order,
-          ),
-        ),
-      )
-    }
-  val orderDto = order.toOrderDto()
-  val user =
-    User(
-      userId = 0,
-      subject = "Subject",
-      password = "Password",
-      image = "Image",
-      firstName = "FirstName",
-      lastName = "LastName",
-      email = "Email",
-      profile = Other,
-      salt = "Salt",
-    )
-  val remoteHandler =
-    RemoteHandler(
-      login = { _, _ -> Result.success(TokenDto("")) },
-      getUser = { _, _ -> Result.success(user.toUserDto()) },
-      addNewOrder = { _ -> Result.success(orderDto) },
-      addNewCutOrder = { _ -> Result.success(cutOrder.toCutOrderDto()) },
-      getActualCutOrdersQuantity = {
-          _ ->
-        Result.success(ActualCutOrdersQuantityDto(cutOrder.quantity))
-      },
-    )
-
-  AppTheme {
-    OrderScreen(
-      ordersPagingFlow = ordersFlow,
-      user = user,
-      loginState = LoginState.NotLoggedYet,
-      networkStatus = NetworkStatus.Unavailable,
-      selectedOrderRecordId = null,
-      remoteHandler = remoteHandler,
-      onDecryptSubjectAndPassword = { Pair("", "") },
-      onDecryptToken = { "" },
-      viewModelScope = rememberCoroutineScope(),
     )
   }
 }

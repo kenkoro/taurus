@@ -8,20 +8,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toCheckedOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Cut
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.ActualCutOrdersQuantityDialog
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
-import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -30,32 +28,17 @@ import kotlinx.coroutines.withContext
 @Composable
 fun OrderItemBottomActionButton(
   modifier: Modifier = Modifier,
-  networkStatus: NetworkStatus,
   order: Order,
-  userId: Int,
-  userProfile: UserProfile,
-  userSubject: String? = null,
-  localHandler: LocalHandler = LocalHandler(),
-  remoteHandler: RemoteHandler,
-  snackbarsHolder: SnackbarsHolder,
+  localHandler: OrderScreenLocalHandler,
+  remoteHandler: OrderScreenRemoteHandler,
+  utils: OrderScreenUtils,
+  snackbarsHolder: OrderScreenSnackbarsHolder,
   onHide: () -> Unit = {},
-  onDecryptToken: () -> String,
   onRefresh: () -> Unit = {},
-  viewModelScope: CoroutineScope,
 ) {
-  val apiRequestErrorMessage = stringResource(id = R.string.request_error)
+  val scope = utils.viewModelScope
+  val user = utils.user
 
-  val okActionLabel = stringResource(id = R.string.ok)
-
-  val onApiErrorShowSnackbar =
-    suspend {
-      withContext(Dispatchers.Main) {
-        snackbarsHolder.errorSnackbarHostState.showSnackbar(
-          message = apiRequestErrorMessage,
-          actionLabel = okActionLabel,
-        )
-      }
-    }
   val onHideWithDelay =
     suspend {
       onHide()
@@ -70,39 +53,36 @@ fun OrderItemBottomActionButton(
   if (showCutterDialog) {
     ActualCutOrdersQuantityDialog(
       order = order,
-      cutterId = userId,
-      userSubject = userSubject,
       localHandler = localHandler,
       remoteHandler = remoteHandler,
+      utils = utils,
+      snackbarsHolder = snackbarsHolder,
       closeCutterDialog = { showCutterDialog = false },
       onHideWithDelay = onHideWithDelay,
       onRefresh = onRefresh,
-      onApiErrorShowSnackbar = onApiErrorShowSnackbar,
-      viewModelScope = viewModelScope,
     )
   }
 
-  when (userProfile) {
+  when (user?.profile) {
     Customer -> {
       OrderItemButton(
         modifier = modifier,
         order = order,
         text = stringResource(id = R.string.delete_button),
-        networkStatus = networkStatus,
+        networkStatus = utils.network,
         onClick = {
-          viewModelScope.launch {
+          scope.launch {
             launch(Dispatchers.IO) {
               onHideWithDelay()
 
               localHandler.deleteOrder(order)
               val wasAcknowledged =
-                remoteHandler.deleteOrder(
-                  order.orderId,
-                  userSubject ?: "",
-                )
+                remoteHandler.deleteOrder(order.orderId, user.subject)
 
               if (wasAcknowledged) {
                 onRefresh()
+              } else {
+                withContext(Dispatchers.Main) { snackbarsHolder.apiError() }
               }
             }
           }
@@ -116,7 +96,7 @@ fun OrderItemBottomActionButton(
           modifier = modifier,
           order = order,
           text = stringResource(id = R.string.order_was_cut),
-          networkStatus = networkStatus,
+          networkStatus = utils.network,
           onClick = openCutterDialog,
         )
       }
@@ -128,22 +108,19 @@ fun OrderItemBottomActionButton(
           modifier = modifier,
           order = order,
           text = stringResource(id = R.string.order_was_checked),
-          networkStatus = networkStatus,
+          networkStatus = utils.network,
           onClick = {
-            viewModelScope.launch(Dispatchers.IO) {
+            scope.launch(Dispatchers.IO) {
               onHideWithDelay()
 
               val checkedOrder = order.toCheckedOrder()
               localHandler.editOrder(checkedOrder, order.orderId)
               val wasAcknowledged =
-                remoteHandler.editOrder(
-                  checkedOrder,
-                  userSubject ?: "",
-                )
+                remoteHandler.editOrder(checkedOrder, user.subject)
               if (wasAcknowledged) {
                 onRefresh()
               } else {
-                onApiErrorShowSnackbar()
+                withContext(Dispatchers.Main) { snackbarsHolder.apiError() }
               }
             }
           },

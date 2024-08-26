@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -21,27 +21,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.feature.orders.domain.Order
-import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order.OrderItem
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
-import com.kenkoro.taurus.client.feature.profile.domain.User
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Tailor
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 
@@ -49,26 +45,15 @@ import java.util.UUID
 fun PullToRefreshLazyOrdersContent(
   modifier: Modifier = Modifier,
   orders: LazyPagingItems<Order>,
-  user: User,
-  networkStatus: NetworkStatus,
-  selectedOrderRecordId: Int? = null,
-  onRefreshOrders: () -> Unit,
-  lazyOrdersState: LazyListState,
-  orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
-  onSelectOrder: (Int?) -> Unit = {},
-  localHandler: LocalHandler,
-  remoteHandler: RemoteHandler,
-  snackbarsHolder: SnackbarsHolder,
-  onDecryptToken: () -> String,
-  onOrderStatus: (OrderStatus) -> Unit = {},
-  onOrderId: (Int) -> Unit = {},
-  onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
-  viewModelScope: CoroutineScope,
+  localHandler: OrderScreenLocalHandler,
+  remoteHandler: OrderScreenRemoteHandler,
+  navigator: OrderScreenNavigator,
+  utils: OrderScreenUtils,
+  statesHolder: OrderStatesHolder,
+  snackbarsHolder: OrderScreenSnackbarsHolder,
+  onRefreshOrders: suspend () -> Unit = {},
 ) {
-  val paginatedOrdersErrorMessage = stringResource(id = R.string.paginated_orders_error)
-  val orderAccessErrorMessage = stringResource(id = R.string.orders_access_error)
-
-  val okActionLabel = stringResource(id = R.string.ok)
+  val user = utils.user
 
   val size = LocalSize.current
   val offset = LocalOffset.current
@@ -76,29 +61,20 @@ fun PullToRefreshLazyOrdersContent(
   val contentHeight = LocalContentHeight.current
 
   val pullToRefreshState = rememberPullToRefreshState()
+  val lazyListState = rememberLazyListState()
 
   if (orders.loadState.append is LoadState.Error) {
-    LaunchedEffect(Unit) {
-      snackbarsHolder.errorSnackbarHostState.showSnackbar(
-        message = paginatedOrdersErrorMessage,
-        actionLabel = okActionLabel,
-      )
-    }
+    LaunchedEffect(Unit, Dispatchers.Main) { snackbarsHolder.getPaginatedOrdersError() }
   }
 
-  if (user.profile == Tailor || user.profile == Other) {
-    LaunchedEffect(Unit, Dispatchers.Main) {
-      snackbarsHolder.errorSnackbarHostState.showSnackbar(
-        message = orderAccessErrorMessage,
-        actionLabel = okActionLabel,
-      )
-    }
+  if (user?.profile == Tailor || user?.profile == Other) {
+    LaunchedEffect(Unit, Dispatchers.Main) { snackbarsHolder.accessToOrdersError() }
   }
 
-  if (allowedToSeeOrders(user.profile)) {
+  if (allowedToSeeOrders(user?.profile)) {
     Box(modifier = modifier.nestedScroll(pullToRefreshState.nestedScrollConnection)) {
       LazyColumn(
-        state = lazyOrdersState,
+        state = lazyListState,
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
@@ -114,20 +90,13 @@ fun PullToRefreshLazyOrdersContent(
           if (order != null) {
             OrderItem(
               order = order,
-              networkStatus = networkStatus,
-              user = user,
-              selectedOrderRecordId = selectedOrderRecordId,
-              orderStatesHolder = orderStatesHolder,
-              onSelectOrder = onSelectOrder,
               localHandler = localHandler,
               remoteHandler = remoteHandler,
+              navigator = navigator,
+              utils = utils,
+              statesHolder = statesHolder,
               snackbarsHolder = snackbarsHolder,
-              onDecryptToken = onDecryptToken,
               onRefresh = orders::refresh,
-              onOrderStatus = onOrderStatus,
-              onOrderId = onOrderId,
-              onNavigateToOrderEditorScreen = onNavigateToOrderEditorScreen,
-              viewModelScope = viewModelScope,
             )
           }
         }
@@ -173,6 +142,6 @@ fun PullToRefreshLazyOrdersContent(
   }
 }
 
-fun allowedToSeeOrders(profile: UserProfile): Boolean {
-  return profile != Tailor && profile != Other
+fun allowedToSeeOrders(profile: UserProfile?): Boolean {
+  return profile != null && profile != Tailor && profile != Other
 }

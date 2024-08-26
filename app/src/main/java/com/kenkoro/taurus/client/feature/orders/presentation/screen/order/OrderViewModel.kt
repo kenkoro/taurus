@@ -24,8 +24,8 @@ import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepo
 import com.kenkoro.taurus.client.feature.orders.domain.NewCutOrder
 import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterContext
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderFilterStrategy
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.OrderFilterContext
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.OrderFilterStrategy
 import com.kenkoro.taurus.client.feature.shared.data.local.LocalDatabase
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.DeleteDto
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -35,9 +35,9 @@ import kotlinx.coroutines.delay
 @Composable
 fun LoginScreen(
   modifier: Modifier = Modifier,
-  utils: LoginScreenUtils,
   remoteHandler: LoginScreenRemoteHandler,
   navigator: LoginScreenNavigator,
+  utils: LoginScreenUtils,
 ) {
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
@@ -105,9 +105,9 @@ fun LoginScreen(
         ) {
           AnimatedVisibility(visible = visible) {
             LoginContent(
-              utils = utils,
               remoteHandler = remoteHandler,
               navigator = navigator,
+              utils = utils,
               snackbarsHolder = snackbarsHolder,
             )
           }

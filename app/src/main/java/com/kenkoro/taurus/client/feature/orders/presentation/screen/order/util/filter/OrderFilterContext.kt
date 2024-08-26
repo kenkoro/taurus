@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util
+package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

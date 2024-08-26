@@ -25,8 +25,10 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderViewModel
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.profile.presentation.ProfileScreen
 import com.kenkoro.taurus.client.feature.profile.presentation.UserViewModel
 import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenNavigator
@@ -92,16 +94,18 @@ fun AppNavHost(
     return Triple(loginScreenNavigator, loginScreenRemoteHandler, loginScreenUtils)
   }
 
-  // NOTE: Refactor all these guys as well
-  val localHandler =
-    LocalHandler(
+  val (profileScreenNavigator, profileScreenUtils) = profileScreenParams()
+  val (loginScreenNavigator, loginScreenRemoteHandler, loginScreenUtils) = loginScreenParams()
+
+  val orderScreenLocalHandler =
+    OrderScreenLocalHandler(
       addNewUser = userViewModel::addNewUserLocally,
       addNewOrder = orderViewModel::addNewOrderLocally,
       deleteOrder = orderViewModel::deleteOrderLocally,
       editOrder = orderViewModel::editOrderLocally,
     )
-  val remoteHandler =
-    RemoteHandler(
+  val orderScreenRemoteHandler =
+    OrderScreenRemoteHandler(
       login = loginViewModel::login,
       getUser = userViewModel::getUser,
       addNewOrder = orderViewModel::addNewOrderRemotely,
@@ -121,8 +125,32 @@ fun AppNavHost(
       sizeState = orderEditorViewModel.size,
       titleState = orderEditorViewModel.title,
     )
-  val (profileScreenNavigator, profileScreenUtils) = profileScreenParams()
-  val (loginScreenNavigator, loginScreenRemoteHandler, loginScreenUtils) = loginScreenParams()
+  val orderScreenUtils =
+    OrderScreenUtils(
+      ordersPagingFlow = orderViewModel.ordersPagingFlow,
+      user = userViewModel.user,
+      loginState = loginViewModel.loginState,
+      network = networkStatus,
+      selectedOrderRecordId = orderViewModel.selectedOrderRecordId,
+      saveUser = userViewModel::user,
+      newOrdersFilter = orderViewModel::filterStrategy,
+      selectOrder = orderViewModel::selectOrder,
+      newLoginState = loginViewModel::loginState,
+      encryptJWToken = userViewModel::encryptToken,
+      decryptUserSubjectAndItsPassword = loginViewModel::decryptSubjectAndPassword,
+      decryptJWToken = userViewModel::decryptToken,
+      resetAllOrderStates = orderEditorViewModel::resetAll,
+      saveOrderStatus = orderEditorViewModel::status,
+      saveOrderId = orderEditorViewModel::orderId,
+      viewModelScope = orderViewModel.viewModelScope,
+    )
+  val orderScreenNavigator =
+    OrderScreenNavigator(
+      toProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
+      toOrderEditorScreen = { editOrder: Boolean ->
+        navController.navigate(Screen.OrderEditorScreen.route + "?editOrder=$editOrder")
+      },
+    )
 
   NavHost(
     navController = navController,
@@ -138,29 +166,11 @@ fun AppNavHost(
 
     composable(route = Screen.OrderScreen.route) {
       OrderScreen(
-        ordersPagingFlow = orderViewModel.ordersPagingFlow,
-        user = userViewModel.user,
-        loginState = loginViewModel.loginState,
-        networkStatus = networkStatus,
-        selectedOrderRecordId = orderViewModel.selectedOrderRecordId,
-        orderStatesHolder = orderStatesHolder,
-        onUser = userViewModel::user,
-        onFilterStrategy = orderViewModel::filterStrategy,
-        onSelectOrder = orderViewModel::selectOrder,
-        onLoginState = loginViewModel::loginState,
-        localHandler = localHandler,
-        remoteHandler = remoteHandler,
-        onEncryptToken = userViewModel::encryptToken,
-        onDecryptSubjectAndPassword = loginViewModel::decryptSubjectAndPassword,
-        onDecryptToken = userViewModel::decryptToken,
-        onResetAllOrderFields = orderEditorViewModel::resetAll,
-        onOrderStatus = orderEditorViewModel::status,
-        onOrderId = orderEditorViewModel::orderId,
-        onNavigateToProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
-        onNavigateToOrderEditorScreen = { editOrder ->
-          navController.navigate(Screen.OrderEditorScreen.route + "?editOrder=$editOrder")
-        },
-        viewModelScope = orderViewModel.viewModelScope,
+        localHandler = orderScreenLocalHandler,
+        remoteHandler = orderScreenRemoteHandler,
+        navigator = orderScreenNavigator,
+        utils = orderScreenUtils,
+        states = orderStatesHolder,
       )
     }
 
@@ -190,7 +200,7 @@ fun AppNavHost(
         userSubject = userViewModel.user?.subject ?: "",
         orderStatus = orderEditorViewModel.status,
         networkStatus = networkStatus,
-        orderStatesHolder = orderStatesHolder,
+        states = orderStatesHolder,
         editOrder = editOrder,
         onNavUp = navController::navigateUp,
         onAddNewOrderRemotely = orderViewModel::addNewOrderRemotely,

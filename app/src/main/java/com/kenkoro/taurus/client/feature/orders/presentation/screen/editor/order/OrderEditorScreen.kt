@@ -10,65 +10,63 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.feature.orders.data.remote.dto.OrderDto
 import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.OrderEditorContent
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.OrderEditorTopBar
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderEditorScreen(
   modifier: Modifier = Modifier,
-  userId: Int = 0,
-  userSubject: String = "",
-  orderStatus: OrderStatus = OrderStatus.Idle,
-  networkStatus: NetworkStatus,
-  orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
-  editOrder: Boolean = false,
-  onNavUp: () -> Unit = {},
-  onAddNewOrderRemotely: suspend (NewOrder) -> Result<OrderDto>,
-  onEditOrderRemotely: suspend (NewOrder, String) -> Boolean = { _, _ -> false },
+  remoteHandler: OrderScreenRemoteHandler,
+  navigator: OrderEditorScreenNavigator,
+  utils: OrderEditorScreenUtils,
+  states: OrderStatesHolder,
 ) {
+  val user = utils.user
+  val editOrder = utils.editOrder
+
   val validateChanges = {
-    orderStatesHolder.customerState.isValid &&
-      orderStatesHolder.titleState.isValid &&
-      orderStatesHolder.modelState.isValid &&
-      orderStatesHolder.sizeState.isValid &&
-      orderStatesHolder.colorState.isValid &&
-      orderStatesHolder.categoryState.isValid &&
-      orderStatesHolder.quantityState.isValid
+    states.customerState.isValid &&
+      states.titleState.isValid &&
+      states.modelState.isValid &&
+      states.sizeState.isValid &&
+      states.colorState.isValid &&
+      states.categoryState.isValid &&
+      states.quantityState.isValid
   }
 
   val saveChanges =
     suspend {
       val newOrder =
         NewOrder(
-          orderId = orderStatesHolder.orderIdState,
-          customer = orderStatesHolder.customerState.text,
+          orderId = states.orderIdState,
+          customer = states.customerState.text,
           date = System.currentTimeMillis(),
-          title = orderStatesHolder.titleState.text,
-          model = orderStatesHolder.modelState.text,
-          size = orderStatesHolder.sizeState.text,
-          color = orderStatesHolder.colorState.text,
-          category = orderStatesHolder.categoryState.text,
-          quantity = orderStatesHolder.quantityState.text.toIntOrNull() ?: 0,
+          title = states.titleState.text,
+          model = states.modelState.text,
+          size = states.sizeState.text,
+          color = states.colorState.text,
+          category = states.categoryState.text,
+          quantity = states.quantityState.text.toIntOrNull() ?: 0,
           status =
             if (!editOrder) {
               OrderStatus.Idle
             } else {
-              orderStatus
+              utils.orderStatus
             },
-          creatorId = userId,
+          creatorId = user?.userId ?: 0,
         )
 
       if (editOrder) {
-        onEditOrderRemotely(newOrder, userSubject)
+        remoteHandler.editOrder(newOrder, user?.subject ?: "")
       } else {
-        onAddNewOrderRemotely(newOrder).isSuccess
+        remoteHandler.addNewOrder(newOrder).isSuccess
       }
     }
 
@@ -81,8 +79,8 @@ fun OrderEditorScreen(
       topBar = {
         OrderEditorTopBar(
           editOrder = editOrder,
-          orderStatesHolder = orderStatesHolder,
-          onNavUp = onNavUp,
+          orderStatesHolder = states,
+          onNavUp = navigator.navUp,
           saveChanges = saveChanges,
           validateChanges = validateChanges,
         )
@@ -97,40 +95,13 @@ fun OrderEditorScreen(
         ) {
           OrderEditorContent(
             networkStatus = networkStatus,
-            orderStatesHolder = orderStatesHolder,
+            orderStatesHolder = states,
             onNavUp = onNavUp,
             saveChanges = saveChanges,
             validateChanges = validateChanges,
           )
         }
       },
-    )
-  }
-}
-
-@Preview
-@Composable
-private fun OrderEditorScreenPrev() {
-  val orderDto =
-    OrderDto(
-      recordId = 0,
-      orderId = 0,
-      customer = "",
-      date = 0L,
-      title = "",
-      model = "",
-      size = "",
-      color = "",
-      category = "",
-      quantity = 0,
-      status = OrderStatus.Idle,
-      creatorId = 0,
-    )
-
-  AppTheme {
-    OrderEditorScreen(
-      networkStatus = NetworkStatus.Available,
-      onAddNewOrderRemotely = { Result.success(orderDto) },
     )
   }
 }

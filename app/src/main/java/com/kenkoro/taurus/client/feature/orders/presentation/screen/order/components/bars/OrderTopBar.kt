@@ -20,51 +20,38 @@ import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
-import com.kenkoro.taurus.client.ui.theme.AppTheme
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.util.OrderScreenExtras
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
 fun OrderTopBar(
   modifier: Modifier = Modifier,
-  networkStatus: NetworkStatus,
-  isScrollingInProgress: Boolean = false,
-  userName: String? = null,
-  snackbarsHolder: SnackbarsHolder,
-  onNavigateToProfileScreen: () -> Unit,
+  utils: OrderScreenUtils,
+  snackbarsHolder: OrderScreenSnackbarsHolder,
+  navigator: OrderScreenNavigator,
+  extras: OrderScreenExtras,
 ) {
-  val notImplementedYetMessage = stringResource(id = R.string.not_implemented_yet)
-
-  val okActionLabel = stringResource(id = R.string.ok)
-
-  val onClickNotImplementedShowSnackbar =
-    suspend {
-      snackbarsHolder.snackbarHostState.showSnackbar(
-        message = notImplementedYetMessage,
-        actionLabel = okActionLabel,
-      )
-    }
-
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
   val scope = rememberCoroutineScope()
+
+  val username = extras.username
 
   Row(
     modifier =
@@ -88,12 +75,12 @@ fun OrderTopBar(
               shape = CircleShape,
               color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
-            .clickable { onNavigateToProfileScreen() },
+            .clickable { navigator.toProfileScreen() },
         contentAlignment = Alignment.Center,
         content = {
-          if (!userName.isNullOrEmpty()) {
+          if (!username.isNullOrEmpty()) {
             Text(
-              text = userName.first().toString(),
+              text = username.first().toString(),
               modifier = Modifier.fillMaxWidth(),
               textAlign = TextAlign.Center,
             )
@@ -107,9 +94,7 @@ fun OrderTopBar(
           .fillMaxHeight()
           .fillMaxWidth(.8F)
           .clickable {
-            scope.launch(Dispatchers.Main) {
-              onClickNotImplementedShowSnackbar()
-            }
+            scope.launch(Dispatchers.Main) { snackbarsHolder.notImplementedError() }
           },
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Center,
@@ -126,9 +111,7 @@ fun OrderTopBar(
         Modifier
           .size(contentHeight.topBar)
           .clickable {
-            scope.launch(Dispatchers.Main) {
-              onClickNotImplementedShowSnackbar()
-            }
+            scope.launch(Dispatchers.Main) { snackbarsHolder.notImplementedError() }
           },
     ) {
       Box(
@@ -144,25 +127,5 @@ fun OrderTopBar(
         )
       }
     }
-  }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun OrderTopBarPrev() {
-  AppTheme {
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    OrderTopBar(
-      networkStatus = NetworkStatus.Available,
-      userName = "Peter",
-      snackbarsHolder =
-        SnackbarsHolder(
-          snackbarHostState = snackbarHostState,
-          errorSnackbarHostState = snackbarHostState,
-          internetErrorSnackbarHostState = snackbarHostState,
-        ),
-      onNavigateToProfileScreen = {},
-    )
   }
 }

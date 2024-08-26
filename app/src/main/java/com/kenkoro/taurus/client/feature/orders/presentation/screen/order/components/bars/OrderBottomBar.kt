@@ -22,21 +22,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.core.local.LocalShape
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.SnackbarsHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.util.OrderScreenExtras
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 
 @Composable
 fun OrderBottomBar(
   modifier: Modifier = Modifier,
-  networkStatus: NetworkStatus,
-  isScrollingInProgress: Boolean = false,
-  snackbarsHolder: SnackbarsHolder,
-  onNavigateToOrderEditorScreen: (editOrder: Boolean) -> Unit = {},
-  onResetAllOrderFields: () -> Unit = {},
+  utils: OrderScreenUtils,
+  navigator: OrderScreenNavigator,
+  extras: OrderScreenExtras,
 ) {
   val offset = LocalOffset.current
   val shape = LocalShape.current
@@ -45,7 +44,7 @@ fun OrderBottomBar(
 
   val animatedYOffset by animateDpAsState(
     targetValue =
-      if (isScrollingInProgress) {
+      if (extras.isScrolling) {
         offset.bottomBar
       } else {
         offset.none
@@ -54,7 +53,7 @@ fun OrderBottomBar(
   )
   val animatedBottomBarHeight by animateDpAsState(
     targetValue =
-      if (isScrollingInProgress) {
+      if (extras.isScrolling) {
         contentHeight.none
       } else {
         contentHeight.bottomBar
@@ -63,7 +62,7 @@ fun OrderBottomBar(
   )
   val animatedBottomBarButtonHeight by animateDpAsState(
     targetValue =
-      if (isScrollingInProgress) {
+      if (extras.isScrolling) {
         contentHeight.none
       } else {
         contentHeight.halfStandard
@@ -86,8 +85,8 @@ fun OrderBottomBar(
           .width(contentWidth.orderItem)
           .height(animatedBottomBarButtonHeight),
       onClick = {
-        onResetAllOrderFields()
-        onNavigateToOrderEditorScreen(false)
+        utils.resetAllOrderStates()
+        navigator.toOrderEditorScreen(false)
       },
       shape = RoundedCornerShape(shape.medium),
     ) {

@@ -20,13 +20,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,7 +33,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.core.text.isDigitsOnly
 import com.kenkoro.taurus.client.R
@@ -44,39 +41,31 @@ import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
-import com.kenkoro.taurus.client.feature.login.data.mappers.toUserDto
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toCutOrder
-import com.kenkoro.taurus.client.feature.orders.data.mappers.toCutOrderDto
-import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrderDto
-import com.kenkoro.taurus.client.feature.orders.data.remote.dto.ActualCutOrdersQuantityDto
-import com.kenkoro.taurus.client.feature.orders.domain.CutOrder
 import com.kenkoro.taurus.client.feature.orders.domain.NewCutOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
-import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.LocalHandler
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.handlers.RemoteHandler
-import com.kenkoro.taurus.client.feature.profile.domain.User
-import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
-import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
-import com.kenkoro.taurus.client.ui.theme.AppTheme
-import kotlinx.coroutines.CoroutineScope
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun ActualCutOrdersQuantityDialog(
   modifier: Modifier = Modifier,
   order: Order,
-  cutterId: Int = 0,
-  userSubject: String? = null,
-  localHandler: LocalHandler = LocalHandler(),
-  remoteHandler: RemoteHandler,
+  localHandler: OrderScreenLocalHandler,
+  remoteHandler: OrderScreenRemoteHandler,
+  utils: OrderScreenUtils,
+  snackbarsHolder: OrderScreenSnackbarsHolder,
   closeCutterDialog: () -> Unit = {},
   onHideWithDelay: suspend () -> Unit = {},
   onRefresh: () -> Unit = {},
-  onApiErrorShowSnackbar: suspend () -> SnackbarResult,
-  viewModelScope: CoroutineScope,
 ) {
+  val user = utils.user
+
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
@@ -105,7 +94,7 @@ fun ActualCutOrdersQuantityDialog(
           orderId = order.orderId,
           date = System.currentTimeMillis(),
           quantity = actualCutOrdersQuantityToInt(),
-          cutterId = cutterId,
+          cutterId = user?.userId ?: 0,
           comment = "",
         ),
       )
@@ -117,19 +106,16 @@ fun ActualCutOrdersQuantityDialog(
       val cutOrder = order.toCutOrder()
       localHandler.editOrder(cutOrder, order.orderId)
       val wasAcknowledged =
-        remoteHandler.editOrder(
-          cutOrder,
-          userSubject ?: "",
-        )
+        remoteHandler.editOrder(cutOrder, user?.subject ?: "")
       if (wasAcknowledged) {
         onRefresh()
       } else {
-        onApiErrorShowSnackbar()
+        withContext(Dispatchers.Main) { snackbarsHolder.apiError() }
       }
     }
   val onSubmit = {
     if (actualCutOrdersQuantity.isNotBlank()) {
-      viewModelScope.launch(Dispatchers.IO) {
+      utils.viewModelScope.launch(Dispatchers.IO) {
         isLoading = true
         onAddNewCutOrder()
         isLoading = false
@@ -202,65 +188,5 @@ fun ActualCutOrdersQuantityDialog(
         }
       }
     }
-  }
-}
-
-@Preview
-@Composable
-private fun ActualCutOrdersQuantityDialogPrev() {
-  val cutOrder =
-    CutOrder(
-      cutOrderId = 0,
-      orderId = 419,
-      date = 0L,
-      quantity = 3,
-      cutterId = 0,
-      comment = "",
-    )
-  val order =
-    Order(
-      recordId = 0,
-      orderId = 0,
-      customer = "Customer",
-      date = 0L,
-      title = "Title",
-      model = "Model",
-      size = "Size",
-      color = "Color",
-      category = "Category",
-      quantity = 0,
-      status = OrderStatus.Idle,
-      creatorId = 0,
-    )
-  val user =
-    User(
-      userId = 0,
-      subject = "Subject",
-      password = "Password",
-      image = "Image",
-      firstName = "FirstName",
-      lastName = "LastName",
-      email = "Email",
-      profile = Other,
-      salt = "Salt",
-    )
-  val remoteHandler =
-    RemoteHandler(
-      login = { _, _ -> Result.success(TokenDto("")) },
-      getUser = { _, _ -> Result.success(user.toUserDto()) },
-      addNewOrder = { _ -> Result.success(order.toOrderDto()) },
-      addNewCutOrder = { _ -> Result.success(cutOrder.toCutOrderDto()) },
-      getActualCutOrdersQuantity = { _ ->
-        Result.success(ActualCutOrdersQuantityDto(cutOrder.quantity))
-      },
-    )
-
-  AppTheme {
-    ActualCutOrdersQuantityDialog(
-      remoteHandler = remoteHandler,
-      order = order,
-      onApiErrorShowSnackbar = { SnackbarResult.Dismissed },
-      viewModelScope = rememberCoroutineScope(),
-    )
   }
 }
