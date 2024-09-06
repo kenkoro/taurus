@@ -14,6 +14,7 @@ import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.OrderEditorContent
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.OrderEditorTopBar
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.util.OrderEditorScreenExtras
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
@@ -69,6 +70,11 @@ fun OrderEditorScreen(
         remoteHandler.addNewOrder(newOrder).isSuccess
       }
     }
+  val extras =
+    OrderEditorScreenExtras(
+      saveChanges = saveChanges,
+      validateChanges = validateChanges,
+    )
 
   AppTheme {
     Scaffold(
@@ -79,10 +85,9 @@ fun OrderEditorScreen(
       topBar = {
         OrderEditorTopBar(
           editOrder = editOrder,
-          orderStatesHolder = states,
-          onNavUp = navigator.navUp,
-          saveChanges = saveChanges,
-          validateChanges = validateChanges,
+          states = states,
+          navigator = navigator,
+          extras = extras,
         )
       },
       content = { paddingValues ->
@@ -94,11 +99,10 @@ fun OrderEditorScreen(
               .padding(paddingValues),
         ) {
           OrderEditorContent(
-            networkStatus = networkStatus,
-            orderStatesHolder = states,
-            onNavUp = onNavUp,
-            saveChanges = saveChanges,
-            validateChanges = validateChanges,
+            networkStatus = utils.network,
+            states = states,
+            navigator = navigator,
+            extras = extras,
           )
         }
       },

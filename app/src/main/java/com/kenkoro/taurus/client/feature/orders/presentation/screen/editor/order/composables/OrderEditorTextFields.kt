@@ -24,6 +24,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.util.OrderEditorScreenExtras
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.TextFieldValidationService
 import com.kenkoro.taurus.client.feature.shared.components.TaurusIcon
@@ -34,10 +36,9 @@ import kotlinx.coroutines.withContext
 @Composable
 fun OrderEditorTextFields(
   modifier: Modifier = Modifier,
-  orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
-  onNavUp: () -> Unit = {},
-  saveChanges: suspend () -> Boolean = { false },
-  validateChanges: () -> Boolean = { false },
+  states: OrderStatesHolder = OrderStatesHolder(),
+  navigator: OrderEditorScreenNavigator,
+  extras: OrderEditorScreenExtras,
 ) {
   val scope = rememberCoroutineScope()
   val focusManager = LocalFocusManager.current
@@ -47,13 +48,13 @@ fun OrderEditorTextFields(
     focusManager.clearFocus()
 
     scope.launch(Dispatchers.IO) {
-      if (validateChanges()) {
-        val result = saveChanges()
+      if (extras.validateChanges()) {
+        val result = extras.saveChanges()
         if (result) {
-          withContext(Dispatchers.Main) { onNavUp() }
+          withContext(Dispatchers.Main) { navigator.navUp() }
         }
       } else {
-        TextFieldValidationService.checkAll(orderStatesHolder)
+        TextFieldValidationService.checkAll(states)
       }
     }
   }
@@ -69,13 +70,13 @@ fun OrderEditorTextFields(
   ) {
     Spacer(modifier = Modifier.height(contentHeight.medium))
     TaurusDropDown(
-      state = orderStatesHolder.customerState,
+      state = states.customerState,
       choices = customers(),
       leadingIcon = {
         TaurusIcon(
           imageVector = Icons.Default.Person,
           contentDescription = "CustomerLeadingIcon",
-          isError = orderStatesHolder.customerState.showErrors(),
+          isError = states.customerState.showErrors(),
         )
       },
       supportingText = {
@@ -87,13 +88,13 @@ fun OrderEditorTextFields(
     )
     Spacer(modifier = Modifier.height(contentHeight.large))
     TaurusDropDown(
-      state = orderStatesHolder.titleState,
+      state = states.titleState,
       choices = titles(),
       leadingIcon = {
         TaurusIcon(
           imageVector = Icons.Default.Title,
           contentDescription = "TitleLeadingIcon",
-          isError = orderStatesHolder.titleState.showErrors(),
+          isError = states.titleState.showErrors(),
         )
       },
       supportingText = { Text(text = stringResource(id = R.string.order_title_supporting_text)) },
@@ -101,13 +102,13 @@ fun OrderEditorTextFields(
     )
     Spacer(modifier = Modifier.height(contentHeight.large))
     TaurusDropDown(
-      state = orderStatesHolder.modelState,
+      state = states.modelState,
       choices = emptyList(),
       leadingIcon = {
         TaurusIcon(
           imageVector = Icons.Default.Group,
           contentDescription = "ModelLeadingIcon",
-          isError = orderStatesHolder.modelState.showErrors(),
+          isError = states.modelState.showErrors(),
         )
       },
       supportingText = { Text(text = stringResource(id = R.string.order_model_supporting_text)) },
@@ -115,13 +116,13 @@ fun OrderEditorTextFields(
     )
     Spacer(modifier = Modifier.height(contentHeight.large))
     TaurusDropDown(
-      state = orderStatesHolder.sizeState,
+      state = states.sizeState,
       choices = sizes(),
       leadingIcon = {
         TaurusIcon(
           imageVector = Icons.Default.FormatSize,
           contentDescription = "SizeLeadingIcon",
-          isError = orderStatesHolder.sizeState.showErrors(),
+          isError = states.sizeState.showErrors(),
         )
       },
       supportingText = { Text(text = stringResource(id = R.string.order_size_supporting_text)) },
@@ -129,13 +130,13 @@ fun OrderEditorTextFields(
     )
     Spacer(modifier = Modifier.height(contentHeight.large))
     TaurusDropDown(
-      state = orderStatesHolder.colorState,
+      state = states.colorState,
       choices = emptyList(),
       leadingIcon = {
         TaurusIcon(
           imageVector = Icons.Default.Colorize,
           contentDescription = "ColorLeadingIcon",
-          isError = orderStatesHolder.colorState.showErrors(),
+          isError = states.colorState.showErrors(),
         )
       },
       supportingText = { Text(text = stringResource(id = R.string.order_color_supporting_text)) },
@@ -143,13 +144,13 @@ fun OrderEditorTextFields(
     )
     Spacer(modifier = Modifier.height(contentHeight.large))
     TaurusDropDown(
-      state = orderStatesHolder.colorState,
+      state = states.colorState,
       choices = emptyList(),
       leadingIcon = {
         TaurusIcon(
           imageVector = Icons.Default.Category,
           contentDescription = "CategoryLeadingIcon",
-          isError = orderStatesHolder.categoryState.showErrors(),
+          isError = states.categoryState.showErrors(),
         )
       },
       supportingText = {
@@ -161,7 +162,7 @@ fun OrderEditorTextFields(
     )
     Spacer(modifier = Modifier.height(contentHeight.large))
     OrderQuantity(
-      quantityState = orderStatesHolder.quantityState,
+      quantityState = states.quantityState,
       onImeAction = { onSubmit() },
     )
   }

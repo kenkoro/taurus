@@ -22,15 +22,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
-import com.kenkoro.taurus.client.feature.orders.data.remote.dto.OrderDto
-import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.util.OrderEditorScreenExtras
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.TextFieldValidationService
-import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,10 +37,9 @@ import kotlinx.coroutines.withContext
 fun OrderEditorTopBar(
   modifier: Modifier = Modifier,
   editOrder: Boolean = false,
-  orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
-  onNavUp: () -> Unit = {},
-  saveChanges: suspend () -> Boolean = { false },
-  validateChanges: () -> Boolean = { false },
+  states: OrderStatesHolder = OrderStatesHolder(),
+  navigator: OrderEditorScreenNavigator,
+  extras: OrderEditorScreenExtras,
 ) {
   val scope = rememberCoroutineScope()
   val contentWidth = LocalContentWidth.current
@@ -61,7 +58,7 @@ fun OrderEditorTopBar(
       modifier =
         Modifier
           .size(contentHeight.topBar)
-          .clickable { onNavUp() },
+          .clickable { navigator.navUp() },
       contentAlignment = Alignment.Center,
     ) {
       Icon(
@@ -92,13 +89,13 @@ fun OrderEditorTopBar(
           .size(contentHeight.topBar)
           .clickable {
             scope.launch(Dispatchers.IO) {
-              if (validateChanges()) {
-                val result = saveChanges()
+              if (extras.validateChanges()) {
+                val result = extras.saveChanges()
                 if (result) {
-                  withContext(Dispatchers.Main) { onNavUp() }
+                  withContext(Dispatchers.Main) { navigator.navUp() }
                 }
               } else {
-                TextFieldValidationService.checkAll(orderStatesHolder)
+                TextFieldValidationService.checkAll(states)
               }
             }
           },
@@ -109,29 +106,5 @@ fun OrderEditorTopBar(
         contentDescription = "SaveOrderDetailsChanges",
       )
     }
-  }
-}
-
-@Preview
-@Composable
-private fun OrderEditorTopBarPrev() {
-  val orderDto =
-    OrderDto(
-      recordId = 0,
-      orderId = 0,
-      customer = "",
-      date = 0L,
-      title = "",
-      model = "",
-      size = "",
-      color = "",
-      category = "",
-      quantity = 0,
-      status = OrderStatus.Idle,
-      creatorId = 0,
-    )
-
-  AppTheme {
-    OrderEditorTopBar()
   }
 }

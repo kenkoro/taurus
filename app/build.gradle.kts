@@ -39,12 +39,21 @@ android {
   namespace = "com.kenkoro.taurus.client"
   compileSdk = 34
 
+  applicationVariants.all {
+    outputs
+      .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+      .forEach { output ->
+        val outputFileName = "taurus-$baseName-$versionName-$versionCode.apk"
+        output.outputFileName = outputFileName
+      }
+  }
+
   defaultConfig {
     applicationId = "com.kenkoro.taurus.client"
     minSdk = 24
     targetSdk = 34
     versionCode = 1
-    versionName = "0.1.31"
+    versionName = "0.1.53"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables {

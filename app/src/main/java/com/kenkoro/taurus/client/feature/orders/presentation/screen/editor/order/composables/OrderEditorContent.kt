@@ -13,21 +13,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.tooling.preview.Preview
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.util.OrderEditorScreenExtras
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
-import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderEditorContent(
   modifier: Modifier = Modifier,
   networkStatus: NetworkStatus,
-  orderStatesHolder: OrderStatesHolder = OrderStatesHolder(),
-  onNavUp: () -> Unit = {},
-  saveChanges: suspend () -> Boolean = { false },
-  validateChanges: () -> Boolean = { false },
+  states: OrderStatesHolder = OrderStatesHolder(),
+  navigator: OrderEditorScreenNavigator,
+  extras: OrderEditorScreenExtras,
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
@@ -48,18 +47,9 @@ fun OrderEditorContent(
     Spacer(modifier = Modifier.height(contentHeight.extraLarge))
     OrderEditorTextFields(
       modifier = Modifier.width(contentWidth.standard),
-      orderStatesHolder = orderStatesHolder,
-      saveChanges = saveChanges,
-      onNavUp = onNavUp,
-      validateChanges = validateChanges,
+      states = states,
+      navigator = navigator,
+      extras = extras,
     )
-  }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun OrderEditorContentPrev() {
-  AppTheme {
-    OrderEditorContent(networkStatus = NetworkStatus.Available)
   }
 }

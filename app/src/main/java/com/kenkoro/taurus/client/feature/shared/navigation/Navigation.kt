@@ -22,6 +22,8 @@ import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenRemo
 import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorViewModel
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderViewModel
@@ -94,63 +96,76 @@ fun AppNavHost(
     return Triple(loginScreenNavigator, loginScreenRemoteHandler, loginScreenUtils)
   }
 
+  fun orderScreenParams(): Triple<OrderScreenNavigator, OrderScreenUtils, OrderStatesHolder> {
+    val orderScreenNavigator =
+      OrderScreenNavigator(
+        toProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
+        toOrderEditorScreen = { editOrder: Boolean ->
+          navController.navigate(Screen.OrderEditorScreen.route + "?editOrder=$editOrder")
+        },
+      )
+    val orderScreenUtils =
+      OrderScreenUtils(
+        ordersPagingFlow = orderViewModel.ordersPagingFlow,
+        user = userViewModel.user,
+        loginState = loginViewModel.loginState,
+        network = networkStatus,
+        selectedOrderRecordId = orderViewModel.selectedOrderRecordId,
+        saveUser = userViewModel::user,
+        newOrdersFilter = orderViewModel::filterStrategy,
+        selectOrder = orderViewModel::selectOrder,
+        newLoginState = loginViewModel::loginState,
+        encryptJWToken = userViewModel::encryptToken,
+        decryptUserSubjectAndItsPassword = loginViewModel::decryptSubjectAndPassword,
+        decryptJWToken = userViewModel::decryptToken,
+        resetAllOrderStates = orderEditorViewModel::resetAll,
+        saveOrderStatus = orderEditorViewModel::status,
+        saveOrderId = orderEditorViewModel::orderId,
+        viewModelScope = orderViewModel.viewModelScope,
+      )
+    val orderStatesHolder =
+      OrderStatesHolder(
+        categoryState = orderEditorViewModel.category,
+        colorState = orderEditorViewModel.color,
+        customerState = orderEditorViewModel.customer,
+        modelState = orderEditorViewModel.model,
+        orderIdState = orderEditorViewModel.orderId,
+        quantityState = orderEditorViewModel.quantity,
+        sizeState = orderEditorViewModel.size,
+        titleState = orderEditorViewModel.title,
+      )
+
+    return Triple(orderScreenNavigator, orderScreenUtils, orderStatesHolder)
+  }
+
+  fun orderScreenHandlers(): Pair<OrderScreenLocalHandler, OrderScreenRemoteHandler> {
+    val orderScreenLocalHandler =
+      OrderScreenLocalHandler(
+        addNewUser = userViewModel::addNewUserLocally,
+        addNewOrder = orderViewModel::addNewOrderLocally,
+        deleteOrder = orderViewModel::deleteOrderLocally,
+        editOrder = orderViewModel::editOrderLocally,
+      )
+    val orderScreenRemoteHandler =
+      OrderScreenRemoteHandler(
+        login = loginViewModel::login,
+        getUser = userViewModel::getUser,
+        addNewOrder = orderViewModel::addNewOrderRemotely,
+        deleteOrder = orderViewModel::deleteOrderRemotely,
+        editOrder = orderEditorViewModel::editOrderRemotely,
+        addNewCutOrder = orderViewModel::addNewCutOrderRemotely,
+        getActualCutOrdersQuantity = orderViewModel::getActualCutOrdersQuantity,
+      )
+
+    return Pair(orderScreenLocalHandler, orderScreenRemoteHandler)
+  }
+
   val (profileScreenNavigator, profileScreenUtils) = profileScreenParams()
   val (loginScreenNavigator, loginScreenRemoteHandler, loginScreenUtils) = loginScreenParams()
+  val (orderScreenNavigator, orderScreenUtils, orderStatesHolder) = orderScreenParams()
+  val (orderScreenLocalHandler, orderScreenRemoteHandler) = orderScreenHandlers()
 
-  val orderScreenLocalHandler =
-    OrderScreenLocalHandler(
-      addNewUser = userViewModel::addNewUserLocally,
-      addNewOrder = orderViewModel::addNewOrderLocally,
-      deleteOrder = orderViewModel::deleteOrderLocally,
-      editOrder = orderViewModel::editOrderLocally,
-    )
-  val orderScreenRemoteHandler =
-    OrderScreenRemoteHandler(
-      login = loginViewModel::login,
-      getUser = userViewModel::getUser,
-      addNewOrder = orderViewModel::addNewOrderRemotely,
-      deleteOrder = orderViewModel::deleteOrderRemotely,
-      editOrder = orderEditorViewModel::editOrderRemotely,
-      addNewCutOrder = orderViewModel::addNewCutOrderRemotely,
-      getActualCutOrdersQuantity = orderViewModel::getActualCutOrdersQuantity,
-    )
-  val orderStatesHolder =
-    OrderStatesHolder(
-      categoryState = orderEditorViewModel.category,
-      colorState = orderEditorViewModel.color,
-      customerState = orderEditorViewModel.customer,
-      modelState = orderEditorViewModel.model,
-      orderIdState = orderEditorViewModel.orderId,
-      quantityState = orderEditorViewModel.quantity,
-      sizeState = orderEditorViewModel.size,
-      titleState = orderEditorViewModel.title,
-    )
-  val orderScreenUtils =
-    OrderScreenUtils(
-      ordersPagingFlow = orderViewModel.ordersPagingFlow,
-      user = userViewModel.user,
-      loginState = loginViewModel.loginState,
-      network = networkStatus,
-      selectedOrderRecordId = orderViewModel.selectedOrderRecordId,
-      saveUser = userViewModel::user,
-      newOrdersFilter = orderViewModel::filterStrategy,
-      selectOrder = orderViewModel::selectOrder,
-      newLoginState = loginViewModel::loginState,
-      encryptJWToken = userViewModel::encryptToken,
-      decryptUserSubjectAndItsPassword = loginViewModel::decryptSubjectAndPassword,
-      decryptJWToken = userViewModel::decryptToken,
-      resetAllOrderStates = orderEditorViewModel::resetAll,
-      saveOrderStatus = orderEditorViewModel::status,
-      saveOrderId = orderEditorViewModel::orderId,
-      viewModelScope = orderViewModel.viewModelScope,
-    )
-  val orderScreenNavigator =
-    OrderScreenNavigator(
-      toProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
-      toOrderEditorScreen = { editOrder: Boolean ->
-        navController.navigate(Screen.OrderEditorScreen.route + "?editOrder=$editOrder")
-      },
-    )
+  val orderEditorScreenNavigator = OrderEditorScreenNavigator(navController::navigateUp)
 
   NavHost(
     navController = navController,
@@ -194,17 +209,19 @@ fun AppNavHost(
         ),
     ) {
       val editOrder = it.arguments?.getBoolean("editOrder") ?: false
+      val orderEditorScreenUtils =
+        OrderEditorScreenUtils(
+          user = userViewModel.user,
+          orderStatus = orderEditorViewModel.status,
+          network = networkStatus,
+          editOrder = editOrder,
+        )
 
       OrderEditorScreen(
-        userId = userViewModel.user?.userId ?: 0,
-        userSubject = userViewModel.user?.subject ?: "",
-        orderStatus = orderEditorViewModel.status,
-        networkStatus = networkStatus,
+        remoteHandler = orderScreenRemoteHandler,
+        navigator = orderEditorScreenNavigator,
+        utils = orderEditorScreenUtils,
         states = orderStatesHolder,
-        editOrder = editOrder,
-        onNavUp = navController::navigateUp,
-        onAddNewOrderRemotely = orderViewModel::addNewOrderRemotely,
-        onEditOrderRemotely = orderEditorViewModel::editOrderRemotely,
       )
     }
   }
