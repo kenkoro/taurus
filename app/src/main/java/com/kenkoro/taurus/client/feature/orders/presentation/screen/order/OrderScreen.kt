@@ -50,6 +50,7 @@ fun OrderScreen(
   val paginatedOrdersErrorMessage = stringResource(id = R.string.paginated_orders_error)
   val orderAccessErrorMessage = stringResource(id = R.string.orders_access_error)
   val apiRequestErrorMessage = stringResource(id = R.string.request_error)
+  val orderWasDeletedMessage = stringResource(id = R.string.order_was_deleted)
 
   val okActionLabel = stringResource(id = R.string.ok)
 
@@ -59,12 +60,14 @@ fun OrderScreen(
         snackbarHostState.showSnackbar(
           message = notImplementedYetMessage,
           actionLabel = okActionLabel,
+          duration = SnackbarDuration.Short,
         )
       },
       loginError = {
         errorSnackbarHostState.showSnackbar(
           message = loginErrorMessage,
           actionLabel = okActionLabel,
+          duration = SnackbarDuration.Long,
         )
       },
       internetConnectionError = {
@@ -77,18 +80,28 @@ fun OrderScreen(
         errorSnackbarHostState.showSnackbar(
           message = paginatedOrdersErrorMessage,
           actionLabel = okActionLabel,
+          duration = SnackbarDuration.Long,
         )
       },
       accessToOrdersError = {
         errorSnackbarHostState.showSnackbar(
           message = orderAccessErrorMessage,
           actionLabel = okActionLabel,
+          duration = SnackbarDuration.Long,
         )
       },
       apiError = {
         errorSnackbarHostState.showSnackbar(
           message = apiRequestErrorMessage,
           actionLabel = okActionLabel,
+          duration = SnackbarDuration.Long,
+        )
+      },
+      orderWasDeleted = { orderId ->
+        snackbarHostState.showSnackbar(
+          message = "$orderWasDeletedMessage $orderId",
+          actionLabel = okActionLabel,
+          duration = SnackbarDuration.Short,
         )
       },
     )

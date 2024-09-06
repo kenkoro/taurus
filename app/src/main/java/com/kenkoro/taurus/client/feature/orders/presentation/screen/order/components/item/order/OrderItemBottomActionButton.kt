@@ -81,6 +81,7 @@ fun OrderItemBottomActionButton(
 
               if (wasAcknowledged) {
                 onRefresh()
+                withContext(Dispatchers.Main) { snackbarsHolder.orderWasDeleted(order.orderId) }
               } else {
                 withContext(Dispatchers.Main) { snackbarsHolder.apiError() }
               }

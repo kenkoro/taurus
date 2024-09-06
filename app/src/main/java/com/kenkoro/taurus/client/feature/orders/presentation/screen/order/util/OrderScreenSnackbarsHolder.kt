@@ -9,4 +9,5 @@ data class OrderScreenSnackbarsHolder(
   val getPaginatedOrdersError: suspend () -> SnackbarResult,
   val accessToOrdersError: suspend () -> SnackbarResult,
   val apiError: suspend () -> SnackbarResult,
+  val orderWasDeleted: suspend (orderId: Int) -> SnackbarResult,
 )

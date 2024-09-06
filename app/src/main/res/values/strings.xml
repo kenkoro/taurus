@@ -24,7 +24,7 @@
     <string name="order_customer">Заказчик</string>
     <string name="order_quantity">Количество</string>
     <string name="cancel">Отмена</string>
-    <string name="order_was_deleted">Заказ удален</string>
+    <string name="order_was_deleted">Был удален заказ</string>
     <string name="all_orders">Все заказы</string>
     <string name="paginated_orders_error">Не удалось загрузить заказы</string>
     <string name="login_fail">Не удалось войти</string>
