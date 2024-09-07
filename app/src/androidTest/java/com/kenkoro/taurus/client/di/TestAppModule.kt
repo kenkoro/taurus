@@ -49,6 +49,8 @@ object TestAppModule {
       }
     }
 
+  @Provides
+  @Singleton
   fun provideLocalDatabase(app: Application): LocalDatabase {
     return Room.inMemoryDatabaseBuilder(
       app,
