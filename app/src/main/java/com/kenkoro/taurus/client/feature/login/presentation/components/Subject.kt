@@ -22,12 +22,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.core.androidTest.E2ETestTags
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.login.presentation.util.SubjectState
@@ -73,7 +73,7 @@ fun Subject(
             subjectState.enableShowErrors()
           }
         }
-        .testTag(E2ETestTags.SUBJECT_TEXT_FIELD),
+        .semantics { contentDescription = "LoginScreenSubjectTextField" },
     value = subjectState.text,
     onValueChange = {
       if (it.length <= 20) {

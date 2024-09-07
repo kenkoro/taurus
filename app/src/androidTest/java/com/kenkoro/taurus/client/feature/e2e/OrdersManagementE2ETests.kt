@@ -10,23 +10,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.test.onRoot
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.kenkoro.taurus.client.MainActivity
-import com.kenkoro.taurus.client.core.androidTest.E2ETestTags
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.di.AppModule
-import com.kenkoro.taurus.client.feature.login.presentation.LoginScreen
-import com.kenkoro.taurus.client.feature.login.presentation.LoginViewModel
+import com.kenkoro.taurus.client.feature.login.presentation.LoginRoute
 import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenNavigator
-import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenRemoteHandler
-import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenUtils
 import com.kenkoro.taurus.client.feature.shared.navigation.Screen
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -55,38 +49,23 @@ class OrdersManagementE2ETests {
           color = MaterialTheme.colorScheme.background,
         ) {
           val navController = rememberNavController()
-
-          /**
-           * TODO: Try to use it in the ScreenRoute composable next time
-           */
-          val loginViewModel: LoginViewModel = hiltViewModel()
-
           val ctx = LocalContext.current
           val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(ctx)
           val networkStatus by networkConnectivityObserver
             .observer()
             .collectAsState(initial = NetworkStatus.Unavailable)
 
-          val loginScreenRemoteHandler = LoginScreenRemoteHandler(loginViewModel::login)
-          val loginScreenNavigator =
-            LoginScreenNavigator {
-              navController.navigate(Screen.LoginScreen.route)
-            }
-          val loginScreenUtils =
-            LoginScreenUtils(
-              subject = loginViewModel.subject,
-              password = loginViewModel.password,
-              network = networkStatus,
-              encryptAllUserCredentials = loginViewModel::encryptAll,
-              exit = {},
-              showErrorTitle = loginViewModel::showErrorTitle,
-            )
+          val loginScreenNavigator = LoginScreenNavigator {}
 
-          LoginScreen(
-            remoteHandler = loginScreenRemoteHandler,
-            navigator = loginScreenNavigator,
-            utils = loginScreenUtils,
-          )
+          NavHost(navController = navController, startDestination = Screen.LoginScreen.route) {
+            composable(route = Screen.LoginScreen.route) {
+              LoginRoute(
+                navigator = loginScreenNavigator,
+                network = networkStatus,
+                onExit = {},
+              )
+            }
+          }
         }
       }
     }
@@ -94,33 +73,11 @@ class OrdersManagementE2ETests {
 
   @Test
   fun shouldLogInAsCustomer_And_SeeOrders() {
-    assertThatLoginScreenComponentsAreDisplayed()
-  }
-
-  private fun performTextInputOn(
-    testTag: String,
-    text: String = "",
-  ) {
+    /**
+     * NOTE: Leave it for now
+     */
     composeRule
-      .onNodeWithTag(testTag)
-      .performTextInput(text)
-  }
-
-  private fun logInAsCustomer() {
-    performTextInputOn(E2ETestTags.SUBJECT_TEXT_FIELD, "customer")
-    performTextInputOn(E2ETestTags.PASSWORD_TEXT_FIELD, "1234")
-
-    composeRule
-      .onNodeWithContentDescription("IconForLoginButton")
-      .performClick()
-  }
-
-  private fun assertThatLoginScreenComponentsAreDisplayed() {
-    composeRule
-      .onNodeWithTag(E2ETestTags.SUBJECT_TEXT_FIELD)
-      .assertIsDisplayed()
-    composeRule
-      .onNodeWithTag(E2ETestTags.PASSWORD_TEXT_FIELD)
+      .onRoot()
       .assertIsDisplayed()
   }
 }

@@ -15,11 +15,9 @@ import androidx.navigation.navArgument
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.feature.login.presentation.LoginScreen
+import com.kenkoro.taurus.client.feature.login.presentation.LoginRoute
 import com.kenkoro.taurus.client.feature.login.presentation.LoginViewModel
 import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenNavigator
-import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenRemoteHandler
-import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorViewModel
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
@@ -39,10 +37,6 @@ import com.kenkoro.taurus.client.feature.shared.navigation.util.AppNavHostUtils
 
 typealias PSNavigator = ProfileScreenNavigator
 typealias PSUtils = ProfileScreenUtils
-
-typealias LSNavigator = LoginScreenNavigator
-typealias LSRemoteHandler = LoginScreenRemoteHandler
-typealias LSUtils = LoginScreenUtils
 
 @Composable
 fun AppNavHost(
@@ -75,25 +69,6 @@ fun AppNavHost(
       )
 
     return Pair(profileScreenNavigator, profileScreenUtils)
-  }
-
-  fun loginScreenParams(): Triple<LSNavigator, LSRemoteHandler, LSUtils> {
-    val loginScreenNavigator =
-      LoginScreenNavigator {
-        navController.navigate(Screen.OrderScreen.route)
-      }
-    val loginScreenRemoteHandler = LoginScreenRemoteHandler(loginViewModel::login)
-    val loginScreenUtils =
-      LoginScreenUtils(
-        subject = loginViewModel.subject,
-        password = loginViewModel.password,
-        network = networkStatus,
-        encryptAllUserCredentials = loginViewModel::encryptAll,
-        exit = utils.exit,
-        showErrorTitle = loginViewModel::showErrorTitle,
-      )
-
-    return Triple(loginScreenNavigator, loginScreenRemoteHandler, loginScreenUtils)
   }
 
   fun orderScreenParams(): Triple<OrderScreenNavigator, OrderScreenUtils, OrderStatesHolder> {
@@ -160,8 +135,12 @@ fun AppNavHost(
     return Pair(orderScreenLocalHandler, orderScreenRemoteHandler)
   }
 
+  val loginScreenNavigator =
+    LoginScreenNavigator {
+      navController.navigate(Screen.OrderScreen.route)
+    }
+
   val (profileScreenNavigator, profileScreenUtils) = profileScreenParams()
-  val (loginScreenNavigator, loginScreenRemoteHandler, loginScreenUtils) = loginScreenParams()
   val (orderScreenNavigator, orderScreenUtils, orderStatesHolder) = orderScreenParams()
   val (orderScreenLocalHandler, orderScreenRemoteHandler) = orderScreenHandlers()
 
@@ -172,10 +151,10 @@ fun AppNavHost(
     startDestination = startDestination,
   ) {
     composable(route = Screen.LoginScreen.route) {
-      LoginScreen(
-        utils = loginScreenUtils,
-        remoteHandler = loginScreenRemoteHandler,
+      LoginRoute(
         navigator = loginScreenNavigator,
+        network = networkStatus,
+        onExit = utils.exit,
       )
     }
 
