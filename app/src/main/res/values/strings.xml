@@ -72,4 +72,6 @@
     <string name="actual_cut_orders_quantity_dialog_label">Фактически раскроено</string>
     <string name="empty_text_field">-</string>
     <string name="order_actual_quantity">Фактическое кол-во</string>
+    <string name="order_details_customer">Выбор заказчика</string>
+    <string name="order_details_search_bar">Поиск</string>
 </resources>

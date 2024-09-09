@@ -27,14 +27,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.core.androidTest.E2ETestTags
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.login.presentation.util.PasswordState
@@ -82,8 +80,7 @@ fun Password(
           if (!passwordState.isFocused) {
             passwordState.enableShowErrors()
           }
-        }
-        .testTag(E2ETestTags.PASSWORD_TEXT_FIELD),
+        },
     value = passwordState.text,
     onValueChange = {
       if (it.length <= 20) {
