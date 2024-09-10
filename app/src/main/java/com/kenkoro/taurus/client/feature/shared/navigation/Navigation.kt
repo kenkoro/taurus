@@ -35,6 +35,9 @@ import com.kenkoro.taurus.client.feature.profile.presentation.ProfileScreen
 import com.kenkoro.taurus.client.feature.profile.presentation.UserViewModel
 import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenNavigator
 import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenUtils
+import com.kenkoro.taurus.client.feature.search.order.details.presentation.OrderDetailsSearchScreen
+import com.kenkoro.taurus.client.feature.search.order.details.presentation.OrderDetailsSearchViewModel
+import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
 import com.kenkoro.taurus.client.feature.shared.navigation.util.AppNavHostUtils
 
 typealias PSNavigator = ProfileScreenNavigator
@@ -53,6 +56,7 @@ fun AppNavHost(
   val orderViewModel: OrderViewModel = hiltViewModel()
   val userViewModel: UserViewModel = hiltViewModel()
   val orderEditorViewModel: OrderEditorViewModel = hiltViewModel()
+  val orderDetailsSearchViewModel: OrderDetailsSearchViewModel = hiltViewModel()
 
   val context = LocalContext.current
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
@@ -165,7 +169,15 @@ fun AppNavHost(
   val (orderScreenNavigator, orderScreenUtils, orderStatesHolder) = orderScreenParams()
   val (orderScreenLocalHandler, orderScreenRemoteHandler) = orderScreenHandlers()
 
-  val orderEditorScreenNavigator = OrderEditorScreenNavigator(navController::navigateUp)
+  val orderEditorScreenNavigator =
+    OrderEditorScreenNavigator(
+      navUp = navController::navigateUp,
+      toOrderDetailsSearchScreen = {
+        navController.navigate(
+          Screen.OrderDetailsSearchScreen.route,
+        )
+      },
+    )
 
   NavHost(
     navController = navController,
@@ -222,6 +234,15 @@ fun AppNavHost(
         navigator = orderEditorScreenNavigator,
         utils = orderEditorScreenUtils,
         states = orderStatesHolder,
+        onStateChangeOrderDetailsSearchBehavior =
+          orderDetailsSearchViewModel::changeOrderDetailsSearchBehavior,
+      )
+    }
+
+    composable(route = Screen.OrderDetailsSearchScreen.route) {
+      OrderDetailsSearchScreen(
+        navigator = OrderDetailsSearchScreenNavigator { navController.navigateUp() },
+        onFetchData = orderDetailsSearchViewModel::fetch,
       )
     }
   }

@@ -19,6 +19,7 @@ import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.util.OrderEditorScreenExtras
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
+import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
 @Composable
 fun OrderEditorContent(
@@ -27,6 +28,7 @@ fun OrderEditorContent(
   states: OrderStatesHolder = OrderStatesHolder(),
   navigator: OrderEditorScreenNavigator,
   extras: OrderEditorScreenExtras,
+  onStateChangeOrderDetailsSearchBehavior: (TaurusTextFieldState) -> Unit = {},
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
@@ -50,6 +52,7 @@ fun OrderEditorContent(
       states = states,
       navigator = navigator,
       extras = extras,
+      onStateChangeOrderDetailsSearchBehavior = onStateChangeOrderDetailsSearchBehavior,
     )
   }
 }

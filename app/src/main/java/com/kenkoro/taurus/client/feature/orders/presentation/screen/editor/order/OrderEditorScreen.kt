@@ -17,6 +17,7 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
+import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
@@ -26,6 +27,7 @@ fun OrderEditorScreen(
   navigator: OrderEditorScreenNavigator,
   utils: OrderEditorScreenUtils,
   states: OrderStatesHolder,
+  onStateChangeOrderDetailsSearchBehavior: (TaurusTextFieldState) -> Unit = {},
 ) {
   val user = utils.user
   val editOrder = utils.editOrder
@@ -63,6 +65,7 @@ fun OrderEditorScreen(
             states = states,
             navigator = navigator,
             extras = extras,
+            onStateChangeOrderDetailsSearchBehavior = onStateChangeOrderDetailsSearchBehavior,
           )
         }
       },

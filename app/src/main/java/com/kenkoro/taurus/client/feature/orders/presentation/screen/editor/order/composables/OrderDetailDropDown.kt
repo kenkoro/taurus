@@ -34,14 +34,17 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CustomerState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderDetailDropDown(
   modifier: Modifier = Modifier,
+  navigator: OrderEditorScreenNavigator,
   state: TaurusTextFieldState,
   dropDownTitle: String,
+  onStateChangeOrderDetailsSearchBehavior: (TaurusTextFieldState) -> Unit = {},
   placeholder: @Composable () -> Unit = {
     Text(
       text = stringResource(id = R.string.taurus_drop_down_unselected),
@@ -68,7 +71,8 @@ fun OrderDetailDropDown(
       view.performHapticFeedback(it)
     }
 
-    // NOTE: Go to the search screen
+    onStateChangeOrderDetailsSearchBehavior(state)
+    navigator.toOrderDetailsSearchScreen()
   }
 
   Column(modifier = modifier) {
@@ -120,6 +124,7 @@ private fun OrderDetailDropDownPrev() {
       state = state,
       dropDownTitle = "Customer brand-name",
       placeholder = { Text(text = "Not selected") },
+      navigator = OrderEditorScreenNavigator(),
     )
   }
 }

@@ -15,6 +15,7 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.util.OrderEditorScreenExtras
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
+import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
 @Composable
 fun OrderEditorTextFields(
@@ -22,6 +23,7 @@ fun OrderEditorTextFields(
   states: OrderStatesHolder = OrderStatesHolder(),
   navigator: OrderEditorScreenNavigator,
   extras: OrderEditorScreenExtras,
+  onStateChangeOrderDetailsSearchBehavior: (TaurusTextFieldState) -> Unit = {},
 ) {
   val scrollState = rememberScrollableState { it }
   val contentHeight = LocalContentHeight.current
@@ -35,8 +37,10 @@ fun OrderEditorTextFields(
     verticalArrangement = Arrangement.Top,
   ) {
     OrderDetailDropDown(
+      navigator = navigator,
       state = states.customerState,
       dropDownTitle = stringResource(id = R.string.order_editor_customer),
+      onStateChangeOrderDetailsSearchBehavior = onStateChangeOrderDetailsSearchBehavior,
       supportingText = {
         Text(text = stringResource(id = R.string.order_customer_supporting_text))
       },

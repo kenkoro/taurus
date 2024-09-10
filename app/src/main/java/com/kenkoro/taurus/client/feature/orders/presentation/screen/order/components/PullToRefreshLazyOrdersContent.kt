@@ -107,7 +107,7 @@ fun PullToRefreshLazyOrdersContent(
           if (orders.loadState.append is LoadState.Loading) {
             CircularProgressIndicator(
               modifier = Modifier.size(size.medium),
-              strokeWidth = strokeWidth.standard,
+              strokeWidth = strokeWidth.small,
             )
           }
         }
