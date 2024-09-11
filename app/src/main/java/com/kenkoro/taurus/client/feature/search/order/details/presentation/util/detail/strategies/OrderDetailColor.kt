@@ -3,9 +3,13 @@ package com.kenkoro.taurus.client.feature.search.order.details.presentation.util
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.detail.OrderDetailStrategy
 import kotlinx.coroutines.delay
 
-class OrderDetailCustomer : OrderDetailStrategy {
+class OrderDetailColor : OrderDetailStrategy {
   override suspend fun fetch(): List<String> {
     delay(100L)
-    return listOf("Suborbia")
+    return listOf(
+      "Black",
+      "Silver",
+      "Graphite",
+    )
   }
 }

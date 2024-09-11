@@ -1,5 +1,8 @@
 package com.kenkoro.taurus.client.feature.search.order.details.presentation
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.detail.OrderDetailContext
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.detail.OrderDetailsSearchFactory
@@ -11,6 +14,7 @@ import javax.inject.Inject
 class OrderDetailsSearchViewModel
   @Inject
   constructor() : ViewModel() {
+    var selectedSearchState by mutableStateOf<TaurusTextFieldState?>(null)
     private val orderDetailContext = OrderDetailContext()
 
     fun changeOrderDetailsSearchBehavior(state: TaurusTextFieldState) {

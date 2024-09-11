@@ -39,6 +39,7 @@ import com.kenkoro.taurus.client.feature.search.order.details.presentation.Order
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.OrderDetailsSearchViewModel
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
 import com.kenkoro.taurus.client.feature.shared.navigation.util.AppNavHostUtils
+import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
 typealias PSNavigator = ProfileScreenNavigator
 typealias PSUtils = ProfileScreenUtils
@@ -173,9 +174,8 @@ fun AppNavHost(
     OrderEditorScreenNavigator(
       navUp = navController::navigateUp,
       toOrderDetailsSearchScreen = {
-        navController.navigate(
-          Screen.OrderDetailsSearchScreen.route,
-        )
+        orderDetailsSearchViewModel.selectedSearchState = it
+        navController.navigate(Screen.OrderDetailsSearchScreen.route)
       },
     )
 
@@ -242,7 +242,9 @@ fun AppNavHost(
     composable(route = Screen.OrderDetailsSearchScreen.route) {
       OrderDetailsSearchScreen(
         navigator = OrderDetailsSearchScreenNavigator { navController.navigateUp() },
-        states = orderStatesHolder,
+        selectedSearchState =
+          orderDetailsSearchViewModel.selectedSearchState ?: object :
+            TaurusTextFieldState() {},
         onFetchData = orderDetailsSearchViewModel::fetch,
         onNavUp = { navController.navigateUp() },
       )

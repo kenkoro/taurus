@@ -10,17 +10,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.composables.OrderDetailsSearchContent
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.composables.bars.OrderDetailsTopBar
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
+import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderDetailsSearchScreen(
   modifier: Modifier = Modifier,
   navigator: OrderDetailsSearchScreenNavigator,
-  states: OrderStatesHolder,
+  selectedSearchState: TaurusTextFieldState,
   onFetchData: suspend () -> List<String> = { emptyList() },
   onNavUp: () -> Unit = {},
 ) {
@@ -40,7 +40,7 @@ fun OrderDetailsSearchScreen(
               .padding(paddingValues),
         ) {
           OrderDetailsSearchContent(
-            state = states.customerState,
+            state = selectedSearchState,
             onFetchData = onFetchData,
             onNavUp = onNavUp,
           )

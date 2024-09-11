@@ -51,7 +51,6 @@ fun OrderDetailDropDown(
       color = MaterialTheme.colorScheme.onPrimaryContainer,
     )
   },
-  supportingText: @Composable () -> Unit = {},
   contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
   containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
 ) {
@@ -72,7 +71,7 @@ fun OrderDetailDropDown(
     }
 
     onStateChangeOrderDetailsSearchBehavior(state)
-    navigator.toOrderDetailsSearchScreen()
+    navigator.toOrderDetailsSearchScreen(state)
   }
 
   val selectedItem = @Composable { Text(text = state.text) }
