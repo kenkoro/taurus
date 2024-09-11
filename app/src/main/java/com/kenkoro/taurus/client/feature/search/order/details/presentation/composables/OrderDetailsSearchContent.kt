@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import com.kenkoro.taurus.client.R
@@ -49,6 +51,7 @@ fun OrderDetailsSearchContent(
   modifier: Modifier = Modifier,
   state: TaurusTextFieldState,
   onFetchData: suspend () -> List<String> = { emptyList() },
+  onNavUp: () -> Unit = {},
 ) {
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
@@ -62,8 +65,11 @@ fun OrderDetailsSearchContent(
   var isDataLoading by remember {
     mutableStateOf(false)
   }
+  var searchState by remember {
+    mutableStateOf("")
+  }
 
-  LaunchedEffect(state.text) {
+  LaunchedEffect(searchState) {
     isDataLoading = true
     if (results.isNotEmpty()) {
       results.clear()
@@ -91,10 +97,11 @@ fun OrderDetailsSearchContent(
           Modifier
             .fillMaxWidth()
             .height(contentHeight.searchBar),
-        value = state.text,
+        value = searchState,
         onValueChange = {
-          // Limit this input
-          state.text = it
+          if (it.length <= 20) {
+            searchState = it
+          }
         },
         isError = state.showErrors(),
         leadingIcon = {
@@ -105,7 +112,17 @@ fun OrderDetailsSearchContent(
           )
         },
         placeholder = { Text(text = stringResource(id = R.string.order_details_search_bar)) },
-        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Text),
+        supportingText = {
+          if (state.text.length == 20) {
+            Text(text = stringResource(id = R.string.max_20_supporting_text))
+          }
+        },
+        keyboardOptions =
+          KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Search,
+            keyboardType = KeyboardType.Text,
+          ),
+        keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
         shape = RoundedCornerShape(shape.medium),
         singleLine = true,
       )
@@ -131,9 +148,16 @@ fun OrderDetailsSearchContent(
           items(
             items = results,
             key = { UUID.randomUUID().toString() },
-          ) { result ->
-            Text(text = result)
-            Spacer(modifier = Modifier.height(contentHeight.large))
+          ) { fetchedResult ->
+            OrderDetailsSearchItem(
+              modifier =
+                Modifier.clickable {
+                  searchState = fetchedResult
+                  state.text = fetchedResult
+                  onNavUp()
+                },
+              text = fetchedResult,
+            )
           }
         }
       }
@@ -146,7 +170,6 @@ fun OrderDetailsSearchContent(
 private fun OrderDetailsSearchContentPrev() {
   AppTheme {
     val state: TaurusTextFieldState = CustomerState()
-
-    OrderDetailsSearchContent(state = state)
+    OrderDetailsSearchContent(state = state, onFetchData = { listOf("Result 1", "Result 2") })
   }
 }

@@ -75,6 +75,8 @@ fun OrderDetailDropDown(
     navigator.toOrderDetailsSearchScreen()
   }
 
+  val selectedItem = @Composable { Text(text = state.text) }
+
   Column(modifier = modifier) {
     Text(text = dropDownTitle, color = MaterialTheme.colorScheme.onBackground)
     Spacer(modifier = Modifier.height(contentHeight.small))
@@ -95,7 +97,11 @@ fun OrderDetailDropDown(
         verticalAlignment = Alignment.CenterVertically,
       ) {
         Spacer(modifier = Modifier.width(contentWidth.large))
-        placeholder()
+        if (state.isBlank()) {
+          placeholder()
+        } else {
+          selectedItem()
+        }
       }
       Row(
         modifier =

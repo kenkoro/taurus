@@ -23,5 +23,5 @@ private fun titleValidationError(
 }
 
 private fun isTitleValid(title: String): Boolean {
-  return title.isNotBlank() && title.first().isUpperCase()
+  return title.isNotBlank()
 }

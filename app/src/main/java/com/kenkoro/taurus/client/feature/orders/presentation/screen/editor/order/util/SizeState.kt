@@ -23,12 +23,5 @@ private fun sizeValidationError(
 }
 
 private fun isSizeValid(size: String): Boolean {
-  return size.isNotBlank() && size.isAllLettersUppercase()
-}
-
-fun String.isAllLettersUppercase(): Boolean {
-  this.forEach {
-    if (!it.isUpperCase()) return false
-  }
-  return true
+  return size.isNotBlank()
 }

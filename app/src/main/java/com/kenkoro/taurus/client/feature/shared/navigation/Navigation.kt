@@ -242,7 +242,9 @@ fun AppNavHost(
     composable(route = Screen.OrderDetailsSearchScreen.route) {
       OrderDetailsSearchScreen(
         navigator = OrderDetailsSearchScreenNavigator { navController.navigateUp() },
+        states = orderStatesHolder,
         onFetchData = orderDetailsSearchViewModel::fetch,
+        onNavUp = { navController.navigateUp() },
       )
     }
   }

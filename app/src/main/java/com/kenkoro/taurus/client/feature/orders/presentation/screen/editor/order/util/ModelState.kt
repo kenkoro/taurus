@@ -23,5 +23,5 @@ private fun modelValidationError(
 }
 
 private fun isModelValid(model: String): Boolean {
-  return model.isNotBlank() && model.first().isUpperCase()
+  return model.isNotBlank()
 }

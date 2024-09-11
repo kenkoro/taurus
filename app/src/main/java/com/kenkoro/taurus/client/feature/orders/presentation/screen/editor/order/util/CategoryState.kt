@@ -23,5 +23,5 @@ private fun categoryValidationError(
 }
 
 private fun isCategoryValid(category: String): Boolean {
-  return category.isNotBlank() && category.first().isUpperCase()
+  return category.isNotBlank()
 }

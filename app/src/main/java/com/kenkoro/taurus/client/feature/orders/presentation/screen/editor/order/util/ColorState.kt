@@ -23,5 +23,5 @@ private fun colorValidationError(
 }
 
 private fun isColorValid(color: String): Boolean {
-  return color.isNotBlank() && color.first().isUpperCase()
+  return color.isNotBlank()
 }
