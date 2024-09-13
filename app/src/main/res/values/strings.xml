@@ -74,4 +74,10 @@
     <string name="order_actual_quantity">Фактическое кол-во</string>
     <string name="order_details_customer">Выбор заказчика</string>
     <string name="order_details_search_bar">Поиск</string>
+    <string name="order_details_title">Выберите торговое название</string>
+    <string name="order_details_model">Укажите модель</string>
+    <string name="order_details_size">Укажите размер</string>
+    <string name="order_details_color">Выберите цвет</string>
+    <string name="order_details_category">Выберите категорию</string>
+    <string name="failed_order_editor_validation">Заполните все поля</string>
 </resources>

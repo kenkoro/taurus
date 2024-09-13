@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client.feature.search.order.details.presentation.composables.bars
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,13 +25,21 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CategoryState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.ColorState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CustomerState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.ModelState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.SizeState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.TitleState
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
+import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderDetailsTopBar(
   modifier: Modifier = Modifier,
   navigator: OrderDetailsSearchScreenNavigator,
+  state: TaurusTextFieldState? = null,
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
@@ -65,9 +74,23 @@ fun OrderDetailsTopBar(
     ) {
       Spacer(modifier = Modifier.width(contentWidth.medium))
       Text(
-        text = stringResource(id = R.string.order_details_customer),
+        text = autoTitle(state),
       )
     }
+  }
+}
+
+@SuppressLint("ComposableNaming")
+@Composable
+private fun autoTitle(state: TaurusTextFieldState?): String {
+  return when (state) {
+    is CustomerState -> stringResource(id = R.string.order_details_customer)
+    is TitleState -> stringResource(id = R.string.order_details_title)
+    is ModelState -> stringResource(id = R.string.order_details_model)
+    is SizeState -> stringResource(id = R.string.order_details_size)
+    is ColorState -> stringResource(id = R.string.order_details_color)
+    is CategoryState -> stringResource(id = R.string.order_details_category)
+    else -> ""
   }
 }
 

@@ -11,6 +11,7 @@ data class ContentHeight(
   val none: Dp = 0.dp,
   val small: Dp = 5.dp,
   val medium: Dp = 10.dp,
+  val extraMedium: Dp = 20.dp,
   val large: Dp = 15.dp,
   val extraLarge: Dp = 30.dp,
   val orderItemField: Dp = 25.dp,

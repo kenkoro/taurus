@@ -30,7 +30,7 @@ fun OrderDetailsSearchScreen(
         modifier
           .statusBarsPadding()
           .navigationBarsPadding(),
-      topBar = { OrderDetailsTopBar(navigator = navigator) },
+      topBar = { OrderDetailsTopBar(navigator = navigator, state = selectedSearchState) },
       content = { paddingValues ->
         Surface(
           modifier =

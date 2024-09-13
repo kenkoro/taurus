@@ -14,21 +14,30 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
+import com.kenkoro.taurus.client.core.local.LocalSize
+import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.util.OrderEditorScreenExtras
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.TextFieldValidationService
+import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,10 +49,37 @@ fun OrderEditorTopBar(
   states: OrderStatesHolder = OrderStatesHolder(),
   navigator: OrderEditorScreenNavigator,
   extras: OrderEditorScreenExtras,
+  snackbarsHolder: OrderEditorScreenSnackbarsHolder,
 ) {
-  val scope = rememberCoroutineScope()
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
+  val strokeWidth = LocalStrokeWidth.current
+  val size = LocalSize.current
+
+  val scope = rememberCoroutineScope()
+  var isLoading by remember {
+    mutableStateOf(false)
+  }
+
+  val onSubmit = {
+    scope.launch(Dispatchers.IO) {
+      if (extras.validateChanges()) {
+        isLoading = true
+        val result = extras.saveChanges()
+        isLoading = false
+
+        withContext(Dispatchers.Main) {
+          if (result) {
+            navigator.navUp()
+          } else {
+            snackbarsHolder.apiError()
+          }
+        }
+      } else {
+        withContext(Dispatchers.Main) { snackbarsHolder.failedOrderEditorValidation() }
+      }
+    }
+  }
 
   Row(
     modifier =
@@ -87,24 +123,31 @@ fun OrderEditorTopBar(
       modifier =
         Modifier
           .size(contentHeight.topBar)
-          .clickable {
-            scope.launch(Dispatchers.IO) {
-              if (extras.validateChanges()) {
-                val result = extras.saveChanges()
-                if (result) {
-                  withContext(Dispatchers.Main) { navigator.navUp() }
-                }
-              } else {
-                TextFieldValidationService.checkAll(states)
-              }
-            }
-          },
+          .clickable { onSubmit() },
       contentAlignment = Alignment.Center,
     ) {
-      Icon(
-        imageVector = Icons.Default.Check,
-        contentDescription = "SaveOrderDetailsChanges",
-      )
+      if (isLoading) {
+        CircularProgressIndicator(
+          strokeWidth = strokeWidth.small,
+          modifier = Modifier.size(size.small),
+        )
+      } else {
+        Icon(
+          imageVector = Icons.Default.Check,
+          contentDescription = "",
+        )
+      }
     }
+  }
+}
+
+@Preview
+@Composable
+private fun OrderEditorTopBarPrev() {
+  AppTheme {
+    val navigator = OrderEditorScreenNavigator {}
+    val extras = OrderEditorScreenExtras()
+    val snackbarsHolder = OrderEditorScreenSnackbarsHolder()
+    OrderEditorTopBar(navigator = navigator, extras = extras, snackbarsHolder = snackbarsHolder)
   }
 }

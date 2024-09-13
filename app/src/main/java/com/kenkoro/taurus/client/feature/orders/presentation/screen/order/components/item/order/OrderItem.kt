@@ -89,6 +89,7 @@ fun OrderItem(
 
     utils.saveOrderId(order.orderId)
     utils.saveOrderStatus(order.status)
+    utils.saveDate(order.date)
   }
   val onEditOrder = {
     onSaveStates()

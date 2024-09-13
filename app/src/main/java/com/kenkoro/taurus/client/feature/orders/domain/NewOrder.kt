@@ -1,7 +1,6 @@
 package com.kenkoro.taurus.client.feature.orders.domain
 
 data class NewOrder(
-  val orderId: Int,
   val customer: String,
   val date: Long,
   val title: String,

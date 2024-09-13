@@ -26,5 +26,6 @@ data class OrderScreenUtils(
   val resetAllOrderStates: () -> Unit = {},
   val saveOrderStatus: (OrderStatus) -> Unit = {},
   val saveOrderId: (Int) -> Unit = {},
+  val saveDate: (Long) -> Unit = {},
   val viewModelScope: CoroutineScope,
 )

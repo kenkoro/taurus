@@ -21,6 +21,7 @@ import com.kenkoro.taurus.client.feature.orders.data.remote.dto.CutOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.OrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.repository.CutOrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepositoryImpl
+import com.kenkoro.taurus.client.feature.orders.domain.EditOrder
 import com.kenkoro.taurus.client.feature.orders.domain.NewCutOrder
 import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
@@ -83,11 +84,11 @@ class OrderViewModel
     }
 
     suspend fun editOrderLocally(
-      newOrder: NewOrder,
+      editedOrder: EditOrder,
       orderId: Int,
     ) {
       localDb.withTransaction {
-        localDb.orderDao.upsert(newOrder.toOrderEntity(orderId))
+        localDb.orderDao.upsert(editedOrder.toOrderEntity(orderId))
       }
     }
 

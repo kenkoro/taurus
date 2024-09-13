@@ -126,6 +126,7 @@ fun AppNavHost(
         resetAllOrderStates = orderEditorViewModel::resetAll,
         saveOrderStatus = orderEditorViewModel::status,
         saveOrderId = orderEditorViewModel::orderId,
+        saveDate = orderEditorViewModel::date,
         viewModelScope = orderViewModel.viewModelScope,
       )
     val orderStatesHolder =

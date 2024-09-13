@@ -2,13 +2,13 @@ package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.orde
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
-import com.kenkoro.taurus.client.feature.orders.data.mappers.toNewOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepositoryImpl
-import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
+import com.kenkoro.taurus.client.feature.orders.domain.EditOrder
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CategoryState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.ColorState
@@ -28,6 +28,9 @@ class OrderEditorViewModel
     private val decryptedCredentialService: DecryptedCredentialService,
   ) : ViewModel() {
     var orderId by mutableIntStateOf(1)
+      private set
+
+    var date by mutableLongStateOf(0L)
       private set
 
     var customer by mutableStateOf(CustomerState(customer = ""))
@@ -72,13 +75,17 @@ class OrderEditorViewModel
       this.orderId = orderId
     }
 
+    fun date(date: Long) {
+      this.date = date
+    }
+
     suspend fun editOrderRemotely(
-      dto: NewOrder,
+      dto: EditOrder,
       editorSubject: String,
     ): Boolean {
       val result =
         orderRepository.editOrder(
-          dto = dto.toNewOrderDto(),
+          dto = dto.toEditOrderDto(),
           editorSubject = editorSubject,
           token = decryptedCredentialService.storedToken(),
         )

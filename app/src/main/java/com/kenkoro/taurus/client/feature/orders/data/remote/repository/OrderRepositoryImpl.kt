@@ -1,6 +1,7 @@
 package com.kenkoro.taurus.client.feature.orders.data.remote.repository
 
 import com.kenkoro.taurus.client.feature.orders.data.remote.api.OrderRemoteApi
+import com.kenkoro.taurus.client.feature.orders.data.remote.dto.EditOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.OrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.PaginatedOrdersDto
@@ -33,7 +34,7 @@ class OrderRepositoryImpl(
   ): PaginatedOrdersDto = api.getPaginatedOrders(page, perPage, token)
 
   override suspend fun editOrder(
-    dto: NewOrderDto,
+    dto: EditOrderDto,
     editorSubject: String,
     token: String,
   ): Result<HttpStatusCode> =
