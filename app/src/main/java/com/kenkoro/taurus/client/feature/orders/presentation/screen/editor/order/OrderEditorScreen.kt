@@ -54,7 +54,8 @@ fun OrderEditorScreen(
           states.modelState.isValid &&
           states.sizeState.isValid &&
           states.colorState.isValid &&
-          states.categoryState.isValid
+          states.categoryState.isValid &&
+          states.quantityState.isValid
       },
       saveChanges = {
         if (editOrder) {

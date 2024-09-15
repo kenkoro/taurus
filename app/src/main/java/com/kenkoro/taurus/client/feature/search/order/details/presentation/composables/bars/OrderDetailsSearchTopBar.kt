@@ -96,7 +96,7 @@ private fun autoTitle(state: TaurusTextFieldState?): String {
 
 @PreviewLightDark
 @Composable
-private fun OrderDetailsTopBarPrev() {
+private fun OrderDetailsSearchTopBarPrev() {
   AppTheme {
     OrderDetailsTopBar(navigator = OrderDetailsSearchScreenNavigator {})
   }
