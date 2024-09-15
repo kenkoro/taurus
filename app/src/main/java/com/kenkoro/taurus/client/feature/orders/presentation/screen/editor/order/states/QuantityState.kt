@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util
+package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states
 
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 

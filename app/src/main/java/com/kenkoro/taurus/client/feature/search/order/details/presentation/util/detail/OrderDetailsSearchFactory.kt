@@ -1,11 +1,11 @@
 package com.kenkoro.taurus.client.feature.search.order.details.presentation.util.detail
 
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CategoryState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.ColorState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CustomerState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.ModelState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.SizeState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.TitleState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.CategoryState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.ColorState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.CustomerState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.ModelState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.SizeState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.TitleState
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.detail.strategies.OrderDetailCategory
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.detail.strategies.OrderDetailColor
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.detail.strategies.OrderDetailCustomer

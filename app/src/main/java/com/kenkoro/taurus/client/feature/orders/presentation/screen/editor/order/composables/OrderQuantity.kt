@@ -22,7 +22,7 @@ import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.util.SupportingTextOnError
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.util.TaurusTextFieldTrailingIcon
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.QuantityState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.QuantityState
 import com.kenkoro.taurus.client.feature.shared.components.TaurusIcon
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 

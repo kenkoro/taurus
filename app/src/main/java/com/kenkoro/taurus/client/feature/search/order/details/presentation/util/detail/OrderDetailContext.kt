@@ -11,5 +11,5 @@ class OrderDetailContext {
     this.strategy = strategy
   }
 
-  suspend fun fetch(): List<String> = strategy?.fetch() ?: emptyList()
+  suspend fun fetch(filter: String): List<String> = strategy?.fetch(filter) ?: emptyList()
 }

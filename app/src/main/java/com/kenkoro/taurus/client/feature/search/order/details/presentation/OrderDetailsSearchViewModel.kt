@@ -21,5 +21,5 @@ class OrderDetailsSearchViewModel
       orderDetailContext.strategy(OrderDetailsSearchFactory.getOrderDetailSearchStrategy(state))
     }
 
-    suspend fun fetch(): List<String> = orderDetailContext.fetch()
+    suspend fun fetch(filter: String): List<String> = orderDetailContext.fetch(filter)
   }

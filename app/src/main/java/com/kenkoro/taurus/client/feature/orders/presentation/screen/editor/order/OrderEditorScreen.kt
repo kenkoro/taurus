@@ -20,13 +20,12 @@ import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.OrderEditorContent
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.OrderEditorTopBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.util.OrderEditorScreenExtras
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenUtils
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
 import com.kenkoro.taurus.client.feature.shared.components.TaurusSnackbar
-import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
@@ -36,7 +35,6 @@ fun OrderEditorScreen(
   navigator: OrderEditorScreenNavigator,
   utils: OrderEditorScreenUtils,
   states: OrderStatesHolder,
-  onStateChangeOrderDetailsSearchBehavior: (TaurusTextFieldState) -> Unit = {},
 ) {
   val errorSnackbarHostState = remember { SnackbarHostState() }
   val user = utils.user
@@ -123,7 +121,7 @@ fun OrderEditorScreen(
             networkStatus = utils.network,
             states = states,
             navigator = navigator,
-            onStateChangeOrderDetailsSearchBehavior = onStateChangeOrderDetailsSearchBehavior,
+            onStateChangeOrderDetailsSearchBehavior = utils.changeOrderDetailsSearchScreenBehavior,
           )
         }
       },

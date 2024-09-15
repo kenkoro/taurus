@@ -22,9 +22,9 @@ import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenRemo
 import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorViewModel
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenUtils
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderViewModel
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
@@ -38,6 +38,8 @@ import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreen
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.OrderDetailsSearchScreen
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.OrderDetailsSearchViewModel
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
+import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenRemoteHandler
+import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenUtils
 import com.kenkoro.taurus.client.feature.shared.navigation.util.AppNavHostUtils
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
@@ -47,6 +49,9 @@ typealias PSUtils = ProfileScreenUtils
 typealias LSNavigator = LoginScreenNavigator
 typealias LSRemoteHandler = LoginScreenRemoteHandler
 typealias LSUtils = LoginScreenUtils
+
+typealias OESNavigator = OrderEditorScreenNavigator
+typealias OESUtils = OrderEditorScreenUtils
 
 @Composable
 fun AppNavHost(
@@ -166,19 +171,32 @@ fun AppNavHost(
     return Pair(orderScreenLocalHandler, orderScreenRemoteHandler)
   }
 
+  fun orderEditorScreenParams(editOrder: Boolean = false): Pair<OESNavigator, OESUtils> {
+    val orderEditorScreenNavigator =
+      OrderEditorScreenNavigator(
+        navUp = navController::navigateUp,
+        toOrderDetailsSearchScreen = {
+          orderDetailsSearchViewModel.selectedSearchState = it
+          navController.navigate(Screen.OrderDetailsSearchScreen.route)
+        },
+      )
+    val orderEditorScreenUtils =
+      OrderEditorScreenUtils(
+        user = userViewModel.user,
+        orderStatus = orderEditorViewModel.status,
+        network = networkStatus,
+        editOrder = editOrder,
+        changeOrderDetailsSearchScreenBehavior =
+          orderDetailsSearchViewModel::changeOrderDetailsSearchBehavior,
+      )
+
+    return Pair(orderEditorScreenNavigator, orderEditorScreenUtils)
+  }
+
   val (loginScreenNavigator, loginScreenRemoteHandler, loginScreenUtils) = loginScreenParams()
   val (profileScreenNavigator, profileScreenUtils) = profileScreenParams()
   val (orderScreenNavigator, orderScreenUtils, orderStatesHolder) = orderScreenParams()
   val (orderScreenLocalHandler, orderScreenRemoteHandler) = orderScreenHandlers()
-
-  val orderEditorScreenNavigator =
-    OrderEditorScreenNavigator(
-      navUp = navController::navigateUp,
-      toOrderDetailsSearchScreen = {
-        orderDetailsSearchViewModel.selectedSearchState = it
-        navController.navigate(Screen.OrderDetailsSearchScreen.route)
-      },
-    )
 
   NavHost(
     navController = navController,
@@ -222,32 +240,24 @@ fun AppNavHost(
         ),
     ) {
       val editOrder = it.arguments?.getBoolean("editOrder") ?: false
-      val orderEditorScreenUtils =
-        OrderEditorScreenUtils(
-          user = userViewModel.user,
-          orderStatus = orderEditorViewModel.status,
-          network = networkStatus,
-          editOrder = editOrder,
-        )
+      val (orderEditorScreenNavigator, orderEditorScreenUtils) = orderEditorScreenParams(editOrder)
 
       OrderEditorScreen(
         remoteHandler = orderScreenRemoteHandler,
         navigator = orderEditorScreenNavigator,
         utils = orderEditorScreenUtils,
         states = orderStatesHolder,
-        onStateChangeOrderDetailsSearchBehavior =
-          orderDetailsSearchViewModel::changeOrderDetailsSearchBehavior,
       )
     }
 
     composable(route = Screen.OrderDetailsSearchScreen.route) {
       OrderDetailsSearchScreen(
+        remoteHandler = OrderDetailsSearchScreenRemoteHandler(orderDetailsSearchViewModel::fetch),
         navigator = OrderDetailsSearchScreenNavigator { navController.navigateUp() },
-        selectedSearchState =
-          orderDetailsSearchViewModel.selectedSearchState ?: object :
-            TaurusTextFieldState() {},
-        onFetchData = orderDetailsSearchViewModel::fetch,
-        onNavUp = { navController.navigateUp() },
+        utils =
+          OrderDetailsSearchScreenUtils(
+            orderDetailsSearchViewModel.selectedSearchState ?: object : TaurusTextFieldState() {},
+          ),
       )
     }
   }

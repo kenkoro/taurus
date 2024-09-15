@@ -10,13 +10,13 @@ import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.orders.domain.EditOrder
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CategoryState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.ColorState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CustomerState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.ModelState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.QuantityState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.SizeState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.TitleState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.CategoryState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.ColorState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.CustomerState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.ModelState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.QuantityState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.SizeState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.TitleState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

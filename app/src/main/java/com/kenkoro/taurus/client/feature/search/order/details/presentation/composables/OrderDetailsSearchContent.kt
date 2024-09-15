@@ -33,25 +33,24 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.CustomerState
+import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
+import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenRemoteHandler
 import com.kenkoro.taurus.client.feature.shared.components.TaurusIcon
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
-import com.kenkoro.taurus.client.ui.theme.AppTheme
 import java.util.UUID
 
 @Composable
 fun OrderDetailsSearchContent(
   modifier: Modifier = Modifier,
+  remoteHandler: OrderDetailsSearchScreenRemoteHandler,
+  navigator: OrderDetailsSearchScreenNavigator,
   state: TaurusTextFieldState,
-  onFetchData: suspend () -> List<String> = { emptyList() },
-  onNavUp: () -> Unit = {},
 ) {
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
@@ -74,7 +73,7 @@ fun OrderDetailsSearchContent(
     if (results.isNotEmpty()) {
       results.clear()
     }
-    results.addAll(onFetchData())
+    results.addAll(remoteHandler.fetch(searchState))
     isDataLoading = false
   }
 
@@ -154,7 +153,7 @@ fun OrderDetailsSearchContent(
                 Modifier.clickable {
                   searchState = fetchedResult
                   state.text = fetchedResult
-                  onNavUp()
+                  navigator.navUp()
                 },
               text = fetchedResult,
             )
@@ -162,14 +161,5 @@ fun OrderDetailsSearchContent(
         }
       }
     }
-  }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun OrderDetailsSearchContentPrev() {
-  AppTheme {
-    val state: TaurusTextFieldState = CustomerState()
-    OrderDetailsSearchContent(state = state, onFetchData = { listOf("Result 1", "Result 2") })
   }
 }

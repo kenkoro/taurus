@@ -4,8 +4,8 @@ import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.
 import kotlinx.coroutines.delay
 
 class OrderDetailCustomer : OrderDetailStrategy {
-  override suspend fun fetch(): List<String> {
+  override suspend fun fetch(filter: String): List<String> {
     delay(100L)
-    return listOf("Suborbia")
+    return listOf("Suborbia").filter { it.contains(filter, ignoreCase = true) }
   }
 }
