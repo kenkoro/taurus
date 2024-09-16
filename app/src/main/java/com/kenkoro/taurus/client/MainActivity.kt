@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
                 if (subject.isNotBlank() && password.isNotBlank()) {
                   Screen.OrderScreen
                 } else {
-                  Screen.LoginScreen
+                  Screen.AuthScreen
                 }
               },
               exit = { finish() },
@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
               },
             )
 
-          AppNavHost(utils = utils)
+          AppNavHost(navHostUtils = utils)
         }
       }
     }

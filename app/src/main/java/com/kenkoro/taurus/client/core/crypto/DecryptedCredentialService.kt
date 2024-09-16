@@ -2,6 +2,9 @@ package com.kenkoro.taurus.client.core.crypto
 
 import android.content.Context
 
+typealias Subject = String
+typealias Password = String
+
 class DecryptedCredentialService(private val context: Context) {
   fun storedSubject(): String {
     return DecryptedCredential.decrypt(
@@ -26,5 +29,12 @@ class DecryptedCredentialService(private val context: Context) {
 
   fun deleteAll(): Boolean {
     return DecryptedCredential.deleteAll(context)
+  }
+
+  fun decryptUserCredentials(): Pair<Subject, Password> {
+    return Pair(
+      storedSubject(),
+      storedPassword(),
+    )
   }
 }

@@ -6,9 +6,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.feature.login.data.mappers.toUser
+import com.kenkoro.taurus.client.feature.auth.data.mappers.toUser
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.LoginState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.AuthStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
@@ -45,7 +45,7 @@ fun OrderContent(
     }
   }
 
-  if (utils.loginState == LoginState.NotLoggedYet) {
+  if (utils.authStatus == AuthStatus.WaitingForAuth) {
     LaunchedEffect(Unit, Dispatchers.IO) {
       val (subject, password) = utils.decryptUserSubjectAndItsPassword()
       val loginRequest = remoteHandler.login(subject, password)
@@ -57,7 +57,7 @@ fun OrderContent(
           val requestedUser = userDto.toUser()
           localHandler.addNewUser(requestedUser)
           utils.saveUser(requestedUser)
-          utils.newLoginState(LoginState.Success)
+          utils.newLoginState(AuthStatus.Success)
         }
         getUserRequest.onFailure {
           Log.d("kenkoro", it.message!!)
@@ -77,7 +77,7 @@ fun OrderContent(
     }
   }
 
-  if (utils.loginState.isSuccess()) {
+  if (utils.authStatus.isSuccess()) {
     val orders = utils.ordersPagingFlow.collectAsLazyPagingItems()
 
     PullToRefreshLazyOrdersContent(

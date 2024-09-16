@@ -2,8 +2,8 @@ package com.kenkoro.taurus.client.feature.shared.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.kenkoro.taurus.client.feature.login.data.local.UserEntity
-import com.kenkoro.taurus.client.feature.login.data.local.dao.UserDao
+import com.kenkoro.taurus.client.feature.auth.data.local.UserEntity
+import com.kenkoro.taurus.client.feature.auth.data.local.dao.UserDao
 import com.kenkoro.taurus.client.feature.orders.data.local.OrderEntity
 import com.kenkoro.taurus.client.feature.orders.data.local.dao.OrderDao
 

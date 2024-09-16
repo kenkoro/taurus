@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -15,11 +16,10 @@ import androidx.navigation.navArgument
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.feature.login.presentation.LoginScreen
-import com.kenkoro.taurus.client.feature.login.presentation.LoginViewModel
-import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenNavigator
-import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenRemoteHandler
-import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenUtils
+import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
+import com.kenkoro.taurus.client.feature.auth.presentation.AuthScreen
+import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenNavigator
+import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorViewModel
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
@@ -42,13 +42,11 @@ import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenUtils
 import com.kenkoro.taurus.client.feature.shared.navigation.util.AppNavHostUtils
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
+import com.kenkoro.taurus.client.feature.shared.viewmodels.SharedAuthViewModel
+import com.kenkoro.taurus.client.feature.shared.viewmodels.util.sharedHiltViewModel
 
 typealias PSNavigator = ProfileScreenNavigator
 typealias PSUtils = ProfileScreenUtils
-
-typealias LSNavigator = LoginScreenNavigator
-typealias LSRemoteHandler = LoginScreenRemoteHandler
-typealias LSUtils = LoginScreenUtils
 
 typealias OESNavigator = OrderEditorScreenNavigator
 typealias OESUtils = OrderEditorScreenUtils
@@ -56,9 +54,8 @@ typealias OESUtils = OrderEditorScreenUtils
 @Composable
 fun AppNavHost(
   navController: NavHostController = rememberNavController(),
-  utils: AppNavHostUtils,
+  navHostUtils: AppNavHostUtils,
 ) {
-  val loginViewModel: LoginViewModel = hiltViewModel()
   val orderViewModel: OrderViewModel = hiltViewModel()
   val userViewModel: UserViewModel = hiltViewModel()
   val orderEditorViewModel: OrderEditorViewModel = hiltViewModel()
@@ -69,38 +66,21 @@ fun AppNavHost(
   val networkStatus by networkConnectivityObserver
     .observer()
     .collectAsState(initial = NetworkStatus.Unavailable)
-  val (subject, password) = loginViewModel.decryptSubjectAndPassword()
-  val startDestination = utils.startDestination(subject, password).route
 
-  fun loginScreenParams(): Triple<LSNavigator, LSRemoteHandler, LSUtils> {
-    val loginScreenNavigator =
-      LoginScreenNavigator {
-        navController.navigate(Screen.OrderScreen.route)
-      }
-    val loginScreenRemoteHandler = LoginScreenRemoteHandler(loginViewModel::login)
-    val loginScreenUtils =
-      LoginScreenUtils(
-        subject = loginViewModel.subject,
-        password = loginViewModel.password,
-        network = networkStatus,
-        encryptAllUserCredentials = loginViewModel::encryptAll,
-        exit = utils.exit,
-        showErrorTitle = loginViewModel::showErrorTitle,
-      )
-
-    return Triple(loginScreenNavigator, loginScreenRemoteHandler, loginScreenUtils)
-  }
+  val decryptedCredentialService = DecryptedCredentialService(context)
+  val (subject, password) = decryptedCredentialService.decryptUserCredentials()
+  val startDestination = navHostUtils.startDestination(subject, password).route
 
   fun profileScreenParams(): Pair<PSNavigator, PSUtils> {
     val profileScreenNavigator =
       ProfileScreenNavigator {
-        navController.navigate(Screen.LoginScreen.route)
+        navController.navigate(Screen.AuthScreen.route)
       }
     val profileScreenUtils =
       ProfileScreenUtils(
         deleteAllStoredUserCredentials = userViewModel::deleteAllCredentials,
-        resetLoginState = loginViewModel::resetLoginState,
-        restart = utils.restart,
+        resetLoginState = authViewModel::resetLoginState,
+        restart = navHostUtils.restart,
       )
 
     return Pair(profileScreenNavigator, profileScreenUtils)
@@ -118,15 +98,15 @@ fun AppNavHost(
       OrderScreenUtils(
         ordersPagingFlow = orderViewModel.ordersPagingFlow,
         user = userViewModel.user,
-        loginState = loginViewModel.loginState,
+        authStatus = authViewModel.loginState,
         network = networkStatus,
         selectedOrderRecordId = orderViewModel.selectedOrderRecordId,
         saveUser = userViewModel::user,
         newOrdersFilter = orderViewModel::filterStrategy,
         selectOrder = orderViewModel::selectOrder,
-        newLoginState = loginViewModel::loginState,
+        newLoginState = authViewModel::loginState,
         encryptJWToken = userViewModel::encryptToken,
-        decryptUserSubjectAndItsPassword = loginViewModel::decryptSubjectAndPassword,
+        decryptUserSubjectAndItsPassword = authViewModel::decryptSubjectAndPassword,
         decryptJWToken = userViewModel::decryptToken,
         resetAllOrderStates = orderEditorViewModel::resetAll,
         saveOrderStatus = orderEditorViewModel::status,
@@ -159,7 +139,7 @@ fun AppNavHost(
       )
     val orderScreenRemoteHandler =
       OrderScreenRemoteHandler(
-        login = loginViewModel::login,
+        login = authViewModel::login,
         getUser = userViewModel::getUser,
         addNewOrder = orderViewModel::addNewOrderRemotely,
         deleteOrder = orderViewModel::deleteOrderRemotely,
@@ -193,7 +173,6 @@ fun AppNavHost(
     return Pair(orderEditorScreenNavigator, orderEditorScreenUtils)
   }
 
-  val (loginScreenNavigator, loginScreenRemoteHandler, loginScreenUtils) = loginScreenParams()
   val (profileScreenNavigator, profileScreenUtils) = profileScreenParams()
   val (orderScreenNavigator, orderScreenUtils, orderStatesHolder) = orderScreenParams()
   val (orderScreenLocalHandler, orderScreenRemoteHandler) = orderScreenHandlers()
@@ -202,15 +181,24 @@ fun AppNavHost(
     navController = navController,
     startDestination = startDestination,
   ) {
-    composable(route = Screen.LoginScreen.route) {
-      LoginScreen(
-        remoteHandler = loginScreenRemoteHandler,
-        navigator = loginScreenNavigator,
-        utils = loginScreenUtils,
+    composable(route = Screen.AuthScreen.route) {
+      val navigator = AuthScreenNavigator { navController.navigate(Screen.OrderScreen.route) }
+      val utils =
+        AuthUtils(
+          network = networkStatus,
+          exit = navHostUtils.exit,
+        )
+
+      AuthScreen(
+        navigator = navigator,
+        utils = utils,
       )
     }
 
-    composable(route = Screen.OrderScreen.route) {
+    composable(route = Screen.OrderScreen.route) { entry: NavBackStackEntry ->
+      val sharedAuthStatus = entry.sharedHiltViewModel<SharedAuthViewModel>(navController)
+      // Here, you can now access shared states
+
       OrderScreen(
         localHandler = orderScreenLocalHandler,
         remoteHandler = orderScreenRemoteHandler,

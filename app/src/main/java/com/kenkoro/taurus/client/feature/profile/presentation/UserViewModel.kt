@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.room.withTransaction
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 import com.kenkoro.taurus.client.core.crypto.EncryptedCredentialService
-import com.kenkoro.taurus.client.feature.login.data.mappers.toUserEntity
+import com.kenkoro.taurus.client.feature.auth.data.mappers.toUserEntity
 import com.kenkoro.taurus.client.feature.profile.data.remote.dto.UserDto
 import com.kenkoro.taurus.client.feature.profile.data.remote.repository.UserRepositoryImpl
 import com.kenkoro.taurus.client.feature.profile.domain.User

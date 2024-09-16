@@ -19,8 +19,8 @@ import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.di.AppModule
-import com.kenkoro.taurus.client.feature.login.presentation.LoginRoute
-import com.kenkoro.taurus.client.feature.login.presentation.util.LoginScreenNavigator
+import com.kenkoro.taurus.client.feature.auth.presentation.LoginRoute
+import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenNavigator
 import com.kenkoro.taurus.client.feature.shared.navigation.Screen
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -55,12 +55,12 @@ class OrdersManagementE2ETests {
             .observer()
             .collectAsState(initial = NetworkStatus.Unavailable)
 
-          val loginScreenNavigator = LoginScreenNavigator {}
+          val authScreenNavigator = AuthScreenNavigator {}
 
-          NavHost(navController = navController, startDestination = Screen.LoginScreen.route) {
-            composable(route = Screen.LoginScreen.route) {
+          NavHost(navController = navController, startDestination = Screen.AuthScreen.route) {
+            composable(route = Screen.AuthScreen.route) {
               LoginRoute(
-                navigator = loginScreenNavigator,
+                navigator = authScreenNavigator,
                 network = networkStatus,
                 onExit = {},
               )
