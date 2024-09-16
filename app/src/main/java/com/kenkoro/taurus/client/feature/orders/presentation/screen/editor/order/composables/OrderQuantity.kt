@@ -7,7 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -73,7 +73,7 @@ fun OrderQuantity(
     isError = quantityState.showErrors(),
     leadingIcon = {
       TaurusIcon(
-        imageVector = Icons.Default.AccountBalance,
+        imageVector = Icons.Rounded.Settings,
         contentDescription = "QuantityLeadingIcon",
         isError = quantityState.showErrors(),
       )
