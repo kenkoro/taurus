@@ -15,17 +15,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderBottomBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderTopBar
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.util.OrderScreenExtras
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.viewmodels.OrderViewModel
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
@@ -39,6 +40,9 @@ fun OrderScreen(
   utils: OrderScreenUtils,
   states: OrderStatesHolder,
 ) {
+  val viewModel: OrderViewModel = hiltViewModel()
+
+  val user = viewModel.user
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
   val internetErrorSnackbarHostState = remember { SnackbarHostState() }
@@ -105,11 +109,6 @@ fun OrderScreen(
         )
       },
     )
-  val orderScreenExtras =
-    OrderScreenExtras(
-      isScrolling = lazyOrdersState.isScrollInProgress,
-      username = utils.user?.firstName,
-    )
 
   AppTheme {
     Scaffold(
@@ -140,18 +139,17 @@ fun OrderScreen(
       },
       topBar = {
         OrderTopBar(
-          utils = utils,
           snackbarsHolder = snackbarsHolder,
           navigator = navigator,
-          extras = orderScreenExtras,
+          userName = (viewModel.user ?: "").toString(),
         )
       },
       bottomBar = {
-        if (utils.user != null && utils.user.profile == Customer) {
+        if (user != null && user.profile == Customer) {
           OrderBottomBar(
-            utils = utils,
             navigator = navigator,
-            extras = orderScreenExtras,
+            utils = utils,
+            isScrolling = lazyOrdersState.isScrollInProgress,
           )
         }
       },
@@ -170,6 +168,7 @@ fun OrderScreen(
             utils = utils,
             statesHolder = states,
             snackbarsHolder = snackbarsHolder,
+            user = viewModel.user,
           )
         }
       },

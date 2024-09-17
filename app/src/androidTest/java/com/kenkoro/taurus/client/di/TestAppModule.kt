@@ -7,7 +7,7 @@ import androidx.paging.PagingConfig
 import androidx.room.Room
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 import com.kenkoro.taurus.client.core.crypto.EncryptedCredentialService
-import com.kenkoro.taurus.client.feature.auth.data.remote.api.LoginRemoteApiImpl
+import com.kenkoro.taurus.client.feature.auth.data.remote.api.AuthRemoteApiImpl
 import com.kenkoro.taurus.client.feature.auth.data.remote.repository.LoginRepository
 import com.kenkoro.taurus.client.feature.auth.data.remote.repository.LoginRepositoryImpl
 import com.kenkoro.taurus.client.feature.orders.data.local.OrderEntity
@@ -61,7 +61,7 @@ object TestAppModule {
   @Provides
   @Singleton
   fun provideLoginRepository(): LoginRepositoryImpl {
-    return LoginRepository.create(LoginRemoteApiImpl(client))
+    return LoginRepository.create(AuthRemoteApiImpl(client))
   }
 
   @Provides

@@ -10,20 +10,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenNavigator
 import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenUtils
+import com.kenkoro.taurus.client.feature.profile.presentation.viewmodels.ProfileViewModel
 
 @Composable
 fun ProfileScreen(
   navigator: ProfileScreenNavigator,
   utils: ProfileScreenUtils,
 ) {
+  val viewModel: ProfileViewModel = hiltViewModel()
+
   val onClick = {
-    utils.deleteAllStoredUserCredentials()
-    utils.resetLoginState()
+    viewModel.deleteAllUserCredentials()
+    utils.resetAuthStatus()
     navigator.toLoginScreen()
-    utils.restart()
+    utils.restartApp()
   }
 
   Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

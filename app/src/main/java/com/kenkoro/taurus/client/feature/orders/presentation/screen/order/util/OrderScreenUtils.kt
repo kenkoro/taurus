@@ -4,9 +4,9 @@ import androidx.paging.PagingData
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.AuthStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.OrderFilterStrategy
 import com.kenkoro.taurus.client.feature.profile.domain.User
+import com.kenkoro.taurus.client.feature.shared.states.AuthStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
@@ -23,7 +23,7 @@ data class OrderScreenUtils(
   val encryptJWToken: (String) -> Unit = {},
   val decryptUserSubjectAndItsPassword: () -> Pair<String, String>,
   val decryptJWToken: () -> String,
-  val resetAllOrderStates: () -> Unit = {},
+  val resetAllOrderDetails: () -> Unit = {},
   val saveOrderStatus: (OrderStatus) -> Unit = {},
   val saveOrderId: (Int) -> Unit = {},
   val saveDate: (Long) -> Unit = {},

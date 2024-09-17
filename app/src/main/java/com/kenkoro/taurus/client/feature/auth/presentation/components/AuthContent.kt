@@ -25,6 +25,7 @@ import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenNaviga
 import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthUtils
 import com.kenkoro.taurus.client.feature.auth.presentation.viewmodels.AuthContentViewModel
+import com.kenkoro.taurus.client.feature.shared.states.AuthStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,15 +54,19 @@ fun AuthContent(
       whenLoginSubmitted = { subject, password ->
         scope.launch(Dispatchers.IO) {
           isAuthenticating = true
-          val result = viewModel.login(subject, password)
+          val result = viewModel.auth(subject, password)
           isAuthenticating = false
 
           result.onSuccess {
             viewModel.encryptAll(subject, password, it.token)
+            utils.proceedAuth(AuthStatus.Success)
             withContext(Dispatchers.Main) { navigator.toOrderScreen() }
           }
 
-          result.onFailure { snackbarsHolder.loginError() }
+          result.onFailure {
+            utils.proceedAuth(AuthStatus.Failure)
+            snackbarsHolder.loginError()
+          }
         }
       },
     )

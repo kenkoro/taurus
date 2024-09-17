@@ -2,7 +2,7 @@ package com.kenkoro.taurus.client.feature.auth.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import com.kenkoro.taurus.client.core.crypto.EncryptedCredentialService
-import com.kenkoro.taurus.client.feature.auth.data.remote.dto.LoginDto
+import com.kenkoro.taurus.client.feature.auth.data.remote.dto.AuthDto
 import com.kenkoro.taurus.client.feature.auth.data.remote.repository.LoginRepositoryImpl
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,13 +15,13 @@ class AuthContentViewModel
     private val repository: LoginRepositoryImpl,
     private val encryptedCredentialService: EncryptedCredentialService,
   ) : ViewModel() {
-    suspend fun login(
+    suspend fun auth(
       subject: String,
       password: String,
     ): Result<TokenDto> {
       val result =
-        repository.login(
-          LoginDto(
+        repository.logIn(
+          AuthDto(
             subject = subject,
             password = password,
           ),

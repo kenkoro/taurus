@@ -43,6 +43,7 @@ import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.
 import com.kenkoro.taurus.client.feature.shared.navigation.util.AppNavHostUtils
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import com.kenkoro.taurus.client.feature.shared.viewmodels.SharedAuthViewModel
+import com.kenkoro.taurus.client.feature.shared.viewmodels.SharedOrderDetailsViewModel
 import com.kenkoro.taurus.client.feature.shared.viewmodels.util.sharedHiltViewModel
 
 typealias PSNavigator = ProfileScreenNavigator
@@ -71,21 +72,6 @@ fun AppNavHost(
   val (subject, password) = decryptedCredentialService.decryptUserCredentials()
   val startDestination = navHostUtils.startDestination(subject, password).route
 
-  fun profileScreenParams(): Pair<PSNavigator, PSUtils> {
-    val profileScreenNavigator =
-      ProfileScreenNavigator {
-        navController.navigate(Screen.AuthScreen.route)
-      }
-    val profileScreenUtils =
-      ProfileScreenUtils(
-        deleteAllStoredUserCredentials = userViewModel::deleteAllCredentials,
-        resetLoginState = authViewModel::resetLoginState,
-        restart = navHostUtils.restart,
-      )
-
-    return Pair(profileScreenNavigator, profileScreenUtils)
-  }
-
   fun orderScreenParams(): Triple<OrderScreenNavigator, OrderScreenUtils, OrderStatesHolder> {
     val orderScreenNavigator =
       OrderScreenNavigator(
@@ -108,7 +94,7 @@ fun AppNavHost(
         encryptJWToken = userViewModel::encryptToken,
         decryptUserSubjectAndItsPassword = authViewModel::decryptSubjectAndPassword,
         decryptJWToken = userViewModel::decryptToken,
-        resetAllOrderStates = orderEditorViewModel::resetAll,
+        resetAllOrderDetails = orderEditorViewModel::resetAll,
         saveOrderStatus = orderEditorViewModel::status,
         saveOrderId = orderEditorViewModel::orderId,
         saveDate = orderEditorViewModel::date,
@@ -173,7 +159,6 @@ fun AppNavHost(
     return Pair(orderEditorScreenNavigator, orderEditorScreenUtils)
   }
 
-  val (profileScreenNavigator, profileScreenUtils) = profileScreenParams()
   val (orderScreenNavigator, orderScreenUtils, orderStatesHolder) = orderScreenParams()
   val (orderScreenLocalHandler, orderScreenRemoteHandler) = orderScreenHandlers()
 
@@ -181,12 +166,14 @@ fun AppNavHost(
     navController = navController,
     startDestination = startDestination,
   ) {
-    composable(route = Screen.AuthScreen.route) {
+    composable(route = Screen.AuthScreen.route) { entry ->
+      val sharedAuthViewModel = entry.sharedHiltViewModel<SharedAuthViewModel>(navController)
       val navigator = AuthScreenNavigator { navController.navigate(Screen.OrderScreen.route) }
       val utils =
         AuthUtils(
           network = networkStatus,
           exit = navHostUtils.exit,
+          proceedAuth = sharedAuthViewModel::proceedAuth,
         )
 
       AuthScreen(
@@ -196,22 +183,46 @@ fun AppNavHost(
     }
 
     composable(route = Screen.OrderScreen.route) { entry: NavBackStackEntry ->
-      val sharedAuthStatus = entry.sharedHiltViewModel<SharedAuthViewModel>(navController)
+      val sharedAuthViewModel = entry.sharedHiltViewModel<SharedAuthViewModel>(navController)
+      val sharedOrderDetailsViewModel =
+        entry.sharedHiltViewModel<SharedOrderDetailsViewModel>(
+          navController,
+        )
       // Here, you can now access shared states
+      val navigator =
+        OrderScreenNavigator(
+          toProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
+          toOrderEditorScreen = { editOrder: Boolean ->
+            navController.navigate(Screen.OrderEditorScreen.route + "?editOrder=$editOrder")
+          },
+        )
+      val utils =
+        OrderScreenUtils(
+          resetAllOrderDetails = sharedOrderDetailsViewModel::resetAllOrderDetails,
+        )
 
       OrderScreen(
-        localHandler = orderScreenLocalHandler,
-        remoteHandler = orderScreenRemoteHandler,
-        navigator = orderScreenNavigator,
+        navigator = navigator,
         utils = orderScreenUtils,
         states = orderStatesHolder,
       )
     }
 
-    composable(route = Screen.ProfileScreen.route) {
+    composable(route = Screen.ProfileScreen.route) { entry ->
+      val sharedAuthViewModel = entry.sharedHiltViewModel<SharedAuthViewModel>(navController)
+      val navigator =
+        ProfileScreenNavigator {
+          navController.navigate(Screen.AuthScreen.route)
+        }
+      val utils =
+        ProfileScreenUtils(
+          resetAuthStatus = sharedAuthViewModel::reset,
+          restartApp = navHostUtils.restart,
+        )
+
       ProfileScreen(
-        navigator = profileScreenNavigator,
-        utils = profileScreenUtils,
+        navigator = navigator,
+        utils = utils,
       )
     }
 
@@ -226,7 +237,12 @@ fun AppNavHost(
             defaultValue = false
           },
         ),
-    ) {
+    ) { entry ->
+      val sharedOrderDetailsViewModel =
+        entry.sharedHiltViewModel<SharedOrderDetailsViewModel>(
+          navController,
+        )
+
       val editOrder = it.arguments?.getBoolean("editOrder") ?: false
       val (orderEditorScreenNavigator, orderEditorScreenUtils) = orderEditorScreenParams(editOrder)
 

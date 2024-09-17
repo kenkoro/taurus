@@ -1,8 +1,8 @@
-package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states
+package com.kenkoro.taurus.client.feature.shared.states
 
 enum class AuthStatus {
-  Success,
   WaitingForAuth,
+  Success,
   Failure,
   ;
 

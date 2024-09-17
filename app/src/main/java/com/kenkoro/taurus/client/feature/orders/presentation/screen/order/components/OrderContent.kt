@@ -8,7 +8,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.auth.data.mappers.toUser
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.states.AuthStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
@@ -18,10 +17,12 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.f
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.InspectorOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.ManagerOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.OrderFilterStrategy
+import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Manager
+import com.kenkoro.taurus.client.feature.shared.states.AuthStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,8 +36,8 @@ fun OrderContent(
   utils: OrderScreenUtils,
   statesHolder: OrderStatesHolder,
   snackbarsHolder: OrderScreenSnackbarsHolder,
+  user: User?,
 ) {
-  val user = utils.user
   val network = utils.network
 
   LaunchedEffect(network, Dispatchers.Main) {

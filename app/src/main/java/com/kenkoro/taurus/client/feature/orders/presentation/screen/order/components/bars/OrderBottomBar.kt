@@ -26,16 +26,15 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.core.local.LocalShape
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.util.OrderScreenExtras
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 
 @Composable
 fun OrderBottomBar(
   modifier: Modifier = Modifier,
-  utils: OrderScreenUtils,
   navigator: OrderScreenNavigator,
-  extras: OrderScreenExtras,
+  utils: OrderScreenUtils,
+  isScrolling: Boolean,
 ) {
   val offset = LocalOffset.current
   val shape = LocalShape.current
@@ -44,7 +43,7 @@ fun OrderBottomBar(
 
   val animatedYOffset by animateDpAsState(
     targetValue =
-      if (extras.isScrolling) {
+      if (isScrolling) {
         offset.bottomBar
       } else {
         offset.none
@@ -53,7 +52,7 @@ fun OrderBottomBar(
   )
   val animatedBottomBarHeight by animateDpAsState(
     targetValue =
-      if (extras.isScrolling) {
+      if (isScrolling) {
         contentHeight.none
       } else {
         contentHeight.bottomBar
@@ -62,7 +61,7 @@ fun OrderBottomBar(
   )
   val animatedBottomBarButtonHeight by animateDpAsState(
     targetValue =
-      if (extras.isScrolling) {
+      if (isScrolling) {
         contentHeight.none
       } else {
         contentHeight.halfStandard
@@ -85,7 +84,7 @@ fun OrderBottomBar(
           .width(contentWidth.orderItem)
           .height(animatedBottomBarButtonHeight),
       onClick = {
-        utils.resetAllOrderStates()
+        utils.resetAllOrderDetails()
         navigator.toOrderEditorScreen(false)
       },
       shape = RoundedCornerShape(shape.medium),

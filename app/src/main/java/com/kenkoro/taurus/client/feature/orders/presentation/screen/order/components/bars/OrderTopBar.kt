@@ -32,26 +32,21 @@ import androidx.compose.ui.unit.dp
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.util.OrderScreenExtras
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
 fun OrderTopBar(
   modifier: Modifier = Modifier,
-  utils: OrderScreenUtils,
   snackbarsHolder: OrderScreenSnackbarsHolder,
   navigator: OrderScreenNavigator,
-  extras: OrderScreenExtras,
+  userName: String,
 ) {
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
   val scope = rememberCoroutineScope()
-
-  val username = extras.username
 
   Row(
     modifier =
@@ -78,9 +73,9 @@ fun OrderTopBar(
             .clickable { navigator.toProfileScreen() },
         contentAlignment = Alignment.Center,
         content = {
-          if (!username.isNullOrEmpty()) {
+          if (userName.isNotEmpty()) {
             Text(
-              text = username.first().toString(),
+              text = userName.first().toString(),
               modifier = Modifier.fillMaxWidth(),
               textAlign = TextAlign.Center,
             )
