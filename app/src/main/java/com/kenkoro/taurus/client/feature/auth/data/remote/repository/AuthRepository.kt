@@ -4,9 +4,9 @@ import com.kenkoro.taurus.client.feature.auth.data.remote.api.AuthRemoteApi
 import com.kenkoro.taurus.client.feature.auth.data.remote.dto.AuthDto
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 
-interface LoginRepository {
+interface AuthRepository {
   companion object {
-    fun create(api: AuthRemoteApi): LoginRepositoryImpl = LoginRepositoryImpl(api)
+    fun create(api: AuthRemoteApi): AuthRepositoryImpl = AuthRepositoryImpl(api)
   }
 
   suspend fun logIn(dto: AuthDto): Result<TokenDto>

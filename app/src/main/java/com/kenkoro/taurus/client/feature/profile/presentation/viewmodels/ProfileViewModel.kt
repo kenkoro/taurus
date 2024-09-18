@@ -11,5 +11,5 @@ class ProfileViewModel
   constructor(
     private val decryptedCredentialService: DecryptedCredentialService,
   ) : ViewModel() {
-  fun deleteAllUserCredentials(): Boolean = decryptedCredentialService.deleteAll()
-}
+    fun deleteAllUserCredentials(): Boolean = decryptedCredentialService.deleteAll()
+  }

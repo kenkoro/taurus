@@ -4,9 +4,9 @@ import com.kenkoro.taurus.client.feature.auth.data.remote.api.AuthRemoteApi
 import com.kenkoro.taurus.client.feature.auth.data.remote.dto.AuthDto
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
 
-class LoginRepositoryImpl(
+class AuthRepositoryImpl(
   private val api: AuthRemoteApi,
-) : LoginRepository {
+) : AuthRepository {
   override suspend fun logIn(dto: AuthDto): Result<TokenDto> =
     runCatching {
       api.logIn(dto)

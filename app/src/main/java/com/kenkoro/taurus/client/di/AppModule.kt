@@ -8,8 +8,8 @@ import androidx.room.Room
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 import com.kenkoro.taurus.client.core.crypto.EncryptedCredentialService
 import com.kenkoro.taurus.client.feature.auth.data.remote.api.AuthRemoteApiImpl
-import com.kenkoro.taurus.client.feature.auth.data.remote.repository.LoginRepository
-import com.kenkoro.taurus.client.feature.auth.data.remote.repository.LoginRepositoryImpl
+import com.kenkoro.taurus.client.feature.auth.data.remote.repository.AuthRepository
+import com.kenkoro.taurus.client.feature.auth.data.remote.repository.AuthRepositoryImpl
 import com.kenkoro.taurus.client.feature.orders.data.local.OrderEntity
 import com.kenkoro.taurus.client.feature.orders.data.remote.OrderRemoteMediator
 import com.kenkoro.taurus.client.feature.orders.data.remote.api.CutOrderRemoteApiImpl
@@ -21,7 +21,10 @@ import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepo
 import com.kenkoro.taurus.client.feature.profile.data.remote.api.UserRemoteApiImpl
 import com.kenkoro.taurus.client.feature.profile.data.remote.repository.UserRepository
 import com.kenkoro.taurus.client.feature.profile.data.remote.repository.UserRepositoryImpl
+import com.kenkoro.taurus.client.feature.shared.data.SharedViewModelUtils
+import com.kenkoro.taurus.client.feature.shared.data.ViewModelUtils
 import com.kenkoro.taurus.client.feature.shared.data.local.LocalDatabase
+import com.kenkoro.taurus.client.feature.shared.viewmodels.util.UserStateManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,8 +63,8 @@ object AppModule {
 
   @Provides
   @Singleton
-  fun provideLoginRepository(): LoginRepositoryImpl {
-    return LoginRepository.create(AuthRemoteApiImpl(client))
+  fun provideAuthRepository(): AuthRepositoryImpl {
+    return AuthRepository.create(AuthRemoteApiImpl(client))
   }
 
   @Provides
@@ -89,9 +92,20 @@ object AppModule {
   }
 
   @Provides
+  @Singleton
   fun provideEncryptedCredentialService(app: Application): EncryptedCredentialService {
     return EncryptedCredentialService(app)
   }
+
+  @Provides
+  @Singleton
+  fun provideSharedViewModelUtils(repository: AuthRepositoryImpl): ViewModelUtils {
+    return SharedViewModelUtils(repository)
+  }
+
+  @Provides
+  @Singleton
+  fun provideUserStateManager(): UserStateManager = UserStateManager()
 
   @Provides
   @Singleton

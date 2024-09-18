@@ -5,19 +5,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.kenkoro.taurus.client.feature.profile.domain.User
+import com.kenkoro.taurus.client.feature.shared.viewmodels.util.UserStateManager
+import com.kenkoro.taurus.client.feature.shared.viewmodels.util.UserStateObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class OrderViewModel
   @Inject
-  constructor(
+  constructor(userStateManager: UserStateManager) :
+  ViewModel(),
+    UserStateObserver {
+    init {
+      userStateManager.addNewObserver(this)
+    }
 
-  ) : ViewModel() {
-  var user by mutableStateOf<User?>(null)
-    private set
+    var user by mutableStateOf<User?>(null)
+      private set
 
-  fun saveUser(user: User) {
-    this.user = user
+    override fun updateUserState(user: User) {
+      this.user = user
+    }
   }
-}

@@ -8,8 +8,8 @@ import androidx.room.Room
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 import com.kenkoro.taurus.client.core.crypto.EncryptedCredentialService
 import com.kenkoro.taurus.client.feature.auth.data.remote.api.AuthRemoteApiImpl
-import com.kenkoro.taurus.client.feature.auth.data.remote.repository.LoginRepository
-import com.kenkoro.taurus.client.feature.auth.data.remote.repository.LoginRepositoryImpl
+import com.kenkoro.taurus.client.feature.auth.data.remote.repository.AuthRepository
+import com.kenkoro.taurus.client.feature.auth.data.remote.repository.AuthRepositoryImpl
 import com.kenkoro.taurus.client.feature.orders.data.local.OrderEntity
 import com.kenkoro.taurus.client.feature.orders.data.remote.OrderRemoteMediator
 import com.kenkoro.taurus.client.feature.orders.data.remote.api.CutOrderRemoteApiImpl
@@ -60,8 +60,8 @@ object TestAppModule {
 
   @Provides
   @Singleton
-  fun provideLoginRepository(): LoginRepositoryImpl {
-    return LoginRepository.create(AuthRemoteApiImpl(client))
+  fun provideLoginRepository(): AuthRepositoryImpl {
+    return AuthRepository.create(AuthRemoteApiImpl(client))
   }
 
   @Provides

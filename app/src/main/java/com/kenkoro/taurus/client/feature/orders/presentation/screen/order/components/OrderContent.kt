@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.auth.data.mappers.toUser
@@ -17,6 +18,7 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.f
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.InspectorOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.ManagerOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.OrderFilterStrategy
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.viewmodels.OrderContentViewModel
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
@@ -38,6 +40,8 @@ fun OrderContent(
   snackbarsHolder: OrderScreenSnackbarsHolder,
   user: User?,
 ) {
+  val viewModel: OrderContentViewModel = hiltViewModel()
+
   val network = utils.network
 
   LaunchedEffect(network, Dispatchers.Main) {
@@ -48,12 +52,15 @@ fun OrderContent(
 
   if (utils.authStatus == AuthStatus.WaitingForAuth) {
     LaunchedEffect(Unit, Dispatchers.IO) {
-      val (subject, password) = utils.decryptUserSubjectAndItsPassword()
-      val loginRequest = remoteHandler.login(subject, password)
+      val (subject, password) = viewModel.decryptUserCredentials()
+      val authRequest = viewModel.auth(subject, password)
 
-      loginRequest.onSuccess { result ->
-        utils.encryptJWToken(result.token)
-        val getUserRequest = remoteHandler.getUser(subject, result.token)
+      authRequest.onSuccess { token ->
+        viewModel.encryptJWToken(token)
+
+        // Let's store the user state via the Observer pattern
+
+        val getUserRequest = remoteHandler.getUser(subject, token.token)
         getUserRequest.onSuccess { userDto ->
           val requestedUser = userDto.toUser()
           localHandler.addNewUser(requestedUser)
@@ -66,7 +73,7 @@ fun OrderContent(
         }
       }
 
-      loginRequest.onFailure {
+      authRequest.onFailure {
         withContext(Dispatchers.Main) { snackbarsHolder.loginError() }
       }
     }
@@ -78,7 +85,7 @@ fun OrderContent(
     }
   }
 
-  if (utils.authStatus.isSuccess()) {
+  if (utils.authStatus.isSuccess) {
     val orders = utils.ordersPagingFlow.collectAsLazyPagingItems()
 
     PullToRefreshLazyOrdersContent(
