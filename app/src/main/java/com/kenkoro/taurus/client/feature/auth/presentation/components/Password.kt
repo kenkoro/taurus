@@ -35,7 +35,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
-import com.kenkoro.taurus.client.feature.auth.presentation.util.PasswordState
+import com.kenkoro.taurus.client.feature.auth.presentation.states.PasswordState
 import com.kenkoro.taurus.client.feature.shared.components.TaurusIcon
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 

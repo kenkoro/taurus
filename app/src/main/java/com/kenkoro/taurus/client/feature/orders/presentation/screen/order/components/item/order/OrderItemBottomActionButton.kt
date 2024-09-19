@@ -14,9 +14,8 @@ import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Cut
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.ActualCutOrdersQuantityDialog
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.viewmodels.OrderItemActionButtonViewModel
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
@@ -35,7 +34,7 @@ fun OrderItemBottomActionButton(
   ordersScope: CoroutineScope,
   onHide: () -> Unit = {},
   onRefresh: () -> Unit = {},
-  utils: OrderScreenUtils,
+  shared: OrderScreenShared,
   snackbarsHolder: OrderScreenSnackbarsHolder,
 ) {
   val viewModel: OrderItemActionButtonViewModel = hiltViewModel()
@@ -60,7 +59,7 @@ fun OrderItemBottomActionButton(
       onHideWithDelay = onHideWithDelay,
       onRefresh = onRefresh,
       onEditOrder = viewModel::editOrder,
-      utils = utils,
+      utils = shared,
       snackbarsHolder = snackbarsHolder,
     )
   }
@@ -71,7 +70,7 @@ fun OrderItemBottomActionButton(
         modifier = modifier,
         order = order,
         text = stringResource(id = R.string.delete_button),
-        networkStatus = utils.network,
+        networkStatus = shared.network,
         onClick = {
           ordersScope.launch(Dispatchers.IO) {
             onHideWithDelay()
@@ -97,7 +96,7 @@ fun OrderItemBottomActionButton(
           modifier = modifier,
           order = order,
           text = stringResource(id = R.string.order_was_cut),
-          networkStatus = utils.network,
+          networkStatus = shared.network,
           onClick = openCutterDialog,
         )
       }
@@ -109,7 +108,7 @@ fun OrderItemBottomActionButton(
           modifier = modifier,
           order = order,
           text = stringResource(id = R.string.order_was_checked),
-          networkStatus = utils.network,
+          networkStatus = shared.network,
           onClick = {
             ordersScope.launch(Dispatchers.IO) {
               onHideWithDelay()

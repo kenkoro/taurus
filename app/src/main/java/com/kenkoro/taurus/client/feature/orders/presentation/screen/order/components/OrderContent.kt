@@ -3,19 +3,17 @@ package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.compo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.CutterOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.InspectorOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.ManagerOrderFilter
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.OrderFilterStrategy
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.viewmodels.OrderContentViewModel
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
@@ -30,14 +28,12 @@ import kotlinx.coroutines.withContext
 fun OrderContent(
   modifier: Modifier = Modifier,
   navigator: OrderScreenNavigator,
-  utils: OrderScreenUtils,
+  shared: OrderScreenShared,
   details: OrderDetails,
   snackbarsHolder: OrderScreenSnackbarsHolder,
   user: User?,
 ) {
-  val viewModel: OrderContentViewModel = hiltViewModel()
-
-  val network = utils.network
+  val network = shared.network
 
   LaunchedEffect(network, Dispatchers.Main) {
     if (network != NetworkStatus.Available) {
@@ -45,14 +41,14 @@ fun OrderContent(
     }
   }
 
-  if (utils.authStatus == AuthStatus.WaitingForAuth) {
+  if (shared.authStatus == AuthStatus.WaitingForAuth) {
     LaunchedEffect(Unit, Dispatchers.IO) {
       val (subject, password) = viewModel.decryptUserCredentials()
       val authRequest = viewModel.auth(subject, password)
 
       authRequest.onSuccess { token ->
         viewModel.encryptJWToken(token)
-        val isFailure = viewModel.getUser(subject, token) { utils.proceedAuth(AuthStatus.Success) }
+        val isFailure = viewModel.getUser(subject, token) { shared.proceedAuth(AuthStatus.Success) }
         if (isFailure) {
           withContext(Dispatchers.Main) { snackbarsHolder.loginError() }
         }
@@ -70,7 +66,7 @@ fun OrderContent(
     }
   }
 
-  if (utils.authStatus.isSuccess && user != null) {
+  if (shared.authStatus.isSuccess && user != null) {
     val orders = viewModel.ordersPagingFlow.collectAsLazyPagingItems()
 
     PullToRefreshLazyOrdersContent(
@@ -83,7 +79,7 @@ fun OrderContent(
       },
       ordersScope = viewModel.viewModelScope,
       navigator = navigator,
-      utils = utils,
+      shared = shared,
       statesHolder = details,
       snackbarsHolder = snackbarsHolder,
     )

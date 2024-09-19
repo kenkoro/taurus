@@ -46,9 +46,8 @@ import com.kenkoro.taurus.client.feature.orders.data.mappers.toCutOrder
 import com.kenkoro.taurus.client.feature.orders.domain.EditOrder
 import com.kenkoro.taurus.client.feature.orders.domain.NewCutOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.viewmodels.ActualCutOrdersQuantityDialogViewModel
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +64,7 @@ fun ActualCutOrdersQuantityDialog(
   onHideWithDelay: suspend () -> Unit = {},
   onEditOrder: suspend (dto: EditOrder, editor: String, postAction: () -> Unit) -> Boolean,
   onRefresh: () -> Unit = {},
-  utils: OrderScreenUtils,
+  utils: OrderScreenShared,
   snackbarsHolder: OrderScreenSnackbarsHolder,
 ) {
   val viewModel: ActualCutOrdersQuantityDialogViewModel = hiltViewModel()
@@ -108,12 +107,11 @@ fun ActualCutOrdersQuantityDialog(
       onHideWithDelay()
 
       val cutOrder = order.toCutOrder()
-      localHandler.editOrder(cutOrder, order.orderId)
-      val wasAcknowledged =
-        remoteHandler.editOrder(cutOrder, user?.subject ?: "")
-      if (wasAcknowledged) {
-        onRefresh()
-      } else {
+      val isFailure =
+        onEditOrder(cutOrder, user.subject) {
+          onRefresh()
+        }
+      if (isFailure) {
         withContext(Dispatchers.Main) { snackbarsHolder.apiError() }
       }
     }

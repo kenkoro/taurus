@@ -17,11 +17,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.auth.presentation.components.AuthContent
 import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenNavigator
+import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenShared
 import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenSnackbarsHolder
-import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthUtils
+import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenUtils
 import com.kenkoro.taurus.client.feature.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 import kotlinx.coroutines.delay
@@ -30,8 +32,10 @@ import kotlinx.coroutines.delay
 fun AuthScreen(
   modifier: Modifier = Modifier,
   navigator: AuthScreenNavigator,
-  utils: AuthUtils,
+  shared: AuthScreenShared,
 ) {
+  val viewModel: AuthViewModel = hiltViewModel()
+
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
   val internetSnackbarHostState = remember { SnackbarHostState() }
@@ -58,6 +62,14 @@ fun AuthScreen(
           actionLabel = okActionLabel,
         )
       },
+    )
+  val utils =
+    AuthScreenUtils(
+      subject = viewModel.subject,
+      password = viewModel.password,
+      showErrorTitle = viewModel::showErrorTitle,
+      auth = viewModel::auth,
+      encryptAll = viewModel::encryptAll,
     )
 
   LaunchedEffect(Unit) {
@@ -98,8 +110,9 @@ fun AuthScreen(
           AnimatedVisibility(visible = visible) {
             AuthContent(
               navigator = navigator,
-              utils = utils,
+              shared = shared,
               snackbarsHolder = snackbarsHolder,
+              utils = utils,
             )
           }
         }

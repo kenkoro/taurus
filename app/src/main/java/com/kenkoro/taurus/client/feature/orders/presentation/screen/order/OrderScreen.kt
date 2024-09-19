@@ -22,9 +22,8 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.compon
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderBottomBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderTopBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.viewmodels.OrderViewModel
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
@@ -33,7 +32,7 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 fun OrderScreen(
   modifier: Modifier = Modifier,
   navigator: OrderScreenNavigator,
-  utils: OrderScreenUtils,
+  shared: OrderScreenShared,
   details: OrderDetails,
 ) {
   val viewModel: OrderViewModel = hiltViewModel()
@@ -144,7 +143,7 @@ fun OrderScreen(
         if (user != null && user.profile == Customer) {
           OrderBottomBar(
             navigator = navigator,
-            utils = utils,
+            shared = shared,
             isScrolling = lazyOrdersState.isScrollInProgress,
           )
         }
@@ -159,10 +158,9 @@ fun OrderScreen(
         ) {
           OrderContent(
             navigator = navigator,
-            utils = utils,
+            shared = shared,
             details = details,
             snackbarsHolder = snackbarsHolder,
-            user = viewModel.user,
           )
         }
       },

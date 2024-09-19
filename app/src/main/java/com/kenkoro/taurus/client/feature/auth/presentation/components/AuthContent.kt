@@ -17,14 +17,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.auth.presentation.components.util.AuthExtras
 import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenNavigator
+import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenShared
 import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenSnackbarsHolder
-import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthUtils
-import com.kenkoro.taurus.client.feature.auth.presentation.viewmodels.AuthContentViewModel
+import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenUtils
 import com.kenkoro.taurus.client.feature.shared.states.AuthStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,11 +33,10 @@ import kotlinx.coroutines.withContext
 fun AuthContent(
   modifier: Modifier = Modifier,
   navigator: AuthScreenNavigator,
-  utils: AuthUtils,
+  shared: AuthScreenShared,
   snackbarsHolder: AuthScreenSnackbarsHolder,
+  utils: AuthScreenUtils,
 ) {
-  val viewModel: AuthContentViewModel = hiltViewModel()
-
   val contentWidth = LocalContentWidth.current
   val focusManager = LocalFocusManager.current
 
@@ -54,17 +52,17 @@ fun AuthContent(
       whenLoginSubmitted = { subject, password ->
         scope.launch(Dispatchers.IO) {
           isAuthenticating = true
-          val result = viewModel.auth(subject, password)
+          val result = utils.auth(subject, password)
           isAuthenticating = false
 
           result.onSuccess {
-            viewModel.encryptAll(subject, password, it.token)
-            utils.proceedAuth(AuthStatus.Success)
+            utils.encryptAll(subject, password, it.token)
+            shared.proceedAuth(AuthStatus.Success)
             withContext(Dispatchers.Main) { navigator.toOrderScreen() }
           }
 
           result.onFailure {
-            utils.proceedAuth(AuthStatus.Failure)
+            shared.proceedAuth(AuthStatus.Failure)
             snackbarsHolder.loginError()
           }
         }
@@ -81,8 +79,8 @@ fun AuthContent(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
   ) {
-    if (utils.network != NetworkStatus.Available) {
-      LaunchedEffect(utils.network) { snackbarsHolder.internetConnectionError() }
+    if (shared.network != NetworkStatus.Available) {
+      LaunchedEffect(shared.network) { snackbarsHolder.internetConnectionError() }
     }
 
     Column(
@@ -92,8 +90,9 @@ fun AuthContent(
     ) {
       AuthTextFields(
         modifier = Modifier.width(contentWidth.standard),
-        utils = utils,
+        shared = shared,
         extras = extras,
+        utils = utils,
       )
     }
   }

@@ -42,9 +42,8 @@ import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.allowedToSeeOrders
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.viewmodels.OrderItemViewModel
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Admin
@@ -63,7 +62,7 @@ fun OrderItem(
   onRefresh: () -> Unit = {},
   ordersScope: CoroutineScope,
   navigator: OrderScreenNavigator,
-  utils: OrderScreenUtils,
+  shared: OrderScreenShared,
   details: OrderDetails,
   snackbarsHolder: OrderScreenSnackbarsHolder,
 ) {
@@ -89,7 +88,7 @@ fun OrderItem(
     details.colorState.text = order.color
     details.categoryState.text = order.category
     details.quantityState.text = order.quantity.toString()
-    utils.saveTheRestDetails(order.orderId, order.date, order.status)
+    shared.saveTheRestDetails(order.orderId, order.date, order.status)
   }
   val onEditOrder = {
     onSaveOrderDetails()
@@ -170,7 +169,7 @@ fun OrderItem(
                 ordersScope = ordersScope,
                 onHide = { visible = false },
                 onRefresh = onRefresh,
-                utils = utils,
+                shared = shared,
                 snackbarsHolder = snackbarsHolder,
               )
 

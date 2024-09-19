@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.auth.presentation.util
+package com.kenkoro.taurus.client.feature.auth.presentation.states
 
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 

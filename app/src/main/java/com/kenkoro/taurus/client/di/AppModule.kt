@@ -24,7 +24,6 @@ import com.kenkoro.taurus.client.feature.profile.data.remote.repository.UserRepo
 import com.kenkoro.taurus.client.feature.shared.data.SharedViewModelUtils
 import com.kenkoro.taurus.client.feature.shared.data.ViewModelUtils
 import com.kenkoro.taurus.client.feature.shared.data.local.LocalDatabase
-import com.kenkoro.taurus.client.feature.shared.viewmodels.util.UserStateManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

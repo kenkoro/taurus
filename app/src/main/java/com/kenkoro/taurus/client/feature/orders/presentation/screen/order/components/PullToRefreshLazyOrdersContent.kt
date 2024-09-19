@@ -29,8 +29,8 @@ import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order.OrderItem
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
@@ -48,7 +48,7 @@ fun PullToRefreshLazyOrdersContent(
   onRefreshOrders: suspend () -> Unit = {},
   ordersScope: CoroutineScope,
   navigator: OrderScreenNavigator,
-  utils: OrderScreenUtils,
+  shared: OrderScreenShared,
   statesHolder: OrderDetails,
   snackbarsHolder: OrderScreenSnackbarsHolder,
 ) {
@@ -91,7 +91,7 @@ fun PullToRefreshLazyOrdersContent(
               onRefresh = orders::refresh,
               ordersScope = ordersScope,
               navigator = navigator,
-              utils = utils,
+              shared = shared,
               details = statesHolder,
               snackbarsHolder = snackbarsHolder,
             )

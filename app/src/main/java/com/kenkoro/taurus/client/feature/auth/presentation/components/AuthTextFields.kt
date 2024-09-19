@@ -19,30 +19,28 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.feature.auth.presentation.components.util.AuthExtras
-import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthUtils
-import com.kenkoro.taurus.client.feature.auth.presentation.viewmodels.AuthTextFieldsViewModel
+import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenShared
+import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenUtils
 
 @Composable
 fun AuthTextFields(
   modifier: Modifier = Modifier,
-  utils: AuthUtils,
+  shared: AuthScreenShared,
   extras: AuthExtras,
+  utils: AuthScreenUtils,
 ) {
-  val viewModel: AuthTextFieldsViewModel = hiltViewModel()
-
   val offset = LocalOffset.current
   val focusManager = LocalFocusManager.current
   val contentHeight = LocalContentHeight.current
 
   val focusRequester = remember { FocusRequester() }
-  val subject = viewModel.subject
-  val password = viewModel.password
+  val subject = utils.subject
+  val password = utils.password
 
   val isSubjectInvalidWhilePasswordIsFocused = { !subject.isValid && password.isFocused }
   val isSubjectInvalidWhilePasswordIsNotFocused = { !subject.isValid && !password.isFocused }
@@ -64,7 +62,7 @@ fun AuthTextFields(
       focusManager.moveFocus(FocusDirection.Up)
     }
   }
-  val isLoginButtonEnable = { utils.network == NetworkStatus.Available }
+  val isLoginButtonEnable = { shared.network == NetworkStatus.Available }
 
   val yTargetValue = {
     if (subject.isFocused || password.isFocused) {
@@ -75,7 +73,7 @@ fun AuthTextFields(
   }
   val y by animateDpAsState(targetValue = yTargetValue(), label = "AnimatedYOffset")
   val titleColor = @Composable {
-    if (viewModel.showErrorTitle()) {
+    if (utils.showErrorTitle()) {
       MaterialTheme.colorScheme.error
     } else {
       LocalContentColor.current
@@ -109,7 +107,7 @@ fun AuthTextFields(
       isLogging = extras.isAuthenticating,
       isError = subject.showErrors() || password.showErrors(),
       onSubmit = onSubmit,
-      onExit = utils.exit,
+      onExit = shared.exit,
     )
   }
 }

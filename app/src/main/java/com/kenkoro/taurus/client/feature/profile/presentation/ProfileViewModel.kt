@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.profile.presentation.viewmodels
+package com.kenkoro.taurus.client.feature.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService

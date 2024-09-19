@@ -27,13 +27,13 @@ import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 
 @Composable
 fun OrderBottomBar(
   modifier: Modifier = Modifier,
   navigator: OrderScreenNavigator,
-  utils: OrderScreenUtils,
+  shared: OrderScreenShared,
   isScrolling: Boolean,
 ) {
   val offset = LocalOffset.current
@@ -84,7 +84,7 @@ fun OrderBottomBar(
           .width(contentWidth.orderItem)
           .height(animatedBottomBarButtonHeight),
       onClick = {
-        utils.resetAllOrderDetails()
+        shared.resetAllOrderDetails()
         navigator.toOrderEditorScreen(false)
       },
       shape = RoundedCornerShape(shape.medium),

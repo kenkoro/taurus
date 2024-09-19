@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -18,19 +17,18 @@ import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 import com.kenkoro.taurus.client.feature.auth.presentation.AuthScreen
 import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenNavigator
-import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthUtils
+import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenShared
+import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderScreen
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.profile.presentation.ProfileScreen
 import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenNavigator
-import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenUtils
+import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenShared
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.OrderDetailsSearchScreen
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenRemoteHandler
@@ -40,9 +38,6 @@ import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import com.kenkoro.taurus.client.feature.shared.viewmodels.SharedAuthViewModel
 import com.kenkoro.taurus.client.feature.shared.viewmodels.SharedOrderDetailsViewModel
 import com.kenkoro.taurus.client.feature.shared.viewmodels.util.sharedHiltViewModel
-
-typealias PSNavigator = ProfileScreenNavigator
-typealias PSUtils = ProfileScreenUtils
 
 typealias OESNavigator = OrderEditorScreenNavigator
 typealias OESUtils = OrderEditorScreenUtils
@@ -61,71 +56,6 @@ fun AppNavHost(
   val decryptedCredentialService = DecryptedCredentialService(context)
   val (subject, password) = decryptedCredentialService.decryptUserCredentials()
   val startDestination = navHostUtils.startDestination(subject, password).route
-
-  fun orderScreenParams(): Triple<OrderScreenNavigator, OrderScreenUtils, OrderDetails> {
-    val orderScreenNavigator =
-      OrderScreenNavigator(
-        toProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
-        toOrderEditorScreen = { editOrder: Boolean ->
-          navController.navigate(Screen.OrderEditorScreen.route + "?editOrder=$editOrder")
-        },
-      )
-    val orderScreenUtils =
-      OrderScreenUtils(
-        ordersPagingFlow = orderViewModel.ordersPagingFlow,
-        user = userViewModel.user,
-        authStatus = authViewModel.loginState,
-        network = networkStatus,
-        selectedOrderRecordId = orderViewModel.selectedOrderRecordId,
-        saveUser = userViewModel::user,
-        newOrdersFilter = orderViewModel::filterStrategy,
-        selectOrder = orderViewModel::selectOrder,
-        newLoginState = authViewModel::loginState,
-        encryptJWToken = userViewModel::encryptToken,
-        decryptUserSubjectAndItsPassword = authViewModel::decryptSubjectAndPassword,
-        decryptJWToken = userViewModel::decryptToken,
-        resetAllOrderDetails = orderEditorViewModel::resetAll,
-        saveOrderStatus = orderEditorViewModel::status,
-        saveOrderId = orderEditorViewModel::orderId,
-        saveDate = orderEditorViewModel::date,
-        viewModelScope = orderViewModel.viewModelScope,
-      )
-    val orderDetails =
-      OrderDetails(
-        categoryState = orderEditorViewModel.category,
-        colorState = orderEditorViewModel.color,
-        customerState = orderEditorViewModel.customer,
-        modelState = orderEditorViewModel.model,
-        orderIdState = orderEditorViewModel.orderId,
-        quantityState = orderEditorViewModel.quantity,
-        sizeState = orderEditorViewModel.size,
-        titleState = orderEditorViewModel.title,
-      )
-
-    return Triple(orderScreenNavigator, orderScreenUtils, orderDetails)
-  }
-
-  fun orderScreenHandlers(): Pair<OrderScreenLocalHandler, OrderScreenRemoteHandler> {
-    val orderScreenLocalHandler =
-      OrderScreenLocalHandler(
-        addNewUser = userViewModel::addNewUserLocally,
-        addNewOrder = orderViewModel::addNewOrderLocally,
-        deleteOrder = orderViewModel::deleteOrderLocally,
-        editOrder = orderViewModel::editOrderLocally,
-      )
-    val orderScreenRemoteHandler =
-      OrderScreenRemoteHandler(
-        login = authViewModel::login,
-        getUser = userViewModel::getUser,
-        addNewOrder = orderViewModel::addNewOrderRemotely,
-        deleteOrder = orderViewModel::deleteOrderRemotely,
-        editOrder = orderEditorViewModel::editOrderRemotely,
-        addNewCutOrder = orderViewModel::addNewCutOrderRemotely,
-        getActualCutOrdersQuantity = orderViewModel::getActualCutOrdersQuantity,
-      )
-
-    return Pair(orderScreenLocalHandler, orderScreenRemoteHandler)
-  }
 
   fun orderEditorScreenParams(editOrder: Boolean = false): Pair<OESNavigator, OESUtils> {
     val orderEditorScreenNavigator =
@@ -156,8 +86,8 @@ fun AppNavHost(
     composable(route = Screen.AuthScreen.route) { entry ->
       val sharedAuthViewModel = entry.sharedHiltViewModel<SharedAuthViewModel>(navController)
       val navigator = AuthScreenNavigator { navController.navigate(Screen.OrderScreen.route) }
-      val utils =
-        AuthUtils(
+      val shared =
+        AuthScreenShared(
           network = networkStatus,
           exit = navHostUtils.exit,
           proceedAuth = sharedAuthViewModel::proceedAuth,
@@ -165,7 +95,7 @@ fun AppNavHost(
 
       AuthScreen(
         navigator = navigator,
-        utils = utils,
+        shared = shared,
       )
     }
 
@@ -175,7 +105,6 @@ fun AppNavHost(
         entry.sharedHiltViewModel<SharedOrderDetailsViewModel>(
           navController,
         )
-      // Here, you can now access shared states
       val navigator =
         OrderScreenNavigator(
           toProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
@@ -183,17 +112,36 @@ fun AppNavHost(
             navController.navigate(Screen.OrderEditorScreen.route + "?editOrder=$editOrder")
           },
         )
-      val utils =
-        OrderScreenUtils(
-          resetAllOrderDetails = sharedOrderDetailsViewModel::resetAllOrderDetails,
+      val shared =
+        OrderScreenShared(
           authStatus = sharedAuthViewModel.authStatus,
+          network = networkStatus,
+          resetAllOrderDetails = sharedOrderDetailsViewModel::resetAllOrderDetails,
           proceedAuth = sharedAuthViewModel::proceedAuth,
+          saveTheRestDetails = { orderId: Int, date: Long, status: OrderStatus ->
+            sharedOrderDetailsViewModel.changeOrderId(orderId)
+            sharedOrderDetailsViewModel.changeDate(date)
+            sharedOrderDetailsViewModel.changeOrderStatus(status)
+          },
+        )
+      val details =
+        OrderDetails(
+          orderIdState = sharedOrderDetailsViewModel.orderId,
+          dateState = sharedOrderDetailsViewModel.date,
+          statusState = sharedOrderDetailsViewModel.status,
+          categoryState = sharedOrderDetailsViewModel.category,
+          colorState = sharedOrderDetailsViewModel.color,
+          customerState = sharedOrderDetailsViewModel.customer,
+          modelState = sharedOrderDetailsViewModel.model,
+          quantityState = sharedOrderDetailsViewModel.quantity,
+          sizeState = sharedOrderDetailsViewModel.size,
+          titleState = sharedOrderDetailsViewModel.title,
         )
 
       OrderScreen(
         navigator = navigator,
-        utils = orderScreenUtils,
-        details = orderStatesHolder,
+        shared = shared,
+        details = details,
       )
     }
 
@@ -203,15 +151,15 @@ fun AppNavHost(
         ProfileScreenNavigator {
           navController.navigate(Screen.AuthScreen.route)
         }
-      val utils =
-        ProfileScreenUtils(
+      val shared =
+        ProfileScreenShared(
           resetAuthStatus = sharedAuthViewModel::reset,
           restartApp = navHostUtils.restart,
         )
 
       ProfileScreen(
         navigator = navigator,
-        utils = utils,
+        shared = shared,
       )
     }
 
