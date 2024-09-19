@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalView
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
@@ -38,13 +39,13 @@ import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Cut
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.allowedToSeeOrders
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.viewmodels.OrderItemViewModel
+import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Admin
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Ceo
@@ -52,20 +53,22 @@ import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Manager
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun OrderItem(
   modifier: Modifier = Modifier,
   order: Order,
-  localHandler: OrderScreenLocalHandler,
-  remoteHandler: OrderScreenRemoteHandler,
+  user: User,
+  onRefresh: () -> Unit = {},
+  ordersScope: CoroutineScope,
   navigator: OrderScreenNavigator,
   utils: OrderScreenUtils,
-  statesHolder: OrderStatesHolder,
+  details: OrderDetails,
   snackbarsHolder: OrderScreenSnackbarsHolder,
-  onRefresh: () -> Unit = {},
 ) {
-  val user = utils.user
+  val viewModel: OrderItemViewModel = hiltViewModel()
+  val selectedOrderRecordId = viewModel.selectedOrderRecordId
 
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
@@ -78,36 +81,29 @@ fun OrderItem(
       null
     }
 
-  val onSaveStates = {
-    statesHolder.customerState.text = order.customer
-    statesHolder.titleState.text = order.title
-    statesHolder.modelState.text = order.model
-    statesHolder.sizeState.text = order.size
-    statesHolder.colorState.text = order.color
-    statesHolder.categoryState.text = order.category
-    statesHolder.quantityState.text = order.quantity.toString()
-
-    utils.saveOrderId(order.orderId)
-    utils.saveOrderStatus(order.status)
-    utils.saveDate(order.date)
+  val onSaveOrderDetails = {
+    details.customerState.text = order.customer
+    details.titleState.text = order.title
+    details.modelState.text = order.model
+    details.sizeState.text = order.size
+    details.colorState.text = order.color
+    details.categoryState.text = order.category
+    details.quantityState.text = order.quantity.toString()
+    utils.saveTheRestDetails(order.orderId, order.date, order.status)
   }
   val onEditOrder = {
-    onSaveStates()
+    onSaveOrderDetails()
     navigator.toOrderEditorScreen(true)
   }
-  val onDropOrderSelection = { utils.selectOrder(null) }
 
   var visible by rememberSaveable {
     mutableStateOf(true)
   }
-  val selected = { utils.selectedOrderRecordId == order.recordId }
+  val selected = { selectedOrderRecordId == order.recordId }
   val animatedHeight by animateDpAsState(
     targetValue =
       if (selected()) {
-        if (
-          allowedToUpdateOrderStatus(user?.profile) &&
-          orderStatusCorrespondsToUserProfile(user?.profile, order.status)
-        ) {
+        if (checkUserDetails(user.profile, order.status)) {
           contentHeight.orderItemExpanded
         } else {
           contentHeight.orderItemExpandedWithoutActionButton
@@ -131,9 +127,9 @@ fun OrderItem(
             .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable {
               if (selected()) {
-                onDropOrderSelection()
+                viewModel.clearOrderSelection()
               } else {
-                utils.selectOrder(order.recordId)
+                viewModel.newOrderSelection(order.recordId)
               }
             },
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -151,12 +147,12 @@ fun OrderItem(
           OrderItemContent(
             order = order,
             selected = selected(),
-            isCutter = user != null && user.profile == Cutter,
-            onGetActualCutOrdersQuantity = { remoteHandler.getActualCutOrdersQuantity(it) },
+            isCutter = user.profile == Cutter,
+            onGetActualQuantityOfCutMaterial = viewModel::getActualQuantityOfCutMaterial,
           )
         }
 
-        if (allowedToUpdateOrderStatus(user?.profile) && selected()) {
+        if (allowedToUpdateOrderStatus(user.profile) && selected()) {
           Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -170,15 +166,15 @@ fun OrderItem(
               OrderItemBottomActionButton(
                 modifier = Modifier.weight(1F),
                 order = order,
-                localHandler = localHandler,
-                remoteHandler = remoteHandler,
-                utils = utils,
-                snackbarsHolder = snackbarsHolder,
+                user = user,
+                ordersScope = ordersScope,
                 onHide = { visible = false },
                 onRefresh = onRefresh,
+                utils = utils,
+                snackbarsHolder = snackbarsHolder,
               )
 
-              if (allowedToEditOrder(user?.profile)) {
+              if (allowedToEditOrder(user.profile)) {
                 Spacer(modifier = Modifier.width(contentWidth.small))
                 IconButton(
                   onClick = {
@@ -200,25 +196,31 @@ fun OrderItem(
   }
 }
 
-private fun allowedToUpdateOrderStatus(profile: UserProfile?): Boolean {
+private fun checkUserDetails(
+  profile: UserProfile,
+  status: OrderStatus,
+): Boolean {
+  return allowedToUpdateOrderStatus(profile) && orderStatusCorrespondsToUserProfile(profile, status)
+}
+
+private fun allowedToUpdateOrderStatus(profile: UserProfile): Boolean {
   return allowedToSeeOrders(profile) &&
     profile != Admin &&
     profile != Ceo &&
     profile != Manager
 }
 
-private fun allowedToEditOrder(profile: UserProfile?): Boolean {
-  return profile != null && profile == Customer
+private fun allowedToEditOrder(profile: UserProfile): Boolean {
+  return profile == Customer
 }
 
 private fun orderStatusCorrespondsToUserProfile(
-  userProfile: UserProfile?,
+  userProfile: UserProfile,
   orderStatus: OrderStatus,
 ): Boolean {
   return when (userProfile) {
     Cutter -> orderStatus == Idle
     Inspector -> orderStatus == Cut
-    null -> false
     else -> true
   }
 }

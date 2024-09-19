@@ -14,14 +14,14 @@ import androidx.compose.ui.res.stringResource
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.util.OrderDetailItem
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
 @Composable
 fun OrderEditorTextFields(
   modifier: Modifier = Modifier,
-  states: OrderStatesHolder = OrderStatesHolder(),
+  states: OrderDetails = OrderDetails(),
   navigator: OrderEditorScreenNavigator,
   onStateChangeOrderDetailsSearchBehavior: (TaurusTextFieldState) -> Unit = {},
 ) {

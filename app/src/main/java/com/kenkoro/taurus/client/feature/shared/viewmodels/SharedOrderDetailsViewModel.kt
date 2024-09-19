@@ -2,9 +2,11 @@ package com.kenkoro.taurus.client.feature.shared.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.CategoryState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.ColorState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.CustomerState
@@ -21,6 +23,11 @@ class SharedOrderDetailsViewModel
   constructor() : ViewModel() {
     var orderId by mutableIntStateOf(1)
       private set
+
+    var date by mutableLongStateOf(0L)
+      private set
+
+    var status by mutableStateOf(OrderStatus.Idle)
 
     var customer by mutableStateOf(CustomerState(customer = ""))
       private set
@@ -45,6 +52,8 @@ class SharedOrderDetailsViewModel
 
     fun resetAllOrderDetails() {
       orderId = 1
+      date = 0
+      status = OrderStatus.Idle
       customer = CustomerState("")
       title = TitleState("")
       model = ModelState("")
@@ -52,5 +61,17 @@ class SharedOrderDetailsViewModel
       color = ColorState("")
       category = CategoryState("")
       quantity = QuantityState(null)
+    }
+
+    fun changeOrderId(orderId: Int) {
+      this.orderId = orderId
+    }
+
+    fun changeDate(date: Long) {
+      this.date = date
+    }
+
+    fun changeOrderStatus(status: OrderStatus) {
+      this.status = status
     }
   }

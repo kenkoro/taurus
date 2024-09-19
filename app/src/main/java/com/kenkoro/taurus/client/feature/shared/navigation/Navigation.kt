@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -21,22 +20,18 @@ import com.kenkoro.taurus.client.feature.auth.presentation.AuthScreen
 import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenNavigator
 import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorScreen
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorViewModel
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderScreen
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderViewModel
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.profile.presentation.ProfileScreen
-import com.kenkoro.taurus.client.feature.profile.presentation.UserViewModel
 import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenNavigator
 import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenUtils
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.OrderDetailsSearchScreen
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.OrderDetailsSearchViewModel
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenRemoteHandler
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenUtils
@@ -57,11 +52,6 @@ fun AppNavHost(
   navController: NavHostController = rememberNavController(),
   navHostUtils: AppNavHostUtils,
 ) {
-  val orderViewModel: OrderViewModel = hiltViewModel()
-  val userViewModel: UserViewModel = hiltViewModel()
-  val orderEditorViewModel: OrderEditorViewModel = hiltViewModel()
-  val orderDetailsSearchViewModel: OrderDetailsSearchViewModel = hiltViewModel()
-
   val context = LocalContext.current
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
   val networkStatus by networkConnectivityObserver
@@ -72,7 +62,7 @@ fun AppNavHost(
   val (subject, password) = decryptedCredentialService.decryptUserCredentials()
   val startDestination = navHostUtils.startDestination(subject, password).route
 
-  fun orderScreenParams(): Triple<OrderScreenNavigator, OrderScreenUtils, OrderStatesHolder> {
+  fun orderScreenParams(): Triple<OrderScreenNavigator, OrderScreenUtils, OrderDetails> {
     val orderScreenNavigator =
       OrderScreenNavigator(
         toProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
@@ -100,8 +90,8 @@ fun AppNavHost(
         saveDate = orderEditorViewModel::date,
         viewModelScope = orderViewModel.viewModelScope,
       )
-    val orderStatesHolder =
-      OrderStatesHolder(
+    val orderDetails =
+      OrderDetails(
         categoryState = orderEditorViewModel.category,
         colorState = orderEditorViewModel.color,
         customerState = orderEditorViewModel.customer,
@@ -112,7 +102,7 @@ fun AppNavHost(
         titleState = orderEditorViewModel.title,
       )
 
-    return Triple(orderScreenNavigator, orderScreenUtils, orderStatesHolder)
+    return Triple(orderScreenNavigator, orderScreenUtils, orderDetails)
   }
 
   fun orderScreenHandlers(): Pair<OrderScreenLocalHandler, OrderScreenRemoteHandler> {
@@ -159,9 +149,6 @@ fun AppNavHost(
     return Pair(orderEditorScreenNavigator, orderEditorScreenUtils)
   }
 
-  val (orderScreenNavigator, orderScreenUtils, orderStatesHolder) = orderScreenParams()
-  val (orderScreenLocalHandler, orderScreenRemoteHandler) = orderScreenHandlers()
-
   NavHost(
     navController = navController,
     startDestination = startDestination,
@@ -199,12 +186,14 @@ fun AppNavHost(
       val utils =
         OrderScreenUtils(
           resetAllOrderDetails = sharedOrderDetailsViewModel::resetAllOrderDetails,
+          authStatus = sharedAuthViewModel.authStatus,
+          proceedAuth = sharedAuthViewModel::proceedAuth,
         )
 
       OrderScreen(
         navigator = navigator,
         utils = orderScreenUtils,
-        states = orderStatesHolder,
+        details = orderStatesHolder,
       )
     }
 

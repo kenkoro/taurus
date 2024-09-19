@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components
 
 import androidx.compose.foundation.layout.Arrangement
@@ -28,33 +26,32 @@ import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.feature.orders.domain.Order
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.item.order.OrderItem
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
+import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Tailor
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PullToRefreshLazyOrdersContent(
   modifier: Modifier = Modifier,
   orders: LazyPagingItems<Order>,
-  localHandler: OrderScreenLocalHandler,
-  remoteHandler: OrderScreenRemoteHandler,
+  user: User,
+  onRefreshOrders: suspend () -> Unit = {},
+  ordersScope: CoroutineScope,
   navigator: OrderScreenNavigator,
   utils: OrderScreenUtils,
-  statesHolder: OrderStatesHolder,
+  statesHolder: OrderDetails,
   snackbarsHolder: OrderScreenSnackbarsHolder,
-  onRefreshOrders: suspend () -> Unit = {},
 ) {
-  val user = utils.user
-
   val size = LocalSize.current
   val offset = LocalOffset.current
   val strokeWidth = LocalStrokeWidth.current
@@ -67,11 +64,11 @@ fun PullToRefreshLazyOrdersContent(
     LaunchedEffect(Unit, Dispatchers.Main) { snackbarsHolder.getPaginatedOrdersError() }
   }
 
-  if (user?.profile == Tailor || user?.profile == Other) {
+  if (user.profile == Tailor || user.profile == Other) {
     LaunchedEffect(Unit, Dispatchers.Main) { snackbarsHolder.accessToOrdersError() }
   }
 
-  if (allowedToSeeOrders(user?.profile)) {
+  if (allowedToSeeOrders(user.profile)) {
     Box(modifier = modifier.nestedScroll(pullToRefreshState.nestedScrollConnection)) {
       LazyColumn(
         state = lazyListState,
@@ -90,13 +87,13 @@ fun PullToRefreshLazyOrdersContent(
           if (order != null) {
             OrderItem(
               order = order,
-              localHandler = localHandler,
-              remoteHandler = remoteHandler,
+              user = user,
+              onRefresh = orders::refresh,
+              ordersScope = ordersScope,
               navigator = navigator,
               utils = utils,
-              statesHolder = statesHolder,
+              details = statesHolder,
               snackbarsHolder = snackbarsHolder,
-              onRefresh = orders::refresh,
             )
           }
         }

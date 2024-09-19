@@ -20,7 +20,7 @@ import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.OrderEditorContent
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.OrderEditorTopBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.util.OrderEditorScreenExtras
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenUtils
@@ -34,7 +34,7 @@ fun OrderEditorScreen(
   remoteHandler: OrderScreenRemoteHandler,
   navigator: OrderEditorScreenNavigator,
   utils: OrderEditorScreenUtils,
-  states: OrderStatesHolder,
+  states: OrderDetails,
 ) {
   val errorSnackbarHostState = remember { SnackbarHostState() }
   val user = utils.user

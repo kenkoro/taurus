@@ -17,13 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.OrderContent
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderBottomBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderTopBar
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.viewmodels.OrderViewModel
@@ -34,11 +32,9 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 @Composable
 fun OrderScreen(
   modifier: Modifier = Modifier,
-  localHandler: OrderScreenLocalHandler = OrderScreenLocalHandler(),
-  remoteHandler: OrderScreenRemoteHandler,
   navigator: OrderScreenNavigator,
   utils: OrderScreenUtils,
-  states: OrderStatesHolder,
+  details: OrderDetails,
 ) {
   val viewModel: OrderViewModel = hiltViewModel()
 
@@ -162,11 +158,9 @@ fun OrderScreen(
               .padding(paddingValues),
         ) {
           OrderContent(
-            localHandler = localHandler,
-            remoteHandler = remoteHandler,
             navigator = navigator,
             utils = utils,
-            statesHolder = states,
+            details = details,
             snackbarsHolder = snackbarsHolder,
             user = viewModel.user,
           )

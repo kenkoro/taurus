@@ -1,17 +1,14 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.feature.auth.data.mappers.toUser
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderStatesHolder
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.CutterOrderFilter
@@ -32,11 +29,9 @@ import kotlinx.coroutines.withContext
 @Composable
 fun OrderContent(
   modifier: Modifier = Modifier,
-  localHandler: OrderScreenLocalHandler,
-  remoteHandler: OrderScreenRemoteHandler,
   navigator: OrderScreenNavigator,
   utils: OrderScreenUtils,
-  statesHolder: OrderStatesHolder,
+  details: OrderDetails,
   snackbarsHolder: OrderScreenSnackbarsHolder,
   user: User?,
 ) {
@@ -57,18 +52,8 @@ fun OrderContent(
 
       authRequest.onSuccess { token ->
         viewModel.encryptJWToken(token)
-
-        // Let's store the user state via the Observer pattern
-
-        val getUserRequest = remoteHandler.getUser(subject, token.token)
-        getUserRequest.onSuccess { userDto ->
-          val requestedUser = userDto.toUser()
-          localHandler.addNewUser(requestedUser)
-          utils.saveUser(requestedUser)
-          utils.newLoginState(AuthStatus.Success)
-        }
-        getUserRequest.onFailure {
-          Log.d("kenkoro", it.message!!)
+        val isFailure = viewModel.getUser(subject, token) { utils.proceedAuth(AuthStatus.Success) }
+        if (isFailure) {
           withContext(Dispatchers.Main) { snackbarsHolder.loginError() }
         }
       }
@@ -81,26 +66,26 @@ fun OrderContent(
 
   LaunchedEffect(user) {
     if (user != null) {
-      utils.newOrdersFilter(findStrategy(user.profile))
+      viewModel.filterStrategy(findStrategy(user.profile))
     }
   }
 
-  if (utils.authStatus.isSuccess) {
-    val orders = utils.ordersPagingFlow.collectAsLazyPagingItems()
+  if (utils.authStatus.isSuccess && user != null) {
+    val orders = viewModel.ordersPagingFlow.collectAsLazyPagingItems()
 
     PullToRefreshLazyOrdersContent(
       orders = orders,
-      localHandler = localHandler,
-      remoteHandler = remoteHandler,
-      navigator = navigator,
-      utils = utils,
-      statesHolder = statesHolder,
-      snackbarsHolder = snackbarsHolder,
+      user = user,
       onRefreshOrders = {
-        utils.viewModelScope.launch(Dispatchers.IO) {
+        viewModel.viewModelScope.launch(Dispatchers.IO) {
           orders.refresh()
         }
       },
+      ordersScope = viewModel.viewModelScope,
+      navigator = navigator,
+      utils = utils,
+      statesHolder = details,
+      snackbarsHolder = snackbarsHolder,
     )
   }
 }

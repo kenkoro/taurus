@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Dialog
 import androidx.core.text.isDigitsOnly
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
@@ -42,12 +43,14 @@ import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toCutOrder
+import com.kenkoro.taurus.client.feature.orders.domain.EditOrder
 import com.kenkoro.taurus.client.feature.orders.domain.NewCutOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.viewmodels.ActualCutOrdersQuantityDialogViewModel
+import com.kenkoro.taurus.client.feature.profile.domain.User
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,15 +59,16 @@ import kotlinx.coroutines.withContext
 fun ActualCutOrdersQuantityDialog(
   modifier: Modifier = Modifier,
   order: Order,
-  localHandler: OrderScreenLocalHandler,
-  remoteHandler: OrderScreenRemoteHandler,
-  utils: OrderScreenUtils,
-  snackbarsHolder: OrderScreenSnackbarsHolder,
+  user: User,
+  ordersScope: CoroutineScope,
   closeCutterDialog: () -> Unit = {},
   onHideWithDelay: suspend () -> Unit = {},
+  onEditOrder: suspend (dto: EditOrder, editor: String, postAction: () -> Unit) -> Boolean,
   onRefresh: () -> Unit = {},
+  utils: OrderScreenUtils,
+  snackbarsHolder: OrderScreenSnackbarsHolder,
 ) {
-  val user = utils.user
+  val viewModel: ActualCutOrdersQuantityDialogViewModel = hiltViewModel()
 
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
@@ -89,15 +93,15 @@ fun ActualCutOrdersQuantityDialog(
   }
   val onAddNewCutOrder =
     suspend {
-      remoteHandler.addNewCutOrder(
+      val newCutOrder =
         NewCutOrder(
           orderId = order.orderId,
           date = System.currentTimeMillis(),
           quantity = actualCutOrdersQuantityToInt(),
-          cutterId = user?.userId ?: 0,
+          cutterId = user.userId,
           comment = "",
-        ),
-      )
+        )
+      viewModel.addNewCutOrder(newCutOrder)
     }
   val onChangeOrderStateToCut =
     suspend {
@@ -115,7 +119,7 @@ fun ActualCutOrdersQuantityDialog(
     }
   val onSubmit = {
     if (actualCutOrdersQuantity.isNotBlank()) {
-      utils.viewModelScope.launch(Dispatchers.IO) {
+      ordersScope.launch(Dispatchers.IO) {
         isLoading = true
         onAddNewCutOrder()
         isLoading = false

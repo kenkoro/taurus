@@ -5,9 +5,10 @@ import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
-data class OrderStatesHolder(
+data class OrderDetails(
   val orderIdState: Int = 1,
   val dateState: Long = 0L,
+  val statusState: OrderStatus = OrderStatus.Idle,
   val categoryState: TaurusTextFieldState = CategoryState(),
   val colorState: TaurusTextFieldState = ColorState(),
   val customerState: TaurusTextFieldState = CustomerState(),

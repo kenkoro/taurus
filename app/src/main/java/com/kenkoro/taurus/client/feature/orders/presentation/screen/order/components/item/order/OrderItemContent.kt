@@ -47,7 +47,7 @@ fun OrderItemContent(
   order: Order,
   selected: Boolean,
   isCutter: Boolean = false,
-  onGetActualCutOrdersQuantity: suspend (Int) -> Result<ActualCutOrdersQuantityDto>,
+  onGetActualQuantityOfCutMaterial: suspend (Int) -> Result<ActualCutOrdersQuantityDto>,
 ) {
   var actualQuantity by remember {
     mutableIntStateOf(0)
@@ -77,7 +77,7 @@ fun OrderItemContent(
   LaunchedEffect(Unit) {
     if (!isAdditionalInfoLoading) {
       isAdditionalInfoLoading = true
-      val result = onGetActualCutOrdersQuantity(order.orderId)
+      val result = onGetActualQuantityOfCutMaterial(order.orderId)
       result.onSuccess { actualQuantity = it.actualQuantity }
       result.onFailure { isLoadError = true }
       isAdditionalInfoLoading = false
@@ -204,7 +204,7 @@ private fun OrderItemContentPrev() {
     OrderItemContent(
       order = order,
       selected = true,
-      onGetActualCutOrdersQuantity = { Result.success(ActualCutOrdersQuantityDto(0)) },
+      onGetActualQuantityOfCutMaterial = { Result.success(ActualCutOrdersQuantityDto(0)) },
     )
   }
 }

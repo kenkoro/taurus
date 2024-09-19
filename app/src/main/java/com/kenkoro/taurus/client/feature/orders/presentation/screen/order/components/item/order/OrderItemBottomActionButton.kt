@@ -7,19 +7,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toCheckedOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Cut
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.ActualCutOrdersQuantityDialog
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenLocalHandler
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.viewmodels.OrderItemActionButtonViewModel
+import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -29,15 +31,14 @@ import kotlinx.coroutines.withContext
 fun OrderItemBottomActionButton(
   modifier: Modifier = Modifier,
   order: Order,
-  localHandler: OrderScreenLocalHandler,
-  remoteHandler: OrderScreenRemoteHandler,
-  utils: OrderScreenUtils,
-  snackbarsHolder: OrderScreenSnackbarsHolder,
+  user: User,
+  ordersScope: CoroutineScope,
   onHide: () -> Unit = {},
   onRefresh: () -> Unit = {},
+  utils: OrderScreenUtils,
+  snackbarsHolder: OrderScreenSnackbarsHolder,
 ) {
-  val scope = utils.viewModelScope
-  val user = utils.user
+  val viewModel: OrderItemActionButtonViewModel = hiltViewModel()
 
   val onHideWithDelay =
     suspend {
@@ -53,17 +54,18 @@ fun OrderItemBottomActionButton(
   if (showCutterDialog) {
     ActualCutOrdersQuantityDialog(
       order = order,
-      localHandler = localHandler,
-      remoteHandler = remoteHandler,
-      utils = utils,
-      snackbarsHolder = snackbarsHolder,
+      user = user,
+      ordersScope = ordersScope,
       closeCutterDialog = { showCutterDialog = false },
       onHideWithDelay = onHideWithDelay,
       onRefresh = onRefresh,
+      onEditOrder = viewModel::editOrder,
+      utils = utils,
+      snackbarsHolder = snackbarsHolder,
     )
   }
 
-  when (user?.profile) {
+  when (user.profile) {
     Customer -> {
       OrderItemButton(
         modifier = modifier,
@@ -71,20 +73,18 @@ fun OrderItemBottomActionButton(
         text = stringResource(id = R.string.delete_button),
         networkStatus = utils.network,
         onClick = {
-          scope.launch {
-            launch(Dispatchers.IO) {
-              onHideWithDelay()
+          ordersScope.launch(Dispatchers.IO) {
+            onHideWithDelay()
 
-              localHandler.deleteOrder(order)
-              val wasAcknowledged =
-                remoteHandler.deleteOrder(order.orderId, user.subject)
-
-              if (wasAcknowledged) {
+            val isFailure =
+              viewModel.deleteOrder(order, user.subject) {
                 onRefresh()
-                withContext(Dispatchers.Main) { snackbarsHolder.orderWasDeleted(order.orderId) }
-              } else {
-                withContext(Dispatchers.Main) { snackbarsHolder.apiError() }
+                ordersScope.launch(
+                  Dispatchers.Main,
+                ) { snackbarsHolder.orderWasDeleted(order.orderId) }
               }
+            if (isFailure) {
+              withContext(Dispatchers.Main) { snackbarsHolder.apiError() }
             }
           }
         },
@@ -111,16 +111,15 @@ fun OrderItemBottomActionButton(
           text = stringResource(id = R.string.order_was_checked),
           networkStatus = utils.network,
           onClick = {
-            scope.launch(Dispatchers.IO) {
+            ordersScope.launch(Dispatchers.IO) {
               onHideWithDelay()
 
               val checkedOrder = order.toCheckedOrder()
-              localHandler.editOrder(checkedOrder, order.orderId)
-              val wasAcknowledged =
-                remoteHandler.editOrder(checkedOrder, user.subject)
-              if (wasAcknowledged) {
-                onRefresh()
-              } else {
+              val isFailure =
+                viewModel.editOrder(checkedOrder, user.subject) {
+                  onRefresh()
+                }
+              if (isFailure) {
                 withContext(Dispatchers.Main) { snackbarsHolder.apiError() }
               }
             }
