@@ -35,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.window.Dialog
 import androidx.core.text.isDigitsOnly
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
@@ -43,13 +42,12 @@ import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toCutOrder
-import com.kenkoro.taurus.client.feature.orders.domain.EditOrder
 import com.kenkoro.taurus.client.feature.orders.domain.NewCutOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.profile.domain.User
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -59,16 +57,13 @@ fun ActualCutOrdersQuantityDialog(
   modifier: Modifier = Modifier,
   order: Order,
   user: User,
-  ordersScope: CoroutineScope,
   closeCutterDialog: () -> Unit = {},
   onHideWithDelay: suspend () -> Unit = {},
-  onEditOrder: suspend (dto: EditOrder, editor: String, postAction: () -> Unit) -> Boolean,
   onRefresh: () -> Unit = {},
-  utils: OrderScreenShared,
+  shared: OrderScreenShared,
   snackbarsHolder: OrderScreenSnackbarsHolder,
+  utils: OrderScreenUtils,
 ) {
-  val viewModel: ActualCutOrdersQuantityDialogViewModel = hiltViewModel()
-
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
@@ -76,6 +71,7 @@ fun ActualCutOrdersQuantityDialog(
   val strokeWidth = LocalStrokeWidth.current
   val size = LocalSize.current
 
+  val ordersScope = utils.scope
   var actualCutOrdersQuantity by remember {
     mutableStateOf("")
   }
@@ -100,7 +96,7 @@ fun ActualCutOrdersQuantityDialog(
           cutterId = user.userId,
           comment = "",
         )
-      viewModel.addNewCutOrder(newCutOrder)
+      utils.addNewCutOrder(newCutOrder)
     }
   val onChangeOrderStateToCut =
     suspend {
@@ -108,7 +104,7 @@ fun ActualCutOrdersQuantityDialog(
 
       val cutOrder = order.toCutOrder()
       val isFailure =
-        onEditOrder(cutOrder, user.subject) {
+        utils.editOrder(cutOrder, user.subject) {
           onRefresh()
         }
       if (isFailure) {

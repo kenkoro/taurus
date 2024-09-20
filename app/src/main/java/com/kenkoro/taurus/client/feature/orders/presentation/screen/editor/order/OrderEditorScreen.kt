@@ -31,10 +31,9 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 @Composable
 fun OrderEditorScreen(
   modifier: Modifier = Modifier,
-  remoteHandler: OrderScreenRemoteHandler,
   navigator: OrderEditorScreenNavigator,
   utils: OrderEditorScreenUtils,
-  states: OrderDetails,
+  details: OrderDetails,
 ) {
   val errorSnackbarHostState = remember { SnackbarHostState() }
   val user = utils.user
@@ -49,20 +48,20 @@ fun OrderEditorScreen(
   val extras =
     OrderEditorScreenExtras(
       validateChanges = {
-        states.customerState.isValid &&
-          states.titleState.isValid &&
-          states.modelState.isValid &&
-          states.sizeState.isValid &&
-          states.colorState.isValid &&
-          states.categoryState.isValid &&
-          states.quantityState.isValid
+        details.customerState.isValid &&
+          details.titleState.isValid &&
+          details.modelState.isValid &&
+          details.sizeState.isValid &&
+          details.colorState.isValid &&
+          details.categoryState.isValid &&
+          details.quantityState.isValid
       },
       saveChanges = {
         if (editOrder) {
-          val editedOrder = states.packEditOrder(utils.orderStatus, user?.userId ?: 0)
+          val editedOrder = details.packEditOrder(utils.orderStatus, user?.userId ?: 0)
           remoteHandler.editOrder(editedOrder, user?.subject ?: "")
         } else {
-          val newOrder = states.packNewOrder(OrderStatus.Idle, user?.userId ?: 0)
+          val newOrder = details.packNewOrder(OrderStatus.Idle, user?.userId ?: 0)
           Log.d("kenkoro", newOrder.toString())
           remoteHandler.addNewOrder(newOrder).isSuccess
         }
@@ -104,7 +103,7 @@ fun OrderEditorScreen(
       topBar = {
         OrderEditorTopBar(
           editOrder = editOrder,
-          states = states,
+          states = details,
           navigator = navigator,
           extras = extras,
           snackbarsHolder = snackbarsHolder,
@@ -120,7 +119,7 @@ fun OrderEditorScreen(
         ) {
           OrderEditorContent(
             networkStatus = utils.network,
-            states = states,
+            states = details,
             navigator = navigator,
             onStateChangeOrderDetailsSearchBehavior = utils.changeOrderDetailsSearchScreenBehavior,
           )

@@ -39,7 +39,7 @@ fun AuthScreen(
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
   val internetSnackbarHostState = remember { SnackbarHostState() }
-  var visible by rememberSaveable {
+  var isAuthContentVisible by rememberSaveable {
     mutableStateOf(false)
   }
 
@@ -74,7 +74,7 @@ fun AuthScreen(
 
   LaunchedEffect(Unit) {
     delay(100L)
-    visible = true
+    isAuthContentVisible = true
   }
 
   AppTheme {
@@ -107,7 +107,7 @@ fun AuthScreen(
               .fillMaxSize()
               .padding(it),
         ) {
-          AnimatedVisibility(visible = visible) {
+          AnimatedVisibility(visible = isAuthContentVisible) {
             AuthContent(
               navigator = navigator,
               shared = shared,

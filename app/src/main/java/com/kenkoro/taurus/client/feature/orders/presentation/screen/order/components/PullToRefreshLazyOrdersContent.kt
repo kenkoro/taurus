@@ -31,12 +31,13 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.compon
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Other
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Tailor
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,12 +46,11 @@ fun PullToRefreshLazyOrdersContent(
   modifier: Modifier = Modifier,
   orders: LazyPagingItems<Order>,
   user: User,
-  onRefreshOrders: suspend () -> Unit = {},
-  ordersScope: CoroutineScope,
   navigator: OrderScreenNavigator,
   shared: OrderScreenShared,
   statesHolder: OrderDetails,
   snackbarsHolder: OrderScreenSnackbarsHolder,
+  utils: OrderScreenUtils,
 ) {
   val size = LocalSize.current
   val offset = LocalOffset.current
@@ -89,11 +89,11 @@ fun PullToRefreshLazyOrdersContent(
               order = order,
               user = user,
               onRefresh = orders::refresh,
-              ordersScope = ordersScope,
               navigator = navigator,
               shared = shared,
               details = statesHolder,
               snackbarsHolder = snackbarsHolder,
+              utils = utils,
             )
           }
         }
@@ -115,7 +115,9 @@ fun PullToRefreshLazyOrdersContent(
 
       if (pullToRefreshState.isRefreshing) {
         LaunchedEffect(Unit) {
-          onRefreshOrders()
+          utils.scope.launch(Dispatchers.IO) {
+            orders.refresh()
+          }
         }
       }
 

@@ -2,9 +2,13 @@ package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util
 
 import androidx.paging.PagingData
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.ActualCutOrdersQuantityDto
+import com.kenkoro.taurus.client.feature.orders.data.remote.dto.CutOrderDto
+import com.kenkoro.taurus.client.feature.orders.domain.EditOrder
+import com.kenkoro.taurus.client.feature.orders.domain.NewCutOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.filter.OrderFilterStrategy
 import com.kenkoro.taurus.client.feature.shared.data.remote.dto.TokenDto
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 data class OrderScreenUtils(
@@ -18,5 +22,8 @@ data class OrderScreenUtils(
   val encryptJWToken: (tokenDto: TokenDto) -> Unit,
   val getUser: suspend (subject: String, tokenDto: TokenDto, postAction: () -> Unit) -> Boolean,
   val getActualQuantityOfCutMaterial: suspend (orderId: Int) -> Result<ActualCutOrdersQuantityDto>,
-  // TODO: do this tmw
+  val addNewCutOrder: suspend (cutOrder: NewCutOrder) -> Result<CutOrderDto>,
+  val editOrder: suspend (dto: EditOrder, editor: String, postAction: () -> Unit) -> Boolean,
+  val deleteOrder: suspend (order: Order, deleter: String, postAction: () -> Unit) -> Boolean,
+  val scope: CoroutineScope,
 )

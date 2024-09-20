@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalView
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
@@ -44,6 +43,7 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.compon
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Admin
@@ -52,7 +52,6 @@ import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Manager
-import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun OrderItem(
@@ -60,15 +59,12 @@ fun OrderItem(
   order: Order,
   user: User,
   onRefresh: () -> Unit = {},
-  ordersScope: CoroutineScope,
   navigator: OrderScreenNavigator,
   shared: OrderScreenShared,
   details: OrderDetails,
   snackbarsHolder: OrderScreenSnackbarsHolder,
+  utils: OrderScreenUtils,
 ) {
-  val viewModel: OrderItemViewModel = hiltViewModel()
-  val selectedOrderRecordId = viewModel.selectedOrderRecordId
-
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
@@ -95,6 +91,7 @@ fun OrderItem(
     navigator.toOrderEditorScreen(true)
   }
 
+  val selectedOrderRecordId = utils.selectedOrderRecordId
   var visible by rememberSaveable {
     mutableStateOf(true)
   }
@@ -126,9 +123,9 @@ fun OrderItem(
             .background(MaterialTheme.colorScheme.primaryContainer)
             .clickable {
               if (selected()) {
-                viewModel.clearOrderSelection()
+                utils.clearOrderSelection()
               } else {
-                viewModel.newOrderSelection(order.recordId)
+                utils.newOrderSelection(order.recordId)
               }
             },
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -147,7 +144,7 @@ fun OrderItem(
             order = order,
             selected = selected(),
             isCutter = user.profile == Cutter,
-            onGetActualQuantityOfCutMaterial = viewModel::getActualQuantityOfCutMaterial,
+            onGetActualQuantityOfCutMaterial = utils.getActualQuantityOfCutMaterial,
           )
         }
 
@@ -166,11 +163,11 @@ fun OrderItem(
                 modifier = Modifier.weight(1F),
                 order = order,
                 user = user,
-                ordersScope = ordersScope,
                 onHide = { visible = false },
                 onRefresh = onRefresh,
                 shared = shared,
                 snackbarsHolder = snackbarsHolder,
+                utils = utils,
               )
 
               if (allowedToEditOrder(user.profile)) {

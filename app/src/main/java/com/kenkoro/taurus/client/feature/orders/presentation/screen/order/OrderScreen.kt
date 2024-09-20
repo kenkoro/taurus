@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.OrderContent
@@ -24,6 +25,7 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.compon
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
@@ -104,6 +106,23 @@ fun OrderScreen(
         )
       },
     )
+  val utils =
+    OrderScreenUtils(
+      ordersPagingFlow = viewModel.ordersPagingFlow,
+      selectedOrderRecordId = viewModel.selectedOrderRecordId,
+      filter = viewModel::filterStrategy,
+      newOrderSelection = viewModel::newOrderSelection,
+      clearOrderSelection = viewModel::clearOrderSelection,
+      auth = viewModel::auth,
+      decryptUserCredentials = viewModel::decryptUserCredentials,
+      encryptJWToken = viewModel::encryptJWToken,
+      getUser = viewModel::getUser,
+      getActualQuantityOfCutMaterial = viewModel::getActualQuantityOfCutMaterial,
+      addNewCutOrder = viewModel::addNewCutOrder,
+      editOrder = viewModel::editOrder,
+      deleteOrder = viewModel::deleteOrder,
+      scope = viewModel.viewModelScope,
+    )
 
   AppTheme {
     Scaffold(
@@ -136,7 +155,7 @@ fun OrderScreen(
         OrderTopBar(
           snackbarsHolder = snackbarsHolder,
           navigator = navigator,
-          userName = (viewModel.user ?: "").toString(),
+          userName = (user ?: "").toString(),
         )
       },
       bottomBar = {
@@ -157,10 +176,12 @@ fun OrderScreen(
               .padding(paddingValues),
         ) {
           OrderContent(
+            user = user,
             navigator = navigator,
             shared = shared,
             details = details,
             snackbarsHolder = snackbarsHolder,
+            utils = utils,
           )
         }
       },

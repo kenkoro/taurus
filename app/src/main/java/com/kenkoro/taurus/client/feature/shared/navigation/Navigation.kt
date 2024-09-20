@@ -181,13 +181,11 @@ fun AppNavHost(
         )
 
       val editOrder = it.arguments?.getBoolean("editOrder") ?: false
-      val (orderEditorScreenNavigator, orderEditorScreenUtils) = orderEditorScreenParams(editOrder)
 
       OrderEditorScreen(
-        remoteHandler = orderScreenRemoteHandler,
         navigator = orderEditorScreenNavigator,
         utils = orderEditorScreenUtils,
-        states = orderStatesHolder,
+        details = orderStatesHolder,
       )
     }
 

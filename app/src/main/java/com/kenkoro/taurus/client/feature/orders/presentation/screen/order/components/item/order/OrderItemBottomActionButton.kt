@@ -7,7 +7,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toCheckedOrder
 import com.kenkoro.taurus.client.feature.orders.domain.Order
@@ -16,11 +15,11 @@ import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus.Idle
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.ActualCutOrdersQuantityDialog
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -31,14 +30,13 @@ fun OrderItemBottomActionButton(
   modifier: Modifier = Modifier,
   order: Order,
   user: User,
-  ordersScope: CoroutineScope,
   onHide: () -> Unit = {},
   onRefresh: () -> Unit = {},
   shared: OrderScreenShared,
   snackbarsHolder: OrderScreenSnackbarsHolder,
+  utils: OrderScreenUtils,
 ) {
-  val viewModel: OrderItemActionButtonViewModel = hiltViewModel()
-
+  val ordersScope = utils.scope
   val onHideWithDelay =
     suspend {
       onHide()
@@ -54,13 +52,12 @@ fun OrderItemBottomActionButton(
     ActualCutOrdersQuantityDialog(
       order = order,
       user = user,
-      ordersScope = ordersScope,
       closeCutterDialog = { showCutterDialog = false },
       onHideWithDelay = onHideWithDelay,
       onRefresh = onRefresh,
-      onEditOrder = viewModel::editOrder,
-      utils = shared,
+      shared = shared,
       snackbarsHolder = snackbarsHolder,
+      utils = utils,
     )
   }
 
@@ -76,11 +73,11 @@ fun OrderItemBottomActionButton(
             onHideWithDelay()
 
             val isFailure =
-              viewModel.deleteOrder(order, user.subject) {
+              utils.deleteOrder(order, user.subject) {
                 onRefresh()
-                ordersScope.launch(
-                  Dispatchers.Main,
-                ) { snackbarsHolder.orderWasDeleted(order.orderId) }
+                ordersScope.launch(Dispatchers.Main) {
+                  snackbarsHolder.orderWasDeleted(order.orderId)
+                }
               }
             if (isFailure) {
               withContext(Dispatchers.Main) { snackbarsHolder.apiError() }
@@ -115,7 +112,7 @@ fun OrderItemBottomActionButton(
 
               val checkedOrder = order.toCheckedOrder()
               val isFailure =
-                viewModel.editOrder(checkedOrder, user.subject) {
+                utils.editOrder(checkedOrder, user.subject) {
                   onRefresh()
                 }
               if (isFailure) {
