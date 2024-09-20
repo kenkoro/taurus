@@ -1,6 +1,5 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -12,9 +11,11 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.OrderEditorContent
@@ -22,9 +23,9 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.bars.util.OrderEditorScreenExtras
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenUtils
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenRemoteHandler
 import com.kenkoro.taurus.client.feature.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
@@ -32,12 +33,14 @@ import com.kenkoro.taurus.client.ui.theme.AppTheme
 fun OrderEditorScreen(
   modifier: Modifier = Modifier,
   navigator: OrderEditorScreenNavigator,
-  utils: OrderEditorScreenUtils,
   details: OrderDetails,
+  shared: OrderEditorScreenShared,
+  utils: OrderEditorScreenUtils,
 ) {
+  val viewModel: OrderEditorViewModel = hiltViewModel()
+
+  val user = viewModel.user
   val errorSnackbarHostState = remember { SnackbarHostState() }
-  val user = utils.user
-  val editOrder = utils.editOrder
 
   val failedOrderEditorValidationMessage =
     stringResource(id = R.string.failed_order_editor_validation)
@@ -47,23 +50,14 @@ fun OrderEditorScreen(
 
   val extras =
     OrderEditorScreenExtras(
-      validateChanges = {
-        details.customerState.isValid &&
-          details.titleState.isValid &&
-          details.modelState.isValid &&
-          details.sizeState.isValid &&
-          details.colorState.isValid &&
-          details.categoryState.isValid &&
-          details.quantityState.isValid
-      },
+      validateChanges = details::areDetailsValid,
       saveChanges = {
-        if (editOrder) {
-          val editedOrder = details.packEditOrder(utils.orderStatus, user?.userId ?: 0)
-          remoteHandler.editOrder(editedOrder, user?.subject ?: "")
+        if (utils.isInEdit) {
+          val editedOrder = details.packEditOrder(details.statusState, user?.userId ?: 0)
+          viewModel.editOrder(editedOrder, utils.subject)
         } else {
           val newOrder = details.packNewOrder(OrderStatus.Idle, user?.userId ?: 0)
-          Log.d("kenkoro", newOrder.toString())
-          remoteHandler.addNewOrder(newOrder).isSuccess
+          viewModel.addNewOrder(newOrder)
         }
       },
     )
@@ -86,6 +80,10 @@ fun OrderEditorScreen(
       },
     )
 
+  LaunchedEffect(Unit) {
+    viewModel.getUserFromLocalDb(utils.subject)
+  }
+
   AppTheme {
     Scaffold(
       modifier =
@@ -102,8 +100,8 @@ fun OrderEditorScreen(
       },
       topBar = {
         OrderEditorTopBar(
-          editOrder = editOrder,
-          states = details,
+          editOrder = utils.isInEdit,
+          details = details,
           navigator = navigator,
           extras = extras,
           snackbarsHolder = snackbarsHolder,
@@ -118,10 +116,9 @@ fun OrderEditorScreen(
               .padding(paddingValues),
         ) {
           OrderEditorContent(
-            networkStatus = utils.network,
-            states = details,
+            shared = shared,
+            details = details,
             navigator = navigator,
-            onStateChangeOrderDetailsSearchBehavior = utils.changeOrderDetailsSearchScreenBehavior,
           )
         }
       },

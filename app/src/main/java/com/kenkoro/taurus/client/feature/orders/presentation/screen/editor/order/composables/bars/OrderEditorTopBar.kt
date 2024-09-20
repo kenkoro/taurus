@@ -46,7 +46,7 @@ import kotlinx.coroutines.withContext
 fun OrderEditorTopBar(
   modifier: Modifier = Modifier,
   editOrder: Boolean = false,
-  states: OrderDetails = OrderDetails(),
+  details: OrderDetails = OrderDetails(),
   navigator: OrderEditorScreenNavigator,
   extras: OrderEditorScreenExtras,
   snackbarsHolder: OrderEditorScreenSnackbarsHolder,

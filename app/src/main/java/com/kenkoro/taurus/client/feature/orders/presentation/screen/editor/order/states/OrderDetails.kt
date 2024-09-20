@@ -1,7 +1,7 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states
 
+import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.orders.domain.EditOrder
-import com.kenkoro.taurus.client.feature.orders.domain.NewOrder
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 
@@ -39,10 +39,9 @@ data class OrderDetails(
   fun packNewOrder(
     status: OrderStatus,
     creatorId: Int,
-  ): NewOrder {
-    return NewOrder(
+  ): NewOrderDto {
+    return NewOrderDto(
       customer = customerState.text,
-      date = dateState,
       title = titleState.text,
       model = modelState.text,
       size = sizeState.text,
@@ -52,5 +51,15 @@ data class OrderDetails(
       status = status,
       creatorId = creatorId,
     )
+  }
+
+  fun areDetailsValid(): Boolean {
+    return customerState.isValid &&
+      titleState.isValid &&
+      modelState.isValid &&
+      sizeState.isValid &&
+      colorState.isValid &&
+      categoryState.isValid &&
+      quantityState.isValid
   }
 }

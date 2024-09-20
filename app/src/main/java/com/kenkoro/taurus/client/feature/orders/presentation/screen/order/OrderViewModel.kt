@@ -12,9 +12,9 @@ import androidx.paging.map
 import androidx.room.withTransaction
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 import com.kenkoro.taurus.client.core.crypto.EncryptedCredentialService
+import com.kenkoro.taurus.client.feature.auth.data.mappers.toUser
 import com.kenkoro.taurus.client.feature.auth.data.mappers.toUserEntity
 import com.kenkoro.taurus.client.feature.orders.data.local.OrderEntity
-import com.kenkoro.taurus.client.feature.orders.data.mappers.toNewCutOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrder
 import com.kenkoro.taurus.client.feature.orders.data.mappers.toOrderEntity
 import com.kenkoro.taurus.client.feature.orders.data.remote.dto.ActualCutOrdersQuantityDto
@@ -102,7 +102,7 @@ class OrderViewModel
       val result = userRepository.getUser(subject, tokenDto.token)
       result.onSuccess { userDto ->
         localDb.withTransaction { localDb.userDao.upsert(userDto.toUserEntity()) }
-        // Update the user state
+        user = userDto.toUser()
         postAction()
       }
 
@@ -117,10 +117,7 @@ class OrderViewModel
     }
 
     suspend fun addNewCutOrder(cutOrder: NewCutOrder): Result<CutOrderDto> {
-      return cutOrderRepository.addNewCutOrder(
-        dto = cutOrder.toNewCutOrderDto(),
-        token = decryptedCredentialService.storedToken(),
-      )
+      return sharedUtils.addNewCutOrder(cutOrder)
     }
 
     suspend fun editOrder(
@@ -128,18 +125,7 @@ class OrderViewModel
       editor: String,
       postAction: () -> Unit,
     ): Boolean {
-      val result =
-        orderRepository.editOrder(
-          dto.toEditOrderDto(),
-          editor,
-          decryptedCredentialService.storedToken(),
-        )
-      result.onSuccess {
-        localDb.withTransaction { localDb.orderDao.upsert(dto.toOrderEntity(dto.orderId)) }
-        postAction()
-      }
-
-      return result.isFailure
+      return sharedUtils.editOrder(dto, editor, postAction)
     }
 
     suspend fun deleteOrder(

@@ -11,20 +11,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
-import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
-import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenShared
 
 @Composable
 fun OrderEditorContent(
   modifier: Modifier = Modifier,
-  networkStatus: NetworkStatus,
-  states: OrderDetails = OrderDetails(),
+  shared: OrderEditorScreenShared,
+  details: OrderDetails = OrderDetails(),
   navigator: OrderEditorScreenNavigator,
-  onStateChangeOrderDetailsSearchBehavior: (TaurusTextFieldState) -> Unit = {},
 ) {
+  // TODO: User the network status here as well -> shared.network
   val contentWidth = LocalContentWidth.current
   val focusManager = LocalFocusManager.current
 
@@ -42,9 +41,9 @@ fun OrderEditorContent(
   ) {
     OrderEditorTextFields(
       modifier = Modifier.width(contentWidth.standard),
-      states = states,
+      details = details,
       navigator = navigator,
-      onStateChangeOrderDetailsSearchBehavior = onStateChangeOrderDetailsSearchBehavior,
+      shared = shared,
     )
   }
 }

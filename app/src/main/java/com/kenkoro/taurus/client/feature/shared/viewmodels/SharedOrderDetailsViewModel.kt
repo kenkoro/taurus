@@ -11,6 +11,7 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.ColorState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.CustomerState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.ModelState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.QuantityState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.SizeState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.TitleState
@@ -73,5 +74,20 @@ class SharedOrderDetailsViewModel
 
     fun changeOrderStatus(status: OrderStatus) {
       this.status = status
+    }
+
+    fun getDetails(): OrderDetails {
+      return OrderDetails(
+        orderIdState = orderId,
+        dateState = date,
+        statusState = status,
+        categoryState = category,
+        colorState = color,
+        customerState = customer,
+        modelState = model,
+        quantityState = quantity,
+        sizeState = size,
+        titleState = title,
+      )
     }
   }

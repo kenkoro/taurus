@@ -16,43 +16,43 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.composables.util.OrderDetailItem
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
-import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenShared
 
 @Composable
 fun OrderEditorTextFields(
   modifier: Modifier = Modifier,
-  states: OrderDetails = OrderDetails(),
+  details: OrderDetails,
   navigator: OrderEditorScreenNavigator,
-  onStateChangeOrderDetailsSearchBehavior: (TaurusTextFieldState) -> Unit = {},
+  shared: OrderEditorScreenShared,
 ) {
   val focusManager = LocalFocusManager.current
   val contentHeight = LocalContentHeight.current
 
   val lazyListState = rememberLazyListState()
-  val details =
+  val orderDetailItems =
     listOf(
       OrderDetailItem(
-        state = states.customerState,
+        state = details.customerState,
         dropDownTitle = stringResource(id = R.string.order_editor_customer),
       ),
       OrderDetailItem(
-        state = states.titleState,
+        state = details.titleState,
         dropDownTitle = stringResource(id = R.string.order_editor_title),
       ),
       OrderDetailItem(
-        state = states.modelState,
+        state = details.modelState,
         dropDownTitle = stringResource(id = R.string.order_editor_model),
       ),
       OrderDetailItem(
-        state = states.sizeState,
+        state = details.sizeState,
         dropDownTitle = stringResource(id = R.string.order_editor_size),
       ),
       OrderDetailItem(
-        state = states.colorState,
+        state = details.colorState,
         dropDownTitle = stringResource(id = R.string.order_editor_color),
       ),
       OrderDetailItem(
-        state = states.categoryState,
+        state = details.categoryState,
         dropDownTitle = stringResource(id = R.string.order_editor_category),
       ),
     )
@@ -63,19 +63,19 @@ fun OrderEditorTextFields(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Top,
   ) {
-    items(details) {
+    items(orderDetailItems) {
       OrderDetailDropDown(
         navigator = navigator,
         state = it.state,
         dropDownTitle = it.dropDownTitle,
-        onStateChangeOrderDetailsSearchBehavior = onStateChangeOrderDetailsSearchBehavior,
+        onChangeBehaviorOfOrderDetailsSearch = shared.changeBehaviorOfOrderDetailsSearch,
       )
       Spacer(modifier = Modifier.height(contentHeight.extraMedium))
     }
     item {
       Spacer(modifier = Modifier.height(contentHeight.medium))
       OrderQuantity(
-        quantityState = states.quantityState,
+        quantityState = details.quantityState,
         onImeAction = { focusManager.clearFocus() },
       )
       Spacer(modifier = Modifier.height(contentHeight.extraMedium))

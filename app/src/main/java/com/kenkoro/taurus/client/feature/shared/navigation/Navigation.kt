@@ -20,8 +20,8 @@ import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenNaviga
 import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenShared
 import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.OrderEditorScreen
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenNavigator
+import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.util.OrderEditorScreenUtils
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.OrderScreen
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
@@ -108,8 +108,13 @@ fun AppNavHost(
       val navigator =
         OrderScreenNavigator(
           toProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
-          toOrderEditorScreen = { editOrder: Boolean ->
-            navController.navigate(Screen.OrderEditorScreen.route + "?editOrder=$editOrder")
+          toOrderEditorScreen = { isInEdit, subject ->
+            navController.navigate(
+              buildString {
+                append(Screen.OrderEditorScreen.route)
+                append("?editOrder=$isInEdit&subject=$subject")
+              },
+            )
           },
         )
       val shared =
@@ -124,19 +129,7 @@ fun AppNavHost(
             sharedOrderDetailsViewModel.changeOrderStatus(status)
           },
         )
-      val details =
-        OrderDetails(
-          orderIdState = sharedOrderDetailsViewModel.orderId,
-          dateState = sharedOrderDetailsViewModel.date,
-          statusState = sharedOrderDetailsViewModel.status,
-          categoryState = sharedOrderDetailsViewModel.category,
-          colorState = sharedOrderDetailsViewModel.color,
-          customerState = sharedOrderDetailsViewModel.customer,
-          modelState = sharedOrderDetailsViewModel.model,
-          quantityState = sharedOrderDetailsViewModel.quantity,
-          sizeState = sharedOrderDetailsViewModel.size,
-          titleState = sharedOrderDetailsViewModel.title,
-        )
+      val details = sharedOrderDetailsViewModel.getDetails()
 
       OrderScreen(
         navigator = navigator,
@@ -166,12 +159,16 @@ fun AppNavHost(
     composable(
       route =
         Screen.OrderEditorScreen.route +
-          "?editOrder={editOrder}",
+          "?editOrder={editOrder}&subject={subject}",
       arguments =
         listOf(
           navArgument("editOrder") {
             type = NavType.BoolType
             defaultValue = false
+          },
+          navArgument("subject") {
+            type = NavType.StringType
+            defaultValue = ""
           },
         ),
     ) { entry ->
@@ -179,13 +176,31 @@ fun AppNavHost(
         entry.sharedHiltViewModel<SharedOrderDetailsViewModel>(
           navController,
         )
-
-      val editOrder = it.arguments?.getBoolean("editOrder") ?: false
+      val navigator =
+        OrderEditorScreenNavigator(
+          navUp = { navController.navigateUp() },
+          toOrderDetailsSearchScreen = { selectedDetail ->
+            // TODO: selectedDetail
+            navController.navigate(Screen.OrderDetailsSearchScreen.route)
+          },
+        )
+      val shared =
+        OrderEditorScreenShared(
+          network = networkStatus,
+          changeBehaviorOfOrderDetailsSearch = { /* TODO: Get this from the search screen */ },
+        )
+      val utils =
+        OrderEditorScreenUtils(
+          isInEdit = entry.arguments?.getBoolean("editOrder") ?: false,
+          subject = entry.arguments?.getString("subject") ?: "",
+        )
+      val details = sharedOrderDetailsViewModel.getDetails()
 
       OrderEditorScreen(
-        navigator = orderEditorScreenNavigator,
-        utils = orderEditorScreenUtils,
-        details = orderStatesHolder,
+        navigator = navigator,
+        details = details,
+        shared = shared,
+        utils = utils,
       )
     }
 

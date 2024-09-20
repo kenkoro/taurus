@@ -1,22 +1,20 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.room.withTransaction
 import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
+import com.kenkoro.taurus.client.feature.auth.data.mappers.toUser
+import com.kenkoro.taurus.client.feature.orders.data.remote.dto.CutOrderDto
+import com.kenkoro.taurus.client.feature.orders.data.remote.dto.NewOrderDto
 import com.kenkoro.taurus.client.feature.orders.data.remote.repository.OrderRepositoryImpl
 import com.kenkoro.taurus.client.feature.orders.domain.EditOrder
-import com.kenkoro.taurus.client.feature.orders.domain.OrderStatus
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.CategoryState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.ColorState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.CustomerState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.ModelState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.QuantityState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.SizeState
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.TitleState
+import com.kenkoro.taurus.client.feature.orders.domain.NewCutOrder
+import com.kenkoro.taurus.client.feature.profile.domain.User
+import com.kenkoro.taurus.client.feature.shared.data.SharedViewModelUtils
+import com.kenkoro.taurus.client.feature.shared.data.local.LocalDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -24,72 +22,44 @@ import javax.inject.Inject
 class OrderEditorViewModel
   @Inject
   constructor(
+    private val sharedUtils: SharedViewModelUtils,
+    private val localDb: LocalDatabase,
     private val orderRepository: OrderRepositoryImpl,
     private val decryptedCredentialService: DecryptedCredentialService,
   ) : ViewModel() {
-    var orderId by mutableIntStateOf(1)
+    // Maybe I should delegate this to some shared place?
+    var user by mutableStateOf<User?>(null)
       private set
 
-    var date by mutableLongStateOf(0L)
-      private set
-
-    var customer by mutableStateOf(CustomerState(customer = ""))
-      private set
-
-    var title by mutableStateOf(TitleState(title = ""))
-      private set
-
-    var model by mutableStateOf(ModelState(model = ""))
-      private set
-
-    var size by mutableStateOf(SizeState(size = ""))
-      private set
-
-    var color by mutableStateOf(ColorState(color = ""))
-      private set
-
-    var category by mutableStateOf(CategoryState(category = ""))
-      private set
-
-    var quantity by mutableStateOf(QuantityState(quantity = null))
-      private set
-
-    var status by mutableStateOf(OrderStatus.Idle)
-      private set
-
-    fun resetAll() {
-      customer = CustomerState(customer = "")
-      title = TitleState(title = "")
-      model = ModelState(model = "")
-      size = SizeState(size = "")
-      color = ColorState(color = "")
-      category = CategoryState(category = "")
-      quantity = QuantityState(quantity = null)
+    suspend fun addNewCutOrder(cutOrder: NewCutOrder): Result<CutOrderDto> {
+      return sharedUtils.addNewCutOrder(cutOrder)
     }
 
-    fun status(status: OrderStatus) {
-      this.status = status
-    }
-
-    fun orderId(orderId: Int) {
-      this.orderId = orderId
-    }
-
-    fun date(date: Long) {
-      this.date = date
-    }
-
-    suspend fun editOrderRemotely(
+    suspend fun editOrder(
       dto: EditOrder,
-      editorSubject: String,
+      editor: String,
+      postAction: () -> Unit = {},
     ): Boolean {
+      return sharedUtils.editOrder(dto, editor, postAction)
+    }
+
+    suspend fun getUserFromLocalDb(subject: String) {
+      localDb.withTransaction {
+        val userEntity = localDb.userDao.getUser(subject)
+        if (userEntity != null) {
+          user = userEntity.toUser()
+        }
+      }
+    }
+
+    suspend fun addNewOrder(dto: NewOrderDto): Boolean {
       val result =
-        orderRepository.editOrder(
-          dto = dto.toEditOrderDto(),
-          editorSubject = editorSubject,
+        orderRepository.addNewOrder(
+          dto = dto,
           token = decryptedCredentialService.storedToken(),
         )
 
+      result.onSuccess { /* Do something on success response result */ }
       return result.isSuccess
     }
   }
