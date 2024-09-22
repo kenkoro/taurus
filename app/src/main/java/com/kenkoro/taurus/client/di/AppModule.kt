@@ -98,13 +98,21 @@ object AppModule {
 
   @Provides
   @Singleton
-  fun provideSharedViewModelUtils(repository: AuthRepositoryImpl): ViewModelUtils {
-    return SharedViewModelUtils(repository)
+  fun provideSharedViewModelUtils(
+    authRepository: AuthRepositoryImpl,
+    orderRepository: OrderRepositoryImpl,
+    cutOrderRepository: CutOrderRepositoryImpl,
+    localDb: LocalDatabase,
+    decryptedCredentialService: DecryptedCredentialService,
+  ): ViewModelUtils {
+    return SharedViewModelUtils(
+      authRepository = authRepository,
+      orderRepository = orderRepository,
+      cutOrderRepository = cutOrderRepository,
+      localDb = localDb,
+      decryptedCredentialService = decryptedCredentialService,
+    )
   }
-
-  @Provides
-  @Singleton
-  fun provideUserStateManager(): UserStateManager = UserStateManager()
 
   @Provides
   @Singleton

@@ -52,16 +52,16 @@ fun AuthContent(
       whenLoginSubmitted = { subject, password ->
         scope.launch(Dispatchers.IO) {
           isAuthenticating = true
-          val result = utils.auth(subject, password)
+          val authRequest = utils.auth(subject, password)
           isAuthenticating = false
 
-          result.onSuccess {
+          authRequest.onSuccess {
             utils.encryptAll(subject, password, it.token)
             shared.proceedAuth(AuthStatus.Success)
             withContext(Dispatchers.Main) { navigator.toOrderScreen() }
           }
 
-          result.onFailure {
+          authRequest.onFailure {
             shared.proceedAuth(AuthStatus.Failure)
             snackbarsHolder.loginError()
           }

@@ -28,10 +28,12 @@ import com.kenkoro.taurus.client.core.local.LocalOffset
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
+import com.kenkoro.taurus.client.feature.profile.domain.User
 
 @Composable
 fun OrderBottomBar(
   modifier: Modifier = Modifier,
+  user: User?,
   navigator: OrderScreenNavigator,
   shared: OrderScreenShared,
   isScrolling: Boolean,
@@ -85,7 +87,7 @@ fun OrderBottomBar(
           .height(animatedBottomBarButtonHeight),
       onClick = {
         shared.resetAllOrderDetails()
-        navigator.toOrderEditorScreen(false)
+        navigator.toOrderEditorScreen(false, user?.subject ?: "")
       },
       shape = RoundedCornerShape(shape.medium),
     ) {

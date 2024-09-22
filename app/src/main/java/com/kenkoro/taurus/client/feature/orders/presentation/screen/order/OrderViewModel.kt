@@ -51,14 +51,14 @@ class OrderViewModel
     private val localDb: LocalDatabase,
     pager: Pager<Int, OrderEntity>,
   ) : ViewModel() {
-    private val orderFilterContext = OrderFilterContext()
+    private val filterContext = OrderFilterContext()
 
     val ordersPagingFlow =
       pager.flow
         .map { pagingData ->
           pagingData
             .map { it.toOrder() }
-            .filter(orderFilterContext::filter)
+            .filter(filterContext::filter)
         }
         .flowOn(Dispatchers.IO)
         .cachedIn(viewModelScope)
@@ -70,7 +70,7 @@ class OrderViewModel
       private set
 
     fun filterStrategy(strategy: OrderFilterStrategy?) {
-      orderFilterContext.strategy(strategy)
+      filterContext.strategy(strategy)
     }
 
     fun newOrderSelection(recordId: Int) {

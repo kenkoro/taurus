@@ -84,11 +84,11 @@ fun OrderItem(
     details.colorState.text = order.color
     details.categoryState.text = order.category
     details.quantityState.text = order.quantity.toString()
-    shared.saveTheRestDetails(order.orderId, order.date, order.status)
+    shared.saveTheRestOfDetails(order.orderId, order.date, order.status)
   }
   val onEditOrder = {
     onSaveOrderDetails()
-    navigator.toOrderEditorScreen(true)
+    navigator.toOrderEditorScreen(true, user.subject)
   }
 
   val selectedOrderRecordId = utils.selectedOrderRecordId

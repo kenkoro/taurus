@@ -59,7 +59,7 @@ class OrderEditorViewModel
           token = decryptedCredentialService.storedToken(),
         )
 
-      result.onSuccess { /* Do something on success response result */ }
+      result.onSuccess { /* Do something on a success response */ }
       return result.isSuccess
     }
   }

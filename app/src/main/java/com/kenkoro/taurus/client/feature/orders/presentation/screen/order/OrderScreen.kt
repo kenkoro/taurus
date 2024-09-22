@@ -161,6 +161,7 @@ fun OrderScreen(
       bottomBar = {
         if (user != null && user.profile == Customer) {
           OrderBottomBar(
+            user = user,
             navigator = navigator,
             shared = shared,
             isScrolling = lazyOrdersState.isScrollInProgress,

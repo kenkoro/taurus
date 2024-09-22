@@ -9,5 +9,5 @@ data class OrderScreenShared(
   val network: NetworkStatus,
   val resetAllOrderDetails: () -> Unit,
   val proceedAuth: (AuthStatus) -> Unit = {},
-  val saveTheRestDetails: (orderId: Int, date: Long, status: OrderStatus) -> Unit,
+  val saveTheRestOfDetails: (orderId: Int, date: Long, status: OrderStatus) -> Unit,
 )

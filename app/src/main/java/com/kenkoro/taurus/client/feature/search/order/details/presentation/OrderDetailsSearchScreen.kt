@@ -13,16 +13,14 @@ import androidx.compose.ui.Modifier
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.composables.OrderDetailsSearchContent
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.composables.bars.OrderDetailsTopBar
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenRemoteHandler
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenUtils
+import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenShared
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
 fun OrderDetailsSearchScreen(
   modifier: Modifier = Modifier,
-  remoteHandler: OrderDetailsSearchScreenRemoteHandler,
   navigator: OrderDetailsSearchScreenNavigator,
-  utils: OrderDetailsSearchScreenUtils,
+  shared: OrderDetailsSearchScreenShared,
 ) {
   AppTheme {
     Scaffold(
@@ -30,7 +28,7 @@ fun OrderDetailsSearchScreen(
         modifier
           .statusBarsPadding()
           .navigationBarsPadding(),
-      topBar = { OrderDetailsTopBar(navigator = navigator, state = utils.selectedSearchState) },
+      topBar = { OrderDetailsTopBar(navigator = navigator, state = shared.selectedDropDownState) },
       content = { paddingValues ->
         Surface(
           modifier =
@@ -40,9 +38,8 @@ fun OrderDetailsSearchScreen(
               .padding(paddingValues),
         ) {
           OrderDetailsSearchContent(
-            remoteHandler = remoteHandler,
             navigator = navigator,
-            state = utils.selectedSearchState,
+            shared = shared,
           )
         }
       },

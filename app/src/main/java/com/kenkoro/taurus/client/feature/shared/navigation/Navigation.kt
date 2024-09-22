@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,7 +15,6 @@ import androidx.navigation.navArgument
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.core.crypto.DecryptedCredentialService
 import com.kenkoro.taurus.client.feature.auth.presentation.AuthScreen
 import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenNavigator
 import com.kenkoro.taurus.client.feature.auth.presentation.util.AuthScreenShared
@@ -31,53 +31,30 @@ import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreen
 import com.kenkoro.taurus.client.feature.profile.presentation.util.ProfileScreenShared
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.OrderDetailsSearchScreen
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenRemoteHandler
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenUtils
+import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenShared
 import com.kenkoro.taurus.client.feature.shared.navigation.util.AppNavHostUtils
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
+import com.kenkoro.taurus.client.feature.shared.viewmodels.NavHostViewModel
 import com.kenkoro.taurus.client.feature.shared.viewmodels.SharedAuthViewModel
+import com.kenkoro.taurus.client.feature.shared.viewmodels.SharedOrderDetailsSearchViewModel
 import com.kenkoro.taurus.client.feature.shared.viewmodels.SharedOrderDetailsViewModel
 import com.kenkoro.taurus.client.feature.shared.viewmodels.util.sharedHiltViewModel
-
-typealias OESNavigator = OrderEditorScreenNavigator
-typealias OESUtils = OrderEditorScreenUtils
 
 @Composable
 fun AppNavHost(
   navController: NavHostController = rememberNavController(),
   navHostUtils: AppNavHostUtils,
 ) {
+  val viewModel: NavHostViewModel = hiltViewModel()
+
   val context = LocalContext.current
   val networkConnectivityObserver: ConnectivityObserver = NetworkConnectivityObserver(context)
   val networkStatus by networkConnectivityObserver
     .observer()
     .collectAsState(initial = NetworkStatus.Unavailable)
 
-  val decryptedCredentialService = DecryptedCredentialService(context)
-  val (subject, password) = decryptedCredentialService.decryptUserCredentials()
+  val (subject, password) = viewModel.decryptUserCredentials()
   val startDestination = navHostUtils.startDestination(subject, password).route
-
-  fun orderEditorScreenParams(editOrder: Boolean = false): Pair<OESNavigator, OESUtils> {
-    val orderEditorScreenNavigator =
-      OrderEditorScreenNavigator(
-        navUp = navController::navigateUp,
-        toOrderDetailsSearchScreen = {
-          orderDetailsSearchViewModel.selectedSearchState = it
-          navController.navigate(Screen.OrderDetailsSearchScreen.route)
-        },
-      )
-    val orderEditorScreenUtils =
-      OrderEditorScreenUtils(
-        user = userViewModel.user,
-        orderStatus = orderEditorViewModel.status,
-        network = networkStatus,
-        editOrder = editOrder,
-        changeOrderDetailsSearchScreenBehavior =
-          orderDetailsSearchViewModel::changeOrderDetailsSearchBehavior,
-      )
-
-    return Pair(orderEditorScreenNavigator, orderEditorScreenUtils)
-  }
 
   NavHost(
     navController = navController,
@@ -123,7 +100,7 @@ fun AppNavHost(
           network = networkStatus,
           resetAllOrderDetails = sharedOrderDetailsViewModel::resetAllOrderDetails,
           proceedAuth = sharedAuthViewModel::proceedAuth,
-          saveTheRestDetails = { orderId: Int, date: Long, status: OrderStatus ->
+          saveTheRestOfDetails = { orderId: Int, date: Long, status: OrderStatus ->
             sharedOrderDetailsViewModel.changeOrderId(orderId)
             sharedOrderDetailsViewModel.changeDate(date)
             sharedOrderDetailsViewModel.changeOrderStatus(status)
@@ -176,18 +153,20 @@ fun AppNavHost(
         entry.sharedHiltViewModel<SharedOrderDetailsViewModel>(
           navController,
         )
+      val sharedOrderDetailsSearchViewModel =
+        entry.sharedHiltViewModel<SharedOrderDetailsSearchViewModel>(navController = navController)
       val navigator =
         OrderEditorScreenNavigator(
           navUp = { navController.navigateUp() },
-          toOrderDetailsSearchScreen = { selectedDetail ->
-            // TODO: selectedDetail
+          toOrderDetailsSearchScreen = { selectedDropDownState ->
+            sharedOrderDetailsSearchViewModel.selectDropDown(selectedDropDownState)
             navController.navigate(Screen.OrderDetailsSearchScreen.route)
           },
         )
       val shared =
         OrderEditorScreenShared(
           network = networkStatus,
-          changeBehaviorOfOrderDetailsSearch = { /* TODO: Get this from the search screen */ },
+          changeBehaviorOfOrderDetailsSearch = sharedOrderDetailsSearchViewModel::selectDropDown,
         )
       val utils =
         OrderEditorScreenUtils(
@@ -204,14 +183,22 @@ fun AppNavHost(
       )
     }
 
-    composable(route = Screen.OrderDetailsSearchScreen.route) {
+    composable(route = Screen.OrderDetailsSearchScreen.route) { entry ->
+      val sharedOrderDetailsSearchViewModel =
+        entry.sharedHiltViewModel<SharedOrderDetailsSearchViewModel>(navController = navController)
+
+      val shared =
+        OrderDetailsSearchScreenShared(
+          selectedDropDownState =
+            sharedOrderDetailsSearchViewModel.selectedDropDown ?: object :
+              TaurusTextFieldState() {},
+          selectDropDown = sharedOrderDetailsSearchViewModel::selectDropDown,
+          fetch = sharedOrderDetailsSearchViewModel::fetch,
+        )
+
       OrderDetailsSearchScreen(
-        remoteHandler = OrderDetailsSearchScreenRemoteHandler(orderDetailsSearchViewModel::fetch),
         navigator = OrderDetailsSearchScreenNavigator { navController.navigateUp() },
-        utils =
-          OrderDetailsSearchScreenUtils(
-            orderDetailsSearchViewModel.selectedSearchState ?: object : TaurusTextFieldState() {},
-          ),
+        shared = shared,
       )
     }
   }

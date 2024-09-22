@@ -40,18 +40,18 @@ import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
 import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenRemoteHandler
+import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenShared
 import com.kenkoro.taurus.client.feature.shared.components.TaurusIcon
-import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import java.util.UUID
 
 @Composable
 fun OrderDetailsSearchContent(
   modifier: Modifier = Modifier,
-  remoteHandler: OrderDetailsSearchScreenRemoteHandler,
   navigator: OrderDetailsSearchScreenNavigator,
-  state: TaurusTextFieldState,
+  shared: OrderDetailsSearchScreenShared,
 ) {
+  val state = shared.selectedDropDownState
+
   val shape = LocalShape.current
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
@@ -70,10 +70,12 @@ fun OrderDetailsSearchContent(
 
   LaunchedEffect(searchState) {
     isDataLoading = true
+
     if (results.isNotEmpty()) {
       results.clear()
     }
-    results.addAll(remoteHandler.fetch(searchState))
+    results.addAll(shared.fetch(searchState))
+
     isDataLoading = false
   }
 
