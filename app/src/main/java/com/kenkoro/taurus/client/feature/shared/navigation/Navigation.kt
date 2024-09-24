@@ -68,6 +68,7 @@ fun AppNavHost(
           network = networkStatus,
           exit = navHostUtils.exit,
           proceedAuth = sharedAuthViewModel::proceedAuth,
+          getUser = sharedAuthViewModel::getUser,
         )
 
       AuthScreen(
@@ -96,6 +97,7 @@ fun AppNavHost(
         )
       val shared =
         OrderScreenShared(
+          user = sharedAuthViewModel.user,
           authStatus = sharedAuthViewModel.authStatus,
           network = networkStatus,
           resetAllOrderDetails = sharedOrderDetailsViewModel::resetAllOrderDetails,
@@ -105,6 +107,7 @@ fun AppNavHost(
             sharedOrderDetailsViewModel.changeDate(date)
             sharedOrderDetailsViewModel.changeOrderStatus(status)
           },
+          getUser = sharedAuthViewModel::getUser,
         )
       val details = sharedOrderDetailsViewModel.getDetails()
 

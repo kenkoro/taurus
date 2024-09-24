@@ -50,12 +50,18 @@ fun OrderContent(
         utils.encryptJWToken(token)
         val isFailure = utils.getUser(subject, token) { shared.proceedAuth(AuthStatus.Success) }
         if (isFailure) {
-          withContext(Dispatchers.Main) { snackbarsHolder.loginError() }
+          withContext(Dispatchers.Main) {
+            snackbarsHolder.loginError()
+            shared.proceedAuth(AuthStatus.Failure)
+          }
         }
       }
 
       authRequest.onFailure {
-        withContext(Dispatchers.Main) { snackbarsHolder.loginError() }
+        withContext(Dispatchers.Main) {
+          shared.proceedAuth(AuthStatus.Failure)
+          snackbarsHolder.loginError()
+        }
       }
     }
   }

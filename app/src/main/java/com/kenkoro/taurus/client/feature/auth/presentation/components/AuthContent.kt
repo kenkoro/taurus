@@ -57,13 +57,22 @@ fun AuthContent(
 
           authRequest.onSuccess {
             utils.encryptAll(subject, password, it.token)
-            shared.proceedAuth(AuthStatus.Success)
-            withContext(Dispatchers.Main) { navigator.toOrderScreen() }
+            val isFailure = shared.getUser(subject, it) { shared.proceedAuth(AuthStatus.Success) }
+            withContext(Dispatchers.Main) {
+              if (isFailure) {
+                snackbarsHolder.loginError()
+                shared.proceedAuth(AuthStatus.Failure)
+              } else {
+                navigator.toOrderScreen()
+              }
+            }
           }
 
           authRequest.onFailure {
-            shared.proceedAuth(AuthStatus.Failure)
-            snackbarsHolder.loginError()
+            withContext(Dispatchers.Main) {
+              shared.proceedAuth(AuthStatus.Failure)
+              snackbarsHolder.loginError()
+            }
           }
         }
       },

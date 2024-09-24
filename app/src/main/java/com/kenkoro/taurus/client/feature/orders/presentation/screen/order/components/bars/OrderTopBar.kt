@@ -34,6 +34,7 @@ import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
+import com.kenkoro.taurus.client.feature.profile.domain.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -42,8 +43,9 @@ fun OrderTopBar(
   modifier: Modifier = Modifier,
   snackbarsHolder: OrderScreenSnackbarsHolder,
   navigator: OrderScreenNavigator,
-  userName: String,
+  user: User?,
 ) {
+  val userFirstName = user?.firstName ?: ""
   val contentWidth = LocalContentWidth.current
   val contentHeight = LocalContentHeight.current
   val scope = rememberCoroutineScope()
@@ -73,9 +75,9 @@ fun OrderTopBar(
             .clickable { navigator.toProfileScreen() },
         contentAlignment = Alignment.Center,
         content = {
-          if (userName.isNotEmpty()) {
+          if (userFirstName.isNotEmpty()) {
             Text(
-              text = userName.first().toString(),
+              text = userFirstName.first().toString(),
               modifier = Modifier.fillMaxWidth(),
               textAlign = TextAlign.Center,
             )

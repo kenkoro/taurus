@@ -39,7 +39,7 @@ fun OrderScreen(
 ) {
   val viewModel: OrderViewModel = hiltViewModel()
 
-  val user = viewModel.user
+  val user = shared.user
   val snackbarHostState = remember { SnackbarHostState() }
   val errorSnackbarHostState = remember { SnackbarHostState() }
   val internetErrorSnackbarHostState = remember { SnackbarHostState() }
@@ -116,7 +116,7 @@ fun OrderScreen(
       auth = viewModel::auth,
       decryptUserCredentials = viewModel::decryptUserCredentials,
       encryptJWToken = viewModel::encryptJWToken,
-      getUser = viewModel::getUser,
+      getUser = shared.getUser,
       getActualQuantityOfCutMaterial = viewModel::getActualQuantityOfCutMaterial,
       addNewCutOrder = viewModel::addNewCutOrder,
       editOrder = viewModel::editOrder,
@@ -155,7 +155,7 @@ fun OrderScreen(
         OrderTopBar(
           snackbarsHolder = snackbarsHolder,
           navigator = navigator,
-          userName = (user ?: "").toString(),
+          user = user,
         )
       },
       bottomBar = {
