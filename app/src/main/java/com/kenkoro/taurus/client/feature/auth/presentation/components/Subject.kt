@@ -73,7 +73,7 @@ fun Subject(
             subjectState.enableShowErrors()
           }
         }
-        .semantics { contentDescription = "LoginScreenSubjectTextField" },
+        .semantics { contentDescription = "subject composable" },
     value = subjectState.text,
     onValueChange = {
       if (it.length <= 20) {
@@ -83,7 +83,7 @@ fun Subject(
     leadingIcon = {
       TaurusIcon(
         imageVector = Icons.AutoMirrored.TwoTone.Login,
-        contentDescription = "SubjectLeadingIcon",
+        contentDescription = "subject composable: leading icon",
         isError = subjectState.showErrors(),
       )
     },
@@ -93,7 +93,7 @@ fun Subject(
           IconButton(onClick = onClearSubject) {
             Icon(
               imageVector = Icons.Default.Close,
-              contentDescription = "ClearSubjectIcon",
+              contentDescription = "subject composable: trailing icon",
             )
           }
           Spacer(modifier = Modifier.width(contentWidth.small))

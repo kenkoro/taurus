@@ -25,7 +25,7 @@ fun TaurusTextFieldTrailingIcon(
       IconButton(onClick = onClear) {
         Icon(
           imageVector = Icons.Default.Close,
-          contentDescription = "ClearTrailingIcon",
+          contentDescription = "taurus text field trailing icon composable",
         )
       }
       Spacer(modifier = Modifier.width(contentWidth.small))

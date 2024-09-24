@@ -62,7 +62,7 @@ fun OrderDetailsTopBar(
     ) {
       Icon(
         imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
-        contentDescription = "GoBackToOrderScreen",
+        contentDescription = "order details search top bar: go back icon",
       )
     }
     Row(

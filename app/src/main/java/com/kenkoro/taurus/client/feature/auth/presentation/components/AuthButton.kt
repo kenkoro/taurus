@@ -81,7 +81,7 @@ fun AuthButton(
       ) {
         Icon(
           imageVector = Icons.Default.Close,
-          contentDescription = "IconForLoginButton",
+          contentDescription = "auth button composable: exit the app",
         )
         Spacer(modifier = Modifier.width(contentWidth.medium))
         Text(text = stringResource(id = R.string.exit_button))
@@ -118,7 +118,7 @@ fun AuthButton(
         } else {
           Icon(
             imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
-            contentDescription = "IconForLoginButton",
+            contentDescription = "auth button composable: log in",
           )
         }
       }

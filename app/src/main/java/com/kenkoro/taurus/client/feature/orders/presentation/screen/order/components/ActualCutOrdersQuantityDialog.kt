@@ -180,7 +180,7 @@ fun ActualCutOrdersQuantityDialog(
           } else {
             Icon(
               imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
-              contentDescription = "ActualCutOrdersQuantityButton",
+              contentDescription = "actual quantity dialog composable: save changes",
             )
           }
         }

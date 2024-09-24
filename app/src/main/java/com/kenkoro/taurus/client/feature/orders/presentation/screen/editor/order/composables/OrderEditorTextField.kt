@@ -72,7 +72,7 @@ fun OrderEditorTextField(
     leadingIcon = {
       TaurusIcon(
         imageVector = imageVector,
-        contentDescription = "LeadingIcon",
+        contentDescription = "order editor text field: leading icon",
         isError = state.showErrors(),
       )
     },

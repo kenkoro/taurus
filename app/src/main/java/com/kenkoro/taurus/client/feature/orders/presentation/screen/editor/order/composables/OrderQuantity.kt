@@ -74,7 +74,7 @@ fun OrderQuantity(
     leadingIcon = {
       TaurusIcon(
         imageVector = Icons.Rounded.Settings,
-        contentDescription = "QuantityLeadingIcon",
+        contentDescription = "order quantity composable: leading icon",
         isError = quantityState.showErrors(),
       )
     },

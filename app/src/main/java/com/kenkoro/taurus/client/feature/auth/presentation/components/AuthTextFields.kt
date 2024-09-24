@@ -71,7 +71,10 @@ fun AuthTextFields(
       offset.none
     }
   }
-  val y by animateDpAsState(targetValue = yTargetValue(), label = "AnimatedYOffset")
+  val y by animateDpAsState(
+    targetValue = yTargetValue(),
+    label = "auth text fields composable: y offset",
+  )
   val titleColor = @Composable {
     if (utils.showErrorTitle()) {
       MaterialTheme.colorScheme.error

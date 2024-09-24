@@ -152,7 +152,7 @@ fun OrderItemContent(
                 Icon(
                   modifier = Modifier.size(size.medium),
                   imageVector = Icons.Default.Error,
-                  contentDescription = "AdditionalInfoError",
+                  contentDescription = "order item content composable: additional order info",
                   tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
               } else {

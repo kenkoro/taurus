@@ -108,7 +108,7 @@ fun OrderDetailsSearchContent(
         leadingIcon = {
           TaurusIcon(
             imageVector = Icons.Default.Search,
-            contentDescription = "order details search content: text field leading icon",
+            contentDescription = "order details search content: leading icon",
             isError = state.showErrors(),
           )
         },

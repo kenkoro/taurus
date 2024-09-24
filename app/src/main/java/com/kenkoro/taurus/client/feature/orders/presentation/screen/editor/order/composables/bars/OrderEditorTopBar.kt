@@ -99,7 +99,7 @@ fun OrderEditorTopBar(
     ) {
       Icon(
         imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
-        contentDescription = "GoBackToOrderScreen",
+        contentDescription = "order editor top bar composable: go back",
       )
     }
     Row(
@@ -134,7 +134,7 @@ fun OrderEditorTopBar(
       } else {
         Icon(
           imageVector = Icons.Default.Check,
-          contentDescription = "",
+          contentDescription = "order editor top bar composable: validate & save changes",
         )
       }
     }

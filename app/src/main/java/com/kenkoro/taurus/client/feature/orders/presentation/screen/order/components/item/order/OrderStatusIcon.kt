@@ -25,7 +25,7 @@ fun OrderStatusIcon(
     OrderStatus.Idle -> {
       Icon(
         imageVector = Icons.Default.AccessTime,
-        contentDescription = "IdleOrder",
+        contentDescription = "order status icon composable: idle",
         modifier = modifier,
         tint = MaterialTheme.colorScheme.primary,
       )
@@ -34,7 +34,7 @@ fun OrderStatusIcon(
     OrderStatus.Cut -> {
       Icon(
         imageVector = Icons.Default.ContentCut,
-        contentDescription = "CutOrder",
+        contentDescription = "order status icon composable: cut",
         modifier = modifier,
         tint = MaterialTheme.colorScheme.primary,
       )
@@ -43,7 +43,7 @@ fun OrderStatusIcon(
     OrderStatus.Checked -> {
       Icon(
         imageVector = Icons.Default.Check,
-        contentDescription = "CheckedOrder",
+        contentDescription = "order status icon composable: checked",
         modifier = modifier,
         tint = MaterialTheme.colorScheme.primary,
       )
@@ -52,7 +52,7 @@ fun OrderStatusIcon(
     OrderStatus.InWork -> {
       Icon(
         imageVector = Icons.Default.WorkOutline,
-        contentDescription = "OrderInWork",
+        contentDescription = "order status icon composable: in work",
         modifier = modifier,
         tint = MaterialTheme.colorScheme.primary,
       )

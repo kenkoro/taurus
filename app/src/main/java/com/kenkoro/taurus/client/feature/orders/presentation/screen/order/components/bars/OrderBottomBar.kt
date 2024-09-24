@@ -50,7 +50,7 @@ fun OrderBottomBar(
       } else {
         offset.none
       },
-    label = "AnimatedYOffset",
+    label = "order bottom bar composable: animated y offset",
   )
   val animatedBottomBarHeight by animateDpAsState(
     targetValue =
@@ -59,7 +59,7 @@ fun OrderBottomBar(
       } else {
         contentHeight.bottomBar
       },
-    label = "AnimatedBottomBarHeight",
+    label = "order bottom bar composable: animated bottom bar height",
   )
   val animatedBottomBarButtonHeight by animateDpAsState(
     targetValue =
@@ -68,7 +68,7 @@ fun OrderBottomBar(
       } else {
         contentHeight.halfStandard
       },
-    label = "AnimatedBottomBarButtonHeight",
+    label = "order bottom bar composable: animated bottom bar button height",
   )
 
   Column(
@@ -96,7 +96,10 @@ fun OrderBottomBar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
       ) {
-        Icon(imageVector = Icons.Default.AddCircle, contentDescription = "AddANewOrder")
+        Icon(
+          imageVector = Icons.Default.AddCircle,
+          contentDescription = "order bottom bar composable: add a new order",
+        )
         Spacer(modifier = Modifier.width(contentWidth.medium))
         Text(text = stringResource(id = R.string.new_order_button))
       }

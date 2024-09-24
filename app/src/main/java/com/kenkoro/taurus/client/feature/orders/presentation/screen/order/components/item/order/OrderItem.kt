@@ -107,7 +107,7 @@ fun OrderItem(
       } else {
         contentHeight.orderItemNotExpanded
       },
-    label = "AnimatedHeightOfOrderItem",
+    label = "order item composable: animated item height",
     animationSpec = tween(300),
   )
 
@@ -180,7 +180,10 @@ fun OrderItem(
                     onEditOrder()
                   },
                 ) {
-                  Icon(imageVector = Icons.Default.Edit, contentDescription = "EditOrder")
+                  Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "order item composable: edit the order",
+                  )
                 }
               }
             }

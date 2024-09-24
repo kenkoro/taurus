@@ -90,7 +90,7 @@ fun Password(
     leadingIcon = {
       TaurusIcon(
         imageVector = Icons.AutoMirrored.Outlined.Rule,
-        contentDescription = "PasswordLeadingIcon",
+        contentDescription = "password composable: leading icon",
         isError = passwordState.showErrors(),
       )
     },
@@ -105,14 +105,14 @@ fun Password(
             }
           Icon(
             imageVector = imageVector,
-            contentDescription = "ShowPasswordIcon",
+            contentDescription = "password composable: show/hide the password",
           )
         }
         if (passwordState.text.isNotEmpty()) {
           IconButton(onClick = onClearPassword) {
             Icon(
               imageVector = Icons.Default.Close,
-              contentDescription = "ClearPasswordIcon",
+              contentDescription = "password composable: clear the password",
             )
           }
         }

@@ -41,7 +41,7 @@ fun OrderItemKeyboardArrowIconRow(
       } else {
         0F
       },
-    label = "AnimatedRotationOfKeyboardArrow",
+    label = "order item arrow composable: rotation",
   )
 
   Row(
@@ -58,7 +58,7 @@ fun OrderItemKeyboardArrowIconRow(
     ) {
       Icon(
         imageVector = Icons.Default.KeyboardArrowDown,
-        contentDescription = "ExpandOrderItemIcon",
+        contentDescription = "order item arrow composable: icon to rotate",
         tint = contentColor,
         modifier = Modifier.rotate(animatedRotationOfKeyboardArrow),
       )

@@ -100,7 +100,7 @@ fun OrderTopBar(
       Spacer(modifier = Modifier.width(contentWidth.medium))
       Icon(
         imageVector = Icons.Default.KeyboardArrowDown,
-        contentDescription = "SelectACustomerForFilteringOrders",
+        contentDescription = "order top bar composable: select a concrete customer",
       )
     }
     Box(
@@ -120,7 +120,7 @@ fun OrderTopBar(
       ) {
         Icon(
           imageVector = Icons.AutoMirrored.Default.Sort,
-          contentDescription = "SortOrders",
+          contentDescription = "order top bar composable: sort orders",
         )
       }
     }
