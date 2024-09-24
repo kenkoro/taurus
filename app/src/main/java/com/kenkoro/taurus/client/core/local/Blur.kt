@@ -4,11 +4,8 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-data class Size(
-  val small: Dp = 15.dp,
-  val medium: Dp = 20.dp,
-  val large: Dp = 25.dp,
-  val loadingBadge: Dp = 96.dp,
+data class Blur(
+  val standard: Dp = 16.dp,
 )
 
-val LocalSize = compositionLocalOf { Size() }
+val LocalBlur = compositionLocalOf { Blur() }

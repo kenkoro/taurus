@@ -8,4 +8,7 @@ enum class AuthStatus {
 
   val isSuccess: Boolean
     get() = this == Success
+
+  val isWaitingForAuth: Boolean
+    get() = this == WaitingForAuth
 }

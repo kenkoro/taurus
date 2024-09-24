@@ -2,9 +2,12 @@ package com.kenkoro.taurus.client.feature.orders.presentation.screen.order.compo
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
+import com.kenkoro.taurus.client.core.local.LocalBlur
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
@@ -19,6 +22,7 @@ import com.kenkoro.taurus.client.feature.profile.domain.UserProfile
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Cutter
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Inspector
 import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Manager
+import com.kenkoro.taurus.client.feature.shared.components.LoadingBadge
 import com.kenkoro.taurus.client.feature.shared.states.AuthStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -33,6 +37,8 @@ fun OrderContent(
   snackbarsHolder: OrderScreenSnackbarsHolder,
   utils: OrderScreenUtils,
 ) {
+  val blur = LocalBlur.current
+
   val network = shared.network
 
   LaunchedEffect(network, Dispatchers.Main) {
@@ -70,6 +76,10 @@ fun OrderContent(
     if (user != null) {
       utils.filter(findStrategy(user.profile))
     }
+  }
+
+  if (shared.authStatus.isWaitingForAuth) {
+    LoadingBadge()
   }
 
   if (shared.authStatus.isSuccess && user != null) {

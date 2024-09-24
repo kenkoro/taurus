@@ -7,10 +7,12 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import com.kenkoro.taurus.client.core.local.Arrangement
+import com.kenkoro.taurus.client.core.local.Blur
 import com.kenkoro.taurus.client.core.local.ContentHeight
 import com.kenkoro.taurus.client.core.local.ContentWidth
 import com.kenkoro.taurus.client.core.local.Elevation
 import com.kenkoro.taurus.client.core.local.LocalArrangement
+import com.kenkoro.taurus.client.core.local.LocalBlur
 import com.kenkoro.taurus.client.core.local.LocalContentHeight
 import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalElevation
@@ -115,6 +117,7 @@ fun AppTheme(
     LocalStrokeWidth provides StrokeWidth(),
     LocalOffset provides Offset(),
     LocalSize provides Size(),
+    LocalBlur provides Blur(),
   ) {
     MaterialTheme(
       colorScheme = colors,
