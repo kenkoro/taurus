@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.search.order.details.presentation.composables.bars
+package com.kenkoro.taurus.client.feature.search.presentation.screen.order.details.composables.bars
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -31,7 +31,7 @@ import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.ModelState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.SizeState
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.TitleState
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
+import com.kenkoro.taurus.client.feature.search.presentation.screen.order.details.util.OrderDetailsSearchScreenNavigator
 import com.kenkoro.taurus.client.feature.shared.states.TaurusTextFieldState
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 

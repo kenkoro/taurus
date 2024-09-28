@@ -55,7 +55,7 @@ class SharedViewModelUtils
         postAction()
       }
 
-      return result.isFailure
+      return result.isSuccess
     }
 
     override suspend fun addNewCutOrder(cutOrder: NewCutOrder): Result<CutOrderDto> {

@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.search.order.details.presentation.composables
+package com.kenkoro.taurus.client.feature.search.presentation.screen.order.details.composables
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

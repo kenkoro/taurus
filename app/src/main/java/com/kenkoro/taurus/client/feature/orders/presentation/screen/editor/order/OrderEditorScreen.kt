@@ -11,7 +11,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -39,7 +38,7 @@ fun OrderEditorScreen(
 ) {
   val viewModel: OrderEditorViewModel = hiltViewModel()
 
-  val user = viewModel.user
+  val user = shared.user
   val errorSnackbarHostState = remember { SnackbarHostState() }
 
   val failedOrderEditorValidationMessage =
@@ -79,10 +78,6 @@ fun OrderEditorScreen(
         )
       },
     )
-
-  LaunchedEffect(Unit) {
-    viewModel.getUserFromLocalDb(utils.subject)
-  }
 
   AppTheme {
     Scaffold(

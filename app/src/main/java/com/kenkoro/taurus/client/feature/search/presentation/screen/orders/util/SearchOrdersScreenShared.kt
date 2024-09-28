@@ -1,12 +1,10 @@
-package com.kenkoro.taurus.client.feature.profile.presentation.util
+package com.kenkoro.taurus.client.feature.search.presentation.screen.orders.util
 
 import com.kenkoro.taurus.client.feature.profile.domain.User
 import com.kenkoro.taurus.client.feature.shared.components.util.NavItemWithNavigation
 
-data class ProfileScreenShared(
+data class SearchOrdersScreenShared(
   val user: User?,
-  val resetAuthStatus: () -> Unit = {},
-  val restartApp: () -> Unit = {},
   val currentRoute: String,
   val items: List<NavItemWithNavigation>,
 )

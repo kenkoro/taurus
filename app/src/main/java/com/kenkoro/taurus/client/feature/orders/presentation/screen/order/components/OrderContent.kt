@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.kenkoro.taurus.client.core.connectivity.NetworkStatus
-import com.kenkoro.taurus.client.core.local.LocalBlur
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
@@ -37,8 +36,6 @@ fun OrderContent(
   snackbarsHolder: OrderScreenSnackbarsHolder,
   utils: OrderScreenUtils,
 ) {
-  val blur = LocalBlur.current
-
   val network = shared.network
 
   LaunchedEffect(network, Dispatchers.Main) {

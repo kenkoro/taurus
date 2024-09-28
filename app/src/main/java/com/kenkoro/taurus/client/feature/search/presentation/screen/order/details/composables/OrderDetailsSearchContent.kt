@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.search.order.details.presentation.composables
+package com.kenkoro.taurus.client.feature.search.presentation.screen.order.details.composables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -39,8 +39,8 @@ import com.kenkoro.taurus.client.core.local.LocalContentWidth
 import com.kenkoro.taurus.client.core.local.LocalShape
 import com.kenkoro.taurus.client.core.local.LocalSize
 import com.kenkoro.taurus.client.core.local.LocalStrokeWidth
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenShared
+import com.kenkoro.taurus.client.feature.search.presentation.screen.order.details.util.OrderDetailsSearchScreenNavigator
+import com.kenkoro.taurus.client.feature.search.presentation.screen.order.details.util.OrderDetailsSearchScreenShared
 import com.kenkoro.taurus.client.feature.shared.components.TaurusIcon
 import java.util.UUID
 
@@ -153,7 +153,6 @@ fun OrderDetailsSearchContent(
             OrderDetailsSearchItem(
               modifier =
                 Modifier.clickable {
-                  searchState = fetchedResult
                   state.text = fetchedResult
                   navigator.navUp()
                 },

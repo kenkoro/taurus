@@ -20,13 +20,12 @@ import androidx.lifecycle.viewModelScope
 import com.kenkoro.taurus.client.R
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order.states.OrderDetails
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.OrderContent
-import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderBottomBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.components.bars.OrderTopBar
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenNavigator
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenShared
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenSnackbarsHolder
 import com.kenkoro.taurus.client.feature.orders.presentation.screen.order.util.OrderScreenUtils
-import com.kenkoro.taurus.client.feature.profile.domain.UserProfile.Customer
+import com.kenkoro.taurus.client.feature.shared.components.BottomNavBar
 import com.kenkoro.taurus.client.feature.shared.components.TaurusSnackbar
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
@@ -155,16 +154,13 @@ fun OrderScreen(
         OrderTopBar(
           snackbarsHolder = snackbarsHolder,
           navigator = navigator,
-          user = user,
         )
       },
       bottomBar = {
-        if (user != null && user.profile == Customer) {
-          OrderBottomBar(
-            user = user,
-            navigator = navigator,
-            shared = shared,
-            isScrolling = lazyOrdersState.isScrollInProgress,
+        if (user != null) {
+          BottomNavBar(
+            items = shared.items,
+            currentRoute = shared.currentRoute,
           )
         }
       },

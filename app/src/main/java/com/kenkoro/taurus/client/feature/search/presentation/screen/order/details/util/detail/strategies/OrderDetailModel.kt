@@ -1,6 +1,6 @@
-package com.kenkoro.taurus.client.feature.search.order.details.presentation.util.detail.strategies
+package com.kenkoro.taurus.client.feature.search.presentation.screen.order.details.util.detail.strategies
 
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.detail.OrderDetailStrategy
+import com.kenkoro.taurus.client.feature.search.presentation.screen.order.details.util.detail.OrderDetailStrategy
 import kotlinx.coroutines.delay
 
 class OrderDetailModel : OrderDetailStrategy {

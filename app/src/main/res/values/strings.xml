@@ -80,4 +80,12 @@
     <string name="order_details_color">Выберите цвет</string>
     <string name="order_details_category">Выберите категорию</string>
     <string name="failed_order_editor_validation">Заполните все поля</string>
+    <string name="search_orders_decription_title">Здесь будет поиск заказов :3</string>
+    <string name="dictionaries_decription_title">Здесь будут словари</string>
+    <string name="order_item">Главная</string>
+    <string name="search_orders_item">Поиск</string>
+    <string name="dictionaries_item">Словари</string>
+    <string name="profile_item">Профиль</string>
+    <string name="order_editor_item">Добавить</string>
+    <string name="order_screen_not_allowed">Для Вас главная страница еще в разработке :3</string>
 </resources>

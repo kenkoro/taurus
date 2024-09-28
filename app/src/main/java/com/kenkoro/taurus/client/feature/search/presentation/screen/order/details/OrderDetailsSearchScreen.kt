@@ -1,4 +1,4 @@
-package com.kenkoro.taurus.client.feature.search.order.details.presentation
+package com.kenkoro.taurus.client.feature.search.presentation.screen.order.details
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,10 +10,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.composables.OrderDetailsSearchContent
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.composables.bars.OrderDetailsTopBar
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenNavigator
-import com.kenkoro.taurus.client.feature.search.order.details.presentation.util.OrderDetailsSearchScreenShared
+import com.kenkoro.taurus.client.feature.search.presentation.screen.order.details.composables.OrderDetailsSearchContent
+import com.kenkoro.taurus.client.feature.search.presentation.screen.order.details.composables.bars.OrderDetailsTopBar
+import com.kenkoro.taurus.client.feature.search.presentation.screen.order.details.util.OrderDetailsSearchScreenNavigator
+import com.kenkoro.taurus.client.feature.search.presentation.screen.order.details.util.OrderDetailsSearchScreenShared
 import com.kenkoro.taurus.client.ui.theme.AppTheme
 
 @Composable
