@@ -86,7 +86,6 @@ fun OrderBottomBar(
           .width(contentWidth.orderItem)
           .height(animatedBottomBarButtonHeight),
       onClick = {
-        shared.resetAllOrderDetails()
         navigator.toOrderEditorScreen(false, user?.subject ?: "")
       },
       shape = RoundedCornerShape(shape.medium),

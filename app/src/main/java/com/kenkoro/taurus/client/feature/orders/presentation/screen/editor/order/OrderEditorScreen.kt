@@ -1,5 +1,6 @@
 package com.kenkoro.taurus.client.feature.orders.presentation.screen.editor.order
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -56,6 +57,7 @@ fun OrderEditorScreen(
           viewModel.editOrder(editedOrder, utils.subject)
         } else {
           val newOrder = details.packNewOrder(OrderStatus.Idle, user?.userId ?: 0)
+          Log.d("kenkoro", newOrder.toString())
           viewModel.addNewOrder(newOrder)
         }
       },

@@ -103,11 +103,11 @@ fun ActualCutOrdersQuantityDialog(
       onHideWithDelay()
 
       val cutOrder = order.toCutOrder()
-      val isFailure =
+      val isSuccess =
         utils.editOrder(cutOrder, user.subject) {
           onRefresh()
         }
-      if (isFailure) {
+      if (!isSuccess) {
         withContext(Dispatchers.Main) { snackbarsHolder.apiError() }
       }
     }

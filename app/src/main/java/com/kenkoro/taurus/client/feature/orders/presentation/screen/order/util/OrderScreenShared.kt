@@ -11,7 +11,6 @@ data class OrderScreenShared(
   val user: User?,
   val authStatus: AuthStatus,
   val network: NetworkStatus,
-  val resetAllOrderDetails: () -> Unit,
   val proceedAuth: (AuthStatus) -> Unit = {},
   val saveTheRestOfDetails: (orderId: Int, date: Long, status: OrderStatus) -> Unit,
   val getUser: suspend (subject: String, token: TokenDto, postAction: () -> Unit) -> Boolean,

@@ -18,11 +18,16 @@ class NavBarUtils(private val navController: NavController) {
 
   private fun canAddNewOrders(profile: UserProfile): Boolean = profile == UserProfile.Customer
 
-  private fun canEditDictionaries(profile: UserProfile): Boolean {
-    return profile == UserProfile.Ceo || profile == UserProfile.Manager
+  private fun canSeeDictionaries(profile: UserProfile): Boolean {
+    return profile == UserProfile.Ceo ||
+      profile == UserProfile.Manager ||
+      profile == UserProfile.Customer
   }
 
-  private fun dynamicNavItems(user: User): List<NavItemWithNavigation> {
+  private fun dynamicNavItems(
+    user: User,
+    extraAction: () -> Unit,
+  ): List<NavItemWithNavigation> {
     val profile = user.profile
     val navItems =
       mutableListOf(
@@ -40,11 +45,14 @@ class NavBarUtils(private val navController: NavController) {
       navItems +=
         NavItemWithNavigation(
           details = BottomNavItem.OrderEditorItem,
-          navigateToSelectedRoute = { navigateTo(Screen.OrderEditorScreen.route) },
+          navigateToSelectedRoute = {
+            extraAction()
+            navigateTo(Screen.OrderEditorScreen.route)
+          },
         )
     }
 
-    if (canEditDictionaries(profile)) {
+    if (canSeeDictionaries(profile)) {
       navItems +=
         NavItemWithNavigation(
           details = BottomNavItem.DictionariesItem,
@@ -61,7 +69,10 @@ class NavBarUtils(private val navController: NavController) {
     return navItems
   }
 
-  fun listOfNavItems(user: User?): List<NavItemWithNavigation> {
-    return if (user != null) dynamicNavItems(user) else emptyList()
+  fun listOfNavItems(
+    user: User?,
+    extraAction: () -> Unit,
+  ): List<NavItemWithNavigation> {
+    return if (user != null) dynamicNavItems(user, extraAction) else emptyList()
   }
 }

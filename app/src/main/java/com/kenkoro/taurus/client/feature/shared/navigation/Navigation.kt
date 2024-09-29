@@ -92,10 +92,6 @@ fun AppNavHost(
         OrderScreenNavigator(
           toProfileScreen = { navController.navigate(Screen.ProfileScreen.route) },
           toOrderEditorScreen = { isInEdit, subject ->
-            if (!isInEdit) {
-              sharedOrderDetailsViewModel.resetAllOrderDetails()
-            }
-
             navController.navigate(
               buildString {
                 append(Screen.OrderEditorScreen.route)
@@ -109,7 +105,6 @@ fun AppNavHost(
           user = sharedAuthViewModel.user,
           authStatus = sharedAuthViewModel.authStatus,
           network = networkStatus,
-          resetAllOrderDetails = sharedOrderDetailsViewModel::resetAllOrderDetails,
           proceedAuth = sharedAuthViewModel::proceedAuth,
           saveTheRestOfDetails = { orderId: Int, date: Long, status: OrderStatus ->
             sharedOrderDetailsViewModel.changeOrderId(orderId)
@@ -118,7 +113,11 @@ fun AppNavHost(
           },
           getUser = sharedAuthViewModel::getUser,
           currentRoute = entry.destination.route ?: Screen.OrderScreen.route,
-          items = navBarUtils.listOfNavItems(sharedAuthViewModel.user),
+          items =
+            navBarUtils.listOfNavItems(
+              sharedAuthViewModel.user,
+              sharedOrderDetailsViewModel::resetAllOrderDetails,
+            ),
         )
       val details = sharedOrderDetailsViewModel.getDetails()
 
@@ -131,6 +130,10 @@ fun AppNavHost(
 
     composable(route = Screen.ProfileScreen.route) { entry ->
       val sharedAuthViewModel = entry.sharedHiltViewModel<SharedAuthViewModel>(navController)
+      val sharedOrderDetailsViewModel =
+        entry.sharedHiltViewModel<SharedOrderDetailsViewModel>(
+          navController,
+        )
       val navigator =
         ProfileScreenNavigator {
           navController.navigate(Screen.AuthScreen.route)
@@ -141,7 +144,11 @@ fun AppNavHost(
           resetAuthStatus = sharedAuthViewModel::reset,
           restartApp = navHostUtils.restart,
           currentRoute = entry.destination.route ?: Screen.OrderScreen.route,
-          items = navBarUtils.listOfNavItems(sharedAuthViewModel.user),
+          items =
+            navBarUtils.listOfNavItems(
+              sharedAuthViewModel.user,
+              sharedOrderDetailsViewModel::resetAllOrderDetails,
+            ),
         )
 
       ProfileScreen(
@@ -223,11 +230,19 @@ fun AppNavHost(
 
     composable(route = Screen.SearchOrdersScreen.route) { entry ->
       val sharedAuthViewModel = entry.sharedHiltViewModel<SharedAuthViewModel>(navController)
+      val sharedOrderDetailsViewModel =
+        entry.sharedHiltViewModel<SharedOrderDetailsViewModel>(
+          navController,
+        )
       val shared =
         SearchOrdersScreenShared(
           user = sharedAuthViewModel.user,
           currentRoute = entry.destination.route ?: Screen.OrderScreen.route,
-          items = navBarUtils.listOfNavItems(sharedAuthViewModel.user),
+          items =
+            navBarUtils.listOfNavItems(
+              sharedAuthViewModel.user,
+              sharedOrderDetailsViewModel::resetAllOrderDetails,
+            ),
         )
 
       SearchOrdersScreen(shared = shared)
@@ -235,11 +250,19 @@ fun AppNavHost(
 
     composable(route = Screen.DictionariesScreen.route) { entry ->
       val sharedAuthViewModel = entry.sharedHiltViewModel<SharedAuthViewModel>(navController)
+      val sharedOrderDetailsViewModel =
+        entry.sharedHiltViewModel<SharedOrderDetailsViewModel>(
+          navController,
+        )
       val shared =
         DictionariesScreenShared(
           user = sharedAuthViewModel.user,
           currentRoute = entry.destination.route ?: Screen.OrderScreen.route,
-          items = navBarUtils.listOfNavItems(sharedAuthViewModel.user),
+          items =
+            navBarUtils.listOfNavItems(
+              sharedAuthViewModel.user,
+              sharedOrderDetailsViewModel::resetAllOrderDetails,
+            ),
         )
 
       DictionariesScreen(shared = shared)
