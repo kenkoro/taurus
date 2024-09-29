@@ -54,7 +54,7 @@ android {
     minSdk = 24
     targetSdk = 34
     versionCode = 1
-    versionName = "0.1.53"
+    versionName = "0.1.83"
 
     testInstrumentationRunner = "com.kenkoro.taurus.client.HiltTestRunner"
     vectorDrawables {
