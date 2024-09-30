@@ -9,7 +9,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.kenkoro.taurus.client.core.connectivity.ConnectivityObserver
 import com.kenkoro.taurus.client.core.connectivity.NetworkConnectivityObserver
@@ -46,7 +45,7 @@ import com.kenkoro.taurus.client.feature.shared.viewmodels.util.sharedHiltViewMo
 
 @Composable
 fun AppNavHost(
-  navController: NavHostController = rememberNavController(),
+  navController: NavHostController,
   navHostUtils: AppNavHostUtils,
 ) {
   val viewModel: NavHostViewModel = hiltViewModel()
